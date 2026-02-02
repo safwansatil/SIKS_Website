@@ -1,0 +1,19 @@
+{
+    "name": "ahmad/siks-web",
+    "description": "SIKS Web project",
+    "type": "project",
+    "require": {
+        "php": ">=8.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "Ahmad\\SiksWeb\\": "src/"
+        }
+    },
+    "authors": [
+        {
+            "name": "Ahmad",
+            "email": "ahmad@example.com"
+        }
+    ]
+}

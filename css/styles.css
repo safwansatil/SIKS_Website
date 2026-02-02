@@ -1,0 +1,63 @@
+/* Custom Design Tokens & Overrides */
+
+:root {
+    --emerald-primary: #10b981;
+    --emerald-dark: #064e3b;
+    --emerald-glow: rgba(16, 185, 129, 0.2);
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+    width: 6px;
+}
+
+::-webkit-scrollbar-track {
+    background: #022c22;
+}
+
+::-webkit-scrollbar-thumb {
+    background: #065f46;
+    border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: #10b981;
+}
+
+/* Custom Selection */
+::selection {
+    background: rgba(16, 185, 129, 0.3);
+    color: #fff;
+}
+
+/* Smooth Transitions */
+.transition-slow {
+    transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Glassmorphism Enhancements */
+.glass-effect:hover {
+    background: rgba(255, 255, 255, 0.08);
+    border-color: rgba(16, 185, 129, 0.3);
+    box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.5);
+}
+
+/* Typography Enhancements */
+.font-display {
+    font-family: 'Outfit', sans-serif;
+}
+
+/* Utilities */
+.text-balance {
+    text-wrap: balance;
+}
+
+/* Animation Overrides */
+@keyframes pulse-emerald {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.5; }
+}
+
+.animate-pulse-subtle {
+    animation: pulse-emerald 3s ease-in-out infinite;
+}

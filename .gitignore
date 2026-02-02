@@ -1,0 +1,21 @@
+# Composer
+/vendor/
+composer.phar
+composer.lock.backup
+
+# Simple Cache Files
+prayer_cache.json
+
+# IDEs and Editors
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS related files
+.DS_Store
+Thumbs.db
+
+# Logs
+error_log
+php_errors.log
