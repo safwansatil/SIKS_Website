@@ -3,11 +3,14 @@ require_once 'includes/config.php';
 require_once 'includes/header.php';
 
 // Fetch articles
-try {
-    $stmt = $pdo->query("SELECT * FROM articles ORDER BY last_edited DESC");
-    $articles = $stmt->fetchAll();
-} catch (PDOException $e) {
-    $articles = [];
+$articles = [];
+if ($pdo) {
+    try {
+        $stmt = $pdo->query("SELECT * FROM articles ORDER BY last_edited DESC");
+        $articles = $stmt->fetchAll();
+    } catch (PDOException $e) {
+        $articles = [];
+    }
 }
 ?>
 

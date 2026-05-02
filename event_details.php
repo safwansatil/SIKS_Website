@@ -5,10 +5,14 @@ require_once 'includes/header.php';
 $id = $_GET['id'] ?? null;
 $event = null;
 
-if ($id) {
-    $stmt = $pdo->prepare("SELECT * FROM events WHERE id = ?");
-    $stmt->execute([$id]);
-    $event = $stmt->fetch();
+if ($id && $pdo) {
+    try {
+        $stmt = $pdo->prepare("SELECT * FROM events WHERE id = ?");
+        $stmt->execute([$id]);
+        $event = $stmt->fetch();
+    } catch (PDOException $e) {
+        $event = null;
+    }
 }
 
 if (!$event) {
@@ -71,10 +75,14 @@ if (!$event) {
                 </div>
 
                 <?php 
-                // Fetch images if any
-                $stmt = $pdo->prepare("SELECT * FROM event_images WHERE event_id = ?");
-                $stmt->execute([$event['id']]);
-                $images = $stmt->fetchAll();
+                $images = [];
+                if ($pdo) {
+                    try {
+                        $stmt = $pdo->prepare("SELECT * FROM event_images WHERE event_id = ?");
+                        $stmt->execute([$event['id']]);
+                        $images = $stmt->fetchAll();
+                    } catch (PDOException $e) {}
+                }
                 if ($images): 
                 ?>
                     <div class="mt-12">

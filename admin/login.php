@@ -1,7 +1,5 @@
 <?php
-require_once '../includes/config.php';
-
-session_start();
+require_once 'auth.php';
 
 // Redirect if already logged in
 if (isset($_SESSION['admin_id'])) {
@@ -16,21 +14,25 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $password = $_POST['password'] ?? '';
 
     if (!empty($username) && !empty($password)) {
-        try {
-            $stmt = $pdo->prepare("SELECT * FROM admins WHERE username = ?");
-            $stmt->execute([$username]);
-            $admin = $stmt->fetch();
+        if (!$pdo) {
+            $error = 'Database connection failed. Please check your credentials in includes/db.php.';
+        } else {
+            try {
+                $stmt = $pdo->prepare("SELECT * FROM admins WHERE username = ?");
+                $stmt->execute([$username]);
+                $admin = $stmt->fetch();
 
-            if ($admin && password_verify($password, $admin['password'])) {
-                $_SESSION['admin_id'] = $admin['id'];
-                $_SESSION['admin_username'] = $admin['username'];
-                header('Location: index.php');
-                exit;
-            } else {
-                $error = 'Invalid username or password.';
+                if ($admin && password_verify($password, $admin['password'])) {
+                    $_SESSION['admin_id'] = $admin['id'];
+                    $_SESSION['admin_username'] = $admin['username'];
+                    header('Location: index.php');
+                    exit;
+                } else {
+                    $error = 'Invalid username or password.';
+                }
+            } catch (PDOException $e) {
+                $error = 'Database error: ' . $e->getMessage();
             }
-        } catch (PDOException $e) {
-            $error = 'Database error: ' . $e->getMessage();
         }
     } else {
         $error = 'Please fill in all fields.';
