@@ -2,101 +2,148 @@
 require_once 'includes/config.php';
 require_once 'includes/header.php';
 
-$events = getEvents();
+$upcomingEvents = getEvents(false);  // is_past = false → upcoming
+$pastEvents = getEvents(true);       // is_past = true → past
 ?>
 
 <section class="py-24">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="text-center mb-16">
             <h2 class="text-4xl font-display font-bold text-emerald-950 mb-4 tracking-tight">Society Events</h2>
-            <p class="text-emerald-950/40 max-w-2xl mx-auto font-medium italic">Stay updated with our upcoming programs,
-                workshops, and sports activities.</p>
+            <p class="text-emerald-950/40 max-w-2xl mx-auto font-medium italic">Stay updated with our upcoming programs, workshops, and activities.</p>
         </div>
 
-        <!-- Filter Tabs -->
-        <div class="flex justify-center mb-16">
-            <div class="inline-flex p-1.5 bg-white rounded-2xl border border-emerald-950/10 shadow-sm">
-                <button onclick="filterEvents('All')" id="tab-All"
-                    class="tab-btn px-8 py-3 rounded-xl text-xs font-bold transition-all duration-300 bg-emerald-950 text-white shadow-lg shadow-emerald-950/20">All
-                    Programs</button>
-                <button onclick="filterEvents('Community')" id="tab-Community"
-                    class="tab-btn px-8 py-3 rounded-xl text-xs font-bold transition-all duration-300 text-emerald-950/60 hover:bg-emerald-950 hover:text-white">Community</button>
-                <button onclick="filterEvents('Sports')" id="tab-Sports"
-                    class="tab-btn px-8 py-3 rounded-xl text-xs font-bold transition-all duration-300 text-emerald-950/60 hover:bg-emerald-950 hover:text-white">Sports</button>
+        <!-- Upcoming Events -->
+        <?php if ($upcomingEvents): ?>
+            <div class="mb-8">
+                <div class="inline-flex items-center space-x-2 px-4 py-1.5 rounded-full bg-emerald-50 border border-emerald-200 mb-10">
+                    <span class="relative flex h-2 w-2">
+                        <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                        <span class="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
+                    </span>
+                    <span class="text-[10px] font-black uppercase tracking-widest text-emerald-700">Upcoming Events</span>
+                </div>
             </div>
-        </div>
 
-        <!-- Events Grid -->
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8" id="events-grid">
-            <?php foreach ($events as $event): ?>
-                <div class="event-card group bg-white border border-emerald-950/10 rounded-[32px] overflow-hidden hover:border-emerald-950/30 hover:shadow-2xl hover:shadow-emerald-950/5 transition-all duration-500 shadow-sm"
-                    data-category="<?php echo $event['category']; ?>">
-                    <div class="p-8">
-                        <div
-                            class="w-14 h-14 rounded-2xl bg-emerald-950/5 flex items-center justify-center mb-8 group-hover:scale-110 transition-transform duration-300 text-emerald-950 border border-emerald-950/5">
-                            <i class="fas <?php echo $event['logo'] ?: 'fa-calendar'; ?> text-2xl"></i>
-                        </div>
-                        <span
-                            class="text-[10px] uppercase tracking-widest text-emerald-950/60 font-bold px-3 py-1.5 rounded-full border border-emerald-950/10">
-                            <?php echo $event['category']; ?>
-                        </span>
-                        <h3 class="text-2xl font-bold text-emerald-950 mt-6 mb-4 leading-tight">
-                            <?php echo htmlspecialchars($event['name']); ?>
-                        </h3>
-                        <div class="space-y-3 mb-8">
-                            <div class="flex items-center text-emerald-950/40 text-xs font-semibold">
-                                <i class="far fa-calendar-alt w-5"></i>
-                                <span><?php echo date('F d, Y', strtotime($event['event_date'])); ?></span>
-                            </div>
-                            <div class="flex items-center text-emerald-950/40 text-xs font-semibold">
-                                <i class="far fa-clock w-5"></i>
-                                <span><?php echo htmlspecialchars($event['event_time']); ?></span>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-24">
+                <?php foreach ($upcomingEvents as $event): ?>
+                    <a href="event_details.php?id=<?php echo $event['id']; ?>" class="card-professional group block">
+                        <!-- Event Cover Image -->
+                        <div class="relative aspect-[16/10] overflow-hidden">
+                            <?php if (!empty($event['cover_image'])): ?>
+                                <img src="<?php echo htmlspecialchars($event['cover_image']); ?>" 
+                                     alt="<?php echo htmlspecialchars($event['name']); ?>"
+                                     class="w-full h-full object-cover">
+                            <?php else: ?>
+                                <div class="w-full h-full bg-gradient-to-br from-emerald-900 to-emerald-950 flex items-center justify-center">
+                                    <i class="fas <?php echo $event['logo'] ?: 'fa-calendar'; ?> text-5xl text-emerald-500/30"></i>
+                                </div>
+                            <?php endif; ?>
+                            <div class="absolute inset-0 bg-gradient-to-t from-emerald-950/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+                            
+                            <!-- Date Badge -->
+                            <div class="absolute top-4 right-4">
+                                <div class="bg-white/95 backdrop-blur-md rounded-2xl px-4 py-2 text-center shadow-lg">
+                                    <p class="text-emerald-950 font-bold text-lg leading-none"><?php echo date('d', strtotime($event['event_date'])); ?></p>
+                                    <p class="text-emerald-950/60 text-[9px] font-bold uppercase tracking-wider"><?php echo date('M', strtotime($event['event_date'])); ?></p>
+                                </div>
                             </div>
                         </div>
-                        <a href="event_details.php?id=<?php echo $event['id']; ?>"
-                            class="w-full py-4 bg-emerald-950/5 hover:bg-emerald-950 hover:text-white text-emerald-950 rounded-2xl text-xs font-bold transition-all duration-300 flex items-center justify-center group/btn border border-emerald-950/5">
-                            View Details
-                            <i
-                                class="fas fa-arrow-right ml-2 opacity-0 -translate-x-2 group-hover/btn:opacity-100 group-hover/btn:translate-x-0 transition-all"></i>
-                        </a>
+
+                        <!-- Card Content -->
+                        <div class="p-6">
+                            <h3 class="text-xl font-bold text-emerald-950 mb-3 leading-tight group-hover:text-emerald-700 transition-colors">
+                                <?php echo htmlspecialchars($event['name']); ?>
+                            </h3>
+                            
+                            <?php if (!empty($event['short_description'])): ?>
+                                <p class="text-emerald-950/50 text-sm line-clamp-2 mb-4 font-medium">
+                                    <?php echo htmlspecialchars($event['short_description']); ?>
+                                </p>
+                            <?php endif; ?>
+
+                            <div class="flex items-center justify-between pt-4 border-t border-emerald-950/5">
+                                <div class="flex items-center space-x-4 text-emerald-950/40 text-xs font-semibold">
+                                    <span><i class="far fa-clock mr-1"></i><?php echo htmlspecialchars($event['event_time']); ?></span>
+                                    <span><i class="fas fa-location-dot mr-1"></i><?php echo htmlspecialchars($event['venue']); ?></span>
+                                </div>
+                                <i class="fas fa-arrow-right text-emerald-950/20 group-hover:text-emerald-600 group-hover:translate-x-1 transition-all text-xs"></i>
+                            </div>
+                        </div>
+                    </a>
+                <?php endforeach; ?>
+            </div>
+        <?php else: ?>
+            <div class="py-20 text-center border border-dashed border-emerald-950/10 rounded-[40px] mb-24">
+                <i class="fas fa-calendar-plus text-4xl text-emerald-950/10 mb-4"></i>
+                <p class="text-emerald-950/30 italic">No upcoming events at the moment.</p>
+            </div>
+        <?php endif; ?>
+
+        <!-- Past Events / Legacy of Excellence -->
+        <?php if ($pastEvents): ?>
+            <div class="mb-16">
+                <div class="flex items-end justify-between mb-12">
+                    <div class="max-w-2xl">
+                        <div class="inline-flex items-center space-x-2 px-4 py-1.5 rounded-full bg-emerald-950/5 border border-emerald-950/10 mb-6">
+                            <span class="text-[10px] font-black uppercase tracking-widest text-emerald-950/50">Legacy of Excellence</span>
+                        </div>
+                        <h2 class="text-3xl font-display font-bold text-emerald-950 mb-4 tracking-tight">Past Events</h2>
+                        <p class="text-emerald-950/40 font-medium italic">A look back at the milestones and memories that define our journey.</p>
+                    </div>
+                    <div class="hidden sm:flex space-x-4">
+                        <button onclick="scrollCarousel(-1)" class="w-12 h-12 rounded-full border border-emerald-950/10 flex items-center justify-center text-emerald-950 hover:bg-emerald-950 hover:text-white transition-all">
+                            <i class="fas fa-chevron-left"></i>
+                        </button>
+                        <button onclick="scrollCarousel(1)" class="w-12 h-12 rounded-full border border-emerald-950/10 flex items-center justify-center text-emerald-950 hover:bg-emerald-950 hover:text-white transition-all">
+                            <i class="fas fa-chevron-right"></i>
+                        </button>
                     </div>
                 </div>
-            <?php endforeach; ?>
-        </div>
+
+                <div id="past-events-carousel" class="flex overflow-x-auto space-x-6 pb-12 no-scrollbar scroll-smooth">
+                    <?php foreach ($pastEvents as $event): ?>
+                        <a href="event_details.php?id=<?php echo $event['id']; ?>" class="flex-none w-[300px] sm:w-[400px] group">
+                            <div class="relative aspect-[4/3] rounded-[32px] overflow-hidden mb-6 border border-emerald-950/5">
+                                <div class="absolute inset-0 bg-emerald-950/20 group-hover:bg-transparent transition-colors duration-500 z-10"></div>
+                                <?php if (!empty($event['cover_image'])): ?>
+                                    <img src="<?php echo htmlspecialchars($event['cover_image']); ?>" 
+                                         alt="<?php echo htmlspecialchars($event['name']); ?>"
+                                         class="absolute inset-0 w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-700 scale-110 group-hover:scale-100">
+                                <?php else: ?>
+                                    <div class="absolute inset-0 w-full h-full bg-gradient-to-br from-emerald-800 to-emerald-950 flex items-center justify-center">
+                                        <i class="fas <?php echo $event['logo'] ?: 'fa-calendar'; ?> text-5xl text-emerald-500/20"></i>
+                                    </div>
+                                <?php endif; ?>
+                                <div class="absolute bottom-6 left-6 z-20">
+                                    <span class="px-3 py-1 bg-white/90 backdrop-blur-md rounded-full text-[9px] font-black uppercase tracking-widest text-emerald-950">
+                                        <?php echo date('M Y', strtotime($event['event_date'])); ?>
+                                    </span>
+                                </div>
+                            </div>
+                            <h3 class="text-xl font-bold text-emerald-950 mb-2 group-hover:text-emerald-600 transition-colors">
+                                <?php echo htmlspecialchars($event['name']); ?>
+                            </h3>
+                            <p class="text-emerald-950/40 text-xs font-semibold uppercase tracking-widest">
+                                <?php echo htmlspecialchars($event['venue']); ?>
+                            </p>
+                        </a>
+                    <?php endforeach; ?>
+                </div>
+            </div>
+        <?php endif; ?>
     </div>
 </section>
 
 <script>
-    function filterEvents(category) {
-        const cards = document.querySelectorAll('.event-card');
-        const buttons = document.querySelectorAll('.tab-btn');
-
-        buttons.forEach(btn => {
-            if (btn.id === 'tab-' + category) {
-                btn.classList.add('bg-emerald-950', 'text-white', 'shadow-lg', 'shadow-emerald-950/20');
-                btn.classList.remove('text-emerald-950/60', 'hover:bg-emerald-950', 'hover:text-white');
-            } else {
-                btn.classList.remove('bg-emerald-950', 'text-white', 'shadow-lg', 'shadow-emerald-950/20');
-                btn.classList.add('text-emerald-950/60', 'hover:bg-emerald-950', 'hover:text-white');
-            }
-        });
-
-        cards.forEach(card => {
-            if (category === 'All' || card.dataset.category === category) {
-                card.style.display = 'block';
-                setTimeout(() => card.style.opacity = '1', 10);
-            } else {
-                card.style.opacity = '0';
-                setTimeout(() => card.style.display = 'none', 300);
-            }
+    function scrollCarousel(direction) {
+        const carousel = document.getElementById('past-events-carousel');
+        const scrollAmount = 400;
+        carousel.scrollBy({
+            left: direction * scrollAmount,
+            behavior: 'smooth'
         });
     }
 </script>
 
-<style>
-    .event-card {
-        transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
-    }
-</style>
-
-<?php require_once 'includes/footer.php'; ?>
+<?php require_once 'includes/footer.php'; ?>
