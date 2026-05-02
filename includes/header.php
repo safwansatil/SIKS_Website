@@ -219,7 +219,7 @@
                             'index.php' => 'Home',
                             'about.php' => 'About',
                             'events.php' => 'Events',
-                            'reminders.php' => 'Reminders'
+                            'articles.php' => 'Articles'
                         ];
                         foreach ($links as $file => $label):
                             $isActive = ($currentPage == $file || ($currentPage == '' && $file == 'index.php'));

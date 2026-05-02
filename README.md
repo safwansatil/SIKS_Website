@@ -1,74 +1,57 @@
 # IUT-SIKS Web Portal
 
-## Project Overview
-This project is a centralized, university-hosted web portal for the **Society of Islamic Knowledge Seekers (IUT-SIKS)**. It has been migrated from a React/Next.js prototype to a server-side rendered **PHP 7.4+** application to ensure compatibility with the IUT Enterprise Server infrastructure.
+Official web portal for the Society of Islamic Knowledge Seekers (SIKS) at Islamic University of Technology.
+
+## 🚀 Deployment Instructions (CWP)
+
+### 1. Database Setup
+1.  Log in to your **CentOS Web Panel (CWP)**.
+2.  Go to **SQL Services** -> **MySQL Manager**.
+3.  Create a new database named `siks_db` (or your preferred name).
+4.  Create a new database user and assign it to the database with all privileges.
+5.  Open **phpMyAdmin** and import the `setup.sql` file located in the root directory.
+
+### 2. Configuration
+**CRITICAL:** You must update the database credentials in `includes/db.php`.
+1.  Open `includes/db.php`.
+2.  Replace the placeholders with your actual database host, name, username, and password:
+    ```php
+    $host = 'localhost';
+    $dbname = 'your_database_name';
+    $username = 'your_database_user';
+    $password = 'your_database_password';
+    ```
+
+### 3. Verification
+To check if the website is working fine:
+1.  Visit the homepage. You should see the **Masjid-e-Zainab IUT** prayer schedule.
+2.  Check the **Daily Reminders** section; it should fetch a random Ayat and Hadith on every refresh.
+3.  Navigate to **Events** and click "View Details" on an event to ensure the detail page loads correctly.
+4.  Navigate to **About** and scroll to the bottom to see the "Past Events" carousel.
 
 ---
 
-## Core Functionalities
+## 🔐 Admin Panel
 
-### 1. Prayer Timetable & Synchronization
-The application features a robust, real-time prayer schedule synchronized with the IUT Mosque's official timings.
-- **Data Source**: Fetches live data from a designated Google Sheet (CSV format).
-- **Intelligent Caching**: Implements a file-based caching mechanism (`prayer_cache.json`) that refreshes every 60 minutes.
-- **Dynamic Logic**: Backend logic determines current and next prayer times based on the **Asia/Dhaka** timezone.
-- **Real-time Countdown**: A client-side JavaScript engine provides a live countdown to the next Jamaat.
+Access the admin panel at: `http://your-domain.com/admin`
 
-### 2. Event Management System
-A centralized system for managing organizational programs, sports, and workshops.
-- **Categorization**: Events are organized into **Community**, **Sports**, and **All** categories.
-- **Dynamic Filtering**: Zero-latency JavaScript filtering for seamless navigation.
-- **Interactive Modals**: High-fidelity detail views with backdrop-blur (Glassmorphism) effects.
+### Default Credentials:
+- **Username**: `admin`
+- **Password**: `admin123`
 
-### 3. Spiritual & Organizational Modules
-- **Daily Reminders**: Dedicated section for Islamic guidance and ethics.
-- **Our Values**: Focuses on **Purpose-Driven**, **Community**, **Knowledge**, and **Excellence**.
+> [!WARNING]
+> Change the default password immediately after logging in via the Articles or Events management pages (if you implement a password change feature) or directly in the `admins` table in phpMyAdmin using `PASSWORD_DEFAULT` hash.
+
+### Features:
+- **Prayers**: Update Jamaat timings for the university mosque.
+- **Events**: Manage upcoming and past society events with full details.
+- **About Page**: Update the Vision, Mission, and main description.
+- **Articles**: Write and publish community articles.
 
 ---
 
-## Technical Architecture
-
-### Design System
-- **Framework**: Tailwind CSS (via CDN) for modern UI.
-- **Color Palette**: Strictly **Emerald Green** spectrum (emerald-500 to 950).
-- **Tone**: Formal and professional academic tone. **Emoji usage is strictly prohibited.**
-
-### Dependency Management & PSR Autoloading
-The project leverages **PHP Composer** for professional structure:
-- **Autoloading**: Utilizes **PSR-4** to map the `src/` directory to the `Iut\Siks\` namespace.
-- **Vendor Management**: External libraries are isolated within the `vendor/` directory.
-- **Setup**: Run `composer install` to initialize backend components.
-
-### Directory Structure
-```text
-/
-├── css/             # Tailwind CSS tokens & custom styles
-├── includes/        # Backend Logic & Partials
-│   ├── config.php   # API, caching, and constants
-│   ├── header.php   # Global Navigation & SEO
-│   └── footer.php   # Scripts & Social links
-├── src/             # PHP classes (Iut\Siks namespace)
-├── vendor/          # Composer dependencies
-├── index.php        # Primary Dashboard
-├── about.php        # Society Overview
-├── events.php       # Event Catalog
-├── reminders.php    # Islamic Reminders
-└── .gitignore       # Server-side maintenance rules
-```
-
----
-
-## Setup & Deployment
-1. **Environment**: PHP 7.4 or higher is required.
-2. **Permissions**: The server must grant **write access** to the root for `prayer_cache.json`.
-3. **Connectivity**: Ensure `cURL` is enabled in PHP.
-4. **No-Build**: Direct upload; no Node/NPM build steps required.
-
-## Code Statistics
-- **Total Lines**: 2,153 lines
-- **Total Files**: 18
-- **Standard**: PSR-4 Compliant
-
----
-# S I K S _ W e b s i t e
-*Developed for the Society of Islamic Knowledge Seekers (IUT-SIKS).*
+## 🛠 Tech Stack
+- **Backend**: PHP 8.0+
+- **Database**: MySQL (PDO)
+- **Frontend**: Tailwind CSS (CDN), FontAwesome
+- **APIs**: Al Quran Cloud (Ayat), fawazahmed0 Hadith API
