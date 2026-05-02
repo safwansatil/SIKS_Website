@@ -1,12 +1,10 @@
 <?php
 /**
  * Database Connection Configuration
- * 
- * Update these values with your actual CWP database credentials.
  */
 
 $host = 'localhost';
-$dbname = 'iutsiks_dynamic';
+$dbname = 'iutsiks_admindb';
 $username = 'iutsiks_17';
 $password = 'ssYm0RNb4i76';
 
