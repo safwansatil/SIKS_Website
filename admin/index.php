@@ -31,6 +31,7 @@ require_once 'auth.php';
         <a href="manage_events.php">Events</a>
         <a href="manage_about.php">About Page</a>
         <a href="manage_articles.php">Articles</a>
+        <a href="change_password.php">Security</a>
         <a href="logout.php" class="logout">Logout</a>
     </div>
 
@@ -59,6 +60,11 @@ require_once 'auth.php';
             <h2>Articles</h2>
             <p>Write and manage articles for the community.</p>
             <a href="manage_articles.php">Manage &rarr;</a>
+        </div>
+        <div class="card">
+            <h2>Security</h2>
+            <p>Change your admin account password.</p>
+            <a href="change_password.php">Change &rarr;</a>
         </div>
     </div>
 </body>

@@ -54,9 +54,18 @@ SIKS_Website/
 
 3. **Database Setup:**
    - Create a new MySQL database named `siks_local` (or your preferred name).
-   - Import the `setup.sql` file into this database to create the necessary tables (`admins`, `articles`, `events`, `event_images`, `hero_slides`, `prayer_times`).
+   - Import the `setup.sql` file into this database to create the necessary tables (`admins`, `articles`, `events`, `event_images`, `hero_slides`, `prayer_times`, `event_categories`).
+   
+4. **Database Updates (Migration):**
+   If you are updating an existing installation (e.g., in CWP), follow these steps:
+   - Open your hosting control panel (CWP) and go to **phpMyAdmin**.
+   - Select your database and go to the **SQL** tab.
+   - Open `setup.sql` from this repository.
+   - Copy the `CREATE TABLE IF NOT EXISTS` and `ALTER TABLE` commands from the bottom of the file (Migration Helpers section).
+   - Paste them into the phpMyAdmin SQL box and click **Go**.
+   - This will add any new columns or tables (like `event_categories`) without affecting your existing data.
 
-4. **Configuration:**
+5. **Configuration:**
    - Open `includes/db.php`.
    - Update the PDO connection string with your local database credentials:
      ```php

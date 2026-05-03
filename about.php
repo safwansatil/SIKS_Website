@@ -43,6 +43,47 @@ $aboutCards = getAboutContent('card');
                 </div>
             <?php endforeach; ?>
         </div>
+
+        <!-- Past Events Showcase -->
+        <?php $pastEvents = getEvents(true, 6); ?>
+        <?php if ($pastEvents): ?>
+            <div class="mt-32">
+                <div class="inline-flex items-center space-x-2 px-4 py-1.5 rounded-full bg-emerald-50 border border-emerald-200 mb-10">
+                    <span class="text-[10px] font-black uppercase tracking-widest text-emerald-700">Legacy of Excellence</span>
+                </div>
+                <h2 class="text-4xl font-display font-bold text-emerald-950 mb-12 tracking-tight">Our Journey Through Events</h2>
+                
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+                    <?php foreach ($pastEvents as $event): ?>
+                        <a href="event_details.php?id=<?php echo $event['id']; ?>" class="group block">
+                            <div class="relative aspect-video rounded-3xl overflow-hidden mb-6 border border-emerald-950/5">
+                                <?php if (!empty($event['cover_image'])): ?>
+                                    <img src="<?php echo htmlspecialchars($event['cover_image']); ?>" 
+                                         alt="<?php echo htmlspecialchars($event['name']); ?>"
+                                         class="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-500 group-hover:scale-105">
+                                <?php else: ?>
+                                    <div class="w-full h-full bg-emerald-900 flex items-center justify-center">
+                                        <i class="fas <?php echo $event['logo'] ?: 'fa-calendar'; ?> text-3xl text-white/20"></i>
+                                    </div>
+                                <?php endif; ?>
+                            </div>
+                            <h4 class="text-lg font-bold text-emerald-950 group-hover:text-emerald-600 transition-colors">
+                                <?php echo htmlspecialchars($event['name']); ?>
+                            </h4>
+                            <p class="text-emerald-950/40 text-xs font-bold uppercase tracking-widest mt-1">
+                                <?php echo date('M Y', strtotime($event['event_date'])); ?>
+                            </p>
+                        </a>
+                    <?php endforeach; ?>
+                </div>
+                
+                <div class="mt-16 text-center">
+                    <a href="events.php" class="inline-flex items-center px-8 py-4 rounded-2xl bg-emerald-950 text-white font-bold hover:bg-black transition-all shadow-xl shadow-emerald-950/20">
+                        View Full Gallery <i class="fas fa-arrow-right ml-3 text-xs"></i>
+                    </a>
+                </div>
+            </div>
+        <?php endif; ?>
     </div>
 </section>
 

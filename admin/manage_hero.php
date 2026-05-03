@@ -97,29 +97,29 @@ try {
     <!-- Add New Slide -->
     <div class="card">
         <h2>Add New Slide</h2>
+        <p style="color: #666; font-size: 0.85rem; margin-bottom: 1rem;">Upload high-resolution images (1920x1080 recommended). Only the image and a short description will be shown.</p>
         <form method="POST" enctype="multipart/form-data">
             <div class="form-group">
-                <label>Image (Required)</label>
+                <label>Background Image *</label>
                 <input type="file" name="image" accept="image/*" required>
             </div>
             <div class="form-group">
-                <label>Title (Optional)</label>
-                <input type="text" name="title" placeholder="Optional overlay title">
+                <label>Short Description (Optional)</label>
+                <textarea name="subtitle" rows="2" placeholder="This will be shown gracefully over the image..."></textarea>
+                <input type="hidden" name="title" value=""> <!-- Keep for DB compatibility -->
             </div>
-            <div class="form-group">
-                <label>Subtitle (Optional)</label>
-                <textarea name="subtitle" rows="2" placeholder="Optional subtitle text"></textarea>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                <div class="form-group">
+                    <label>Sort Order</label>
+                    <input type="number" name="sort_order" value="0">
+                </div>
+                <div class="form-group" style="display: flex; align-items: flex-end; padding-bottom: 0.5rem;">
+                    <label style="margin-bottom: 0; cursor: pointer;">
+                        <input type="checkbox" name="is_active" checked style="width: auto;"> Active
+                    </label>
+                </div>
             </div>
-            <div class="form-group">
-                <label>Sort Order</label>
-                <input type="number" name="sort_order" value="0">
-            </div>
-            <div class="form-group">
-                <label>
-                    <input type="checkbox" name="is_active" checked> Active
-                </label>
-            </div>
-            <button type="submit" class="btn">Upload Slide</button>
+            <button type="submit" class="btn">Upload & Add to Carousel</button>
         </form>
     </div>
 
@@ -131,13 +131,17 @@ try {
                 <div class="slide-card">
                     <img src="../<?php echo htmlspecialchars($slide['image_path']); ?>" alt="Slide">
                     <div class="info">
-                        <p style="font-weight: bold; margin: 0 0 0.25rem 0;"><?php echo htmlspecialchars($slide['title'] ?: '(No title)'); ?></p>
-                        <p style="color: #666; font-size: 0.875rem; margin: 0 0 0.5rem 0;">Order: <?php echo $slide['sort_order']; ?></p>
-                        <span class="badge <?php echo $slide['is_active'] ? 'badge-green' : 'badge-gray'; ?>">
-                            <?php echo $slide['is_active'] ? 'Active' : 'Inactive'; ?>
-                        </span>
-                        <br><br>
-                        <a href="manage_hero.php?delete=<?php echo $slide['id']; ?>" onclick="return confirm('Delete this slide?')" class="btn btn-red" style="font-size: 0.8rem; padding: 0.3rem 0.7rem;">Delete</a>
+                        <p style="color: #333; font-size: 0.9rem; margin: 0 0 0.5rem 0; height: 3em; overflow: hidden; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical;">
+                            <?php echo htmlspecialchars($slide['subtitle'] ?: '(No description)'); ?>
+                        </p>
+                        <div style="display: flex; justify-content: space-between; align-items: center;">
+                            <span class="badge <?php echo $slide['is_active'] ? 'badge-green' : 'badge-gray'; ?>">
+                                <?php echo $slide['is_active'] ? 'Active' : 'Inactive'; ?>
+                            </span>
+                            <span style="color: #999; font-size: 0.75rem;">Order: <?php echo $slide['sort_order']; ?></span>
+                        </div>
+                        <br>
+                        <a href="manage_hero.php?delete=<?php echo $slide['id']; ?>" onclick="return confirm('Delete this slide?')" class="btn btn-red" style="font-size: 0.8rem; padding: 0.3rem 0.7rem; width: 100%; text-align: center;">Delete Slide</a>
                     </div>
                 </div>
             <?php endforeach; ?>

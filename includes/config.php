@@ -128,7 +128,7 @@ function getEvents($is_past = false, $limit = null)
             $sql = "SELECT * FROM events ORDER BY event_date DESC";
         } else {
             $sql = "SELECT * FROM events WHERE is_past = ? ORDER BY ";
-            // Upcoming: soonest first. Past: most recent first.
+            // Upcoming: soonest first. Past: most recent first (latest at top).
             $sql .= $is_past ? "event_date DESC" : "event_date ASC";
         }
         if ($limit) $sql .= " LIMIT " . (int)$limit;
@@ -139,6 +139,22 @@ function getEvents($is_past = false, $limit = null)
             $stmt = $pdo->prepare($sql);
             $stmt->execute([$is_past ? 1 : 0]);
         }
+        return $stmt->fetchAll();
+    } catch (PDOException $e) {
+        return [];
+    }
+}
+
+/**
+ * Get all dynamic event categories
+ */
+function getEventCategories()
+{
+    global $pdo;
+    if (!$pdo) return [];
+
+    try {
+        $stmt = $pdo->query("SELECT * FROM event_categories ORDER BY name ASC");
         return $stmt->fetchAll();
     } catch (PDOException $e) {
         return [];

@@ -29,22 +29,32 @@ if ($pdo) {
     <?php if ($heroSlides && count($heroSlides) > 0): ?>
         <div id="hero-carousel" class="absolute inset-0 z-0">
             <?php foreach ($heroSlides as $index => $slide): ?>
-                <div class="carousel-slide absolute inset-0 transition-opacity duration-1000 <?php echo $index === 0 ? 'carousel-slide-active' : 'carousel-slide-hidden'; ?>"
+                <div class="carousel-slide absolute inset-0 transition-all duration-1000 ease-in-out <?php echo $index === 0 ? 'carousel-slide-active' : 'carousel-slide-hidden'; ?>"
                      data-slide="<?php echo $index; ?>">
                     <img src="<?php echo htmlspecialchars($slide['image_path']); ?>" 
-                         alt="<?php echo htmlspecialchars($slide['title'] ?? 'IUT SIKS'); ?>"
+                         alt="Hero Background"
                          class="w-full h-full object-cover">
+                    <!-- Graceful Description Overlay -->
+                    <?php if (!empty($slide['subtitle'])): ?>
+                        <div class="absolute bottom-32 left-8 md:left-16 z-20 max-w-lg animate-fade-in-up">
+                            <div class="bg-black/20 backdrop-blur-md border border-white/10 p-6 rounded-3xl">
+                                <p class="text-white/90 text-sm md:text-base font-medium leading-relaxed italic">
+                                    "<?php echo htmlspecialchars($slide['subtitle']); ?>"
+                                </p>
+                            </div>
+                        </div>
+                    <?php endif; ?>
                 </div>
             <?php endforeach; ?>
-            <!-- Dark Blurry Overlay -->
-            <div class="absolute inset-0 bg-black/60 backdrop-blur-[2px] z-10"></div>
+            <!-- Dynamic Dark Overlay -->
+            <div class="absolute inset-0 bg-gradient-to-b from-black/60 via-black/40 to-black/80 z-10"></div>
         </div>
 
         <!-- Carousel Navigation Dots -->
         <?php if (count($heroSlides) > 1): ?>
-            <div class="absolute bottom-8 left-1/2 -translate-x-1/2 z-30 flex items-center space-x-2">
+            <div class="absolute bottom-12 right-12 z-30 flex flex-col space-y-3">
                 <?php foreach ($heroSlides as $index => $slide): ?>
-                    <button class="carousel-dot <?php echo $index === 0 ? 'carousel-dot-active' : ''; ?>"
+                    <button class="carousel-dot-v <?php echo $index === 0 ? 'carousel-dot-v-active' : ''; ?>"
                             onclick="goToSlide(<?php echo $index; ?>)"
                             data-dot="<?php echo $index; ?>"></button>
                 <?php endforeach; ?>
@@ -59,11 +69,11 @@ if ($pdo) {
     <?php endif; ?>
 
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-20 text-center">
-        <h1 class="text-7xl md:text-9xl font-display font-bold mb-8 leading-tight tracking-tight text-white">
+        <h1 class="text-7xl md:text-9xl font-display font-bold mb-8 leading-tight tracking-tight text-white drop-shadow-2xl">
             IUT <span style="color: #88c9a1;">SIKS</span>
         </h1>
 
-        <p class="text-lg md:text-xl max-w-2xl mx-auto mb-12 leading-relaxed font-medium text-white/70">
+        <p class="text-lg md:text-xl max-w-2xl mx-auto mb-12 leading-relaxed font-medium text-white/70 drop-shadow-lg">
             Fostering spiritual growth and academic excellence at Islamic University of Technology.
         </p>
 
@@ -90,14 +100,14 @@ if ($pdo) {
 
     function goToSlide(index) {
         const slides = document.querySelectorAll('.carousel-slide');
-        const dots = document.querySelectorAll('.carousel-dot');
+        const dots = document.querySelectorAll('.carousel-dot-v');
         
         slides.forEach(s => { s.classList.remove('carousel-slide-active'); s.classList.add('carousel-slide-hidden'); });
-        dots.forEach(d => d.classList.remove('carousel-dot-active'));
+        dots.forEach(d => d.classList.remove('carousel-dot-v-active'));
         
         slides[index].classList.remove('carousel-slide-hidden');
         slides[index].classList.add('carousel-slide-active');
-        dots[index].classList.add('carousel-dot-active');
+        dots[index].classList.add('carousel-dot-v-active');
         
         currentSlide = index;
         resetInterval();
