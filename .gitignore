@@ -19,6 +19,12 @@ Thumbs.db
 # Logs
 error_log
 php_errors.log
-
+*.log
 
 .env
+*.sql
+*.md
+!README.md
+uploads/
+!uploads/.gitkeep
+includes/db.php

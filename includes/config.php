@@ -342,36 +342,159 @@ function resizeImageToFit($filePath, $targetW = 1920, $targetH = 1080)
     return true;
 }
 
-/**
- * Fetch random Ayat from Al Quran Cloud API
- */
-function getRandomAyat()
+function getRandomAyat($forceRefresh = false)
 {
-    $url = "https://api.alquran.cloud/v1/ayah/random/en.asad";
-    $data = @json_decode(@file_get_contents($url), true);
-    if ($data && isset($data['data'])) {
-        return [
-            'text' => $data['data']['text'],
-            'surah' => $data['data']['surah']['englishName'],
-            'ayah' => $data['data']['numberInSurah']
-        ];
+    $cacheFile = dirname(__DIR__) . '/cache/ayat_cache.json';
+    $cacheTime = 3600; // 1 hour cache
+    
+    // Check cache if not forcing refresh
+    if (!$forceRefresh && file_exists($cacheFile) && (time() - filemtime($cacheFile)) < $cacheTime) {
+        $cached = json_decode(file_get_contents($cacheFile), true);
+        if ($cached) {
+            return $cached;
+        }
     }
-    return null;
+    
+    // Try multiple API endpoints for redundancy
+    $apis = [
+        'https://api.alquran.cloud/v1/ayah/random/en.asad',
+        'https://api.alquran.cloud/v1/ayah/random/en.sahih',
+        'https://cdn.jsdelivr.net/gh/fawazahmed0/quran-api@1/editions/eng-asad/random.json'
+    ];
+    
+    $data = null;
+    foreach ($apis as $api) {
+        $response = @file_get_contents($api);
+        if ($response !== false) {
+            $json = json_decode($response, true);
+            
+            // Handle different API response formats
+            if (isset($json['data'])) {
+                // Al Quran Cloud format
+                $data = [
+                    'text' => $json['data']['text'],
+                    'surah' => $json['data']['surah']['englishName'],
+                    'ayah' => $json['data']['numberInSurah'],
+                    'source' => 'Quran'
+                ];
+                break;
+            } elseif (isset($json['text']) && isset($json['surah'])) {
+                // Simple format
+                $data = [
+                    'text' => $json['text'],
+                    'surah' => $json['surah'],
+                    'ayah' => $json['ayah'] ?? 1,
+                    'source' => 'Quran'
+                ];
+                break;
+            }
+        }
+    }
+    
+    // Save to cache
+    if ($data) {
+        if (!is_dir(dirname($cacheFile))) {
+            mkdir(dirname($cacheFile), 0755, true);
+        }
+        file_put_contents($cacheFile, json_encode($data));
+        return $data;
+    }
+    
+    // Fallback to hardcoded ayat if APIs fail
+    return getFallbackAyat();
+}
+function getFallbackAyat()
+{
+    $ayatList = [
+        ['text' => 'Indeed, prayer prohibits immorality and wrongdoing.', 'surah' => 'Al-Ankabut', 'ayah' => 45],
+        ['text' => 'And whatever good you do - Allah knows it.', 'surah' => 'Al-Baqarah', 'ayah' => 197],
+        ['text' => 'Indeed, Allah is with the patient.', 'surah' => 'Al-Baqarah', 'ayah' => 153],
+        ['text' => 'So remember Me; I will remember you.', 'surah' => 'Al-Baqarah', 'ayah' => 152],
+        ['text' => 'And do good; indeed, Allah loves the doers of good.', 'surah' => 'Al-Baqarah', 'ayah' => 195]
+    ];
+    
+    return $ayatList[array_rand($ayatList)];
 }
 
-/**
- * Fetch random Hadith from fawazahmed0/hadith-api
- */
-function getRandomHadith()
+function getRandomHadith($forceRefresh = false)
 {
-    $randomId = rand(1, 500);
-    $url = "https://cdn.jsdelivr.net/gh/fawazahmed0/hadith-api@1/editions/eng-bukhari/$randomId.json";
-    $data = @json_decode(@file_get_contents($url), true);
-    if ($data && isset($data['hadiths'][0])) {
-        return [
-            'text' => $data['hadiths'][0]['text'],
-            'source' => 'Sahih al-Bukhari'
-        ];
+    $cacheFile = dirname(__DIR__) . '/cache/hadith_cache.json';
+    $cacheTime = 3600; // 1 hour cache
+    
+    // Check cache
+    if (!$forceRefresh && file_exists($cacheFile) && (time() - filemtime($cacheFile)) < $cacheTime) {
+        $cached = json_decode(file_get_contents($cacheFile), true);
+        if ($cached) {
+            return $cached;
+        }
     }
-    return null;
+    
+    // Primary API: Sunnah.com (more reliable)
+    $hadiths = [
+        // Pre-fetch some high-quality hadiths as fallback
+        ['text' => 'The best among you are those who have the best manners and character.', 'source' => 'Sahih al-Bukhari'],
+        ['text' => 'None of you truly believes until he loves for his brother what he loves for himself.', 'source' => 'Sahih al-Bukhari'],
+        ['text' => 'The strong believer is better and more beloved to Allah than the weak believer, while there is good in both.', 'source' => 'Sahih Muslim'],
+        ['text' => 'Do not be people without minds of your own, saying that if others treat you well you will treat them well, and if they do wrong you will do wrong. Instead, accustom yourselves to do good if people do good and not to do wrong if they do evil.', 'source' => 'Jami at-Tirmidhi'],
+        ['text' => 'Make things easy for people and do not make them difficult, and give them good news and do not repel them.', 'source' => 'Sahih al-Bukhari']
+    ];
+    
+    // Try API first
+    $randomId = rand(1, 700); // Broader range for more variety
+    
+    // Try multiple hadith APIs
+    $apis = [
+        "https://cdn.jsdelivr.net/gh/fawazahmed0/hadith-api@1/editions/eng-bukhari/{$randomId}.json",
+        "https://api.sunnah.com/v1/hadiths/bukhari/random", // Requires API key
+        "https://hadithapi.com/api/hadiths/random?limit=1"  // Requires API key
+    ];
+    
+    $data = null;
+    foreach ($apis as $api) {
+        $ch = curl_init();
+        curl_setopt($ch, CURLOPT_URL, $api);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($ch, CURLOPT_TIMEOUT, 5);
+        curl_setopt($ch, CURLOPT_USERAGENT, 'IUT-SIKS-Website/1.0');
+        $response = curl_exec($ch);
+        $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+        curl_close($ch);
+        
+        if ($httpCode === 200 && $response) {
+            $json = json_decode($response, true);
+            if ($json) {
+                // Handle different API response formats
+                if (isset($json['hadiths'][0])) {
+                    $data = [
+                        'text' => $json['hadiths'][0]['text'],
+                        'source' => $json['hadiths'][0]['reference']['book'] ?? 'Sahih al-Bukhari'
+                    ];
+                    break;
+                } elseif (isset($json['hadith']['text'])) {
+                    $data = [
+                        'text' => $json['hadith']['text'],
+                        'source' => $json['hadith']['source'] ?? 'Hadith'
+                    ];
+                    break;
+                }
+            }
+        }
+    }
+    
+    // If no API response, use random from fallback array
+    if (!$data) {
+        $randomIndex = array_rand($hadiths);
+        $data = $hadiths[$randomIndex];
+    }
+    
+    // Save to cache
+    if ($data && is_array($data)) {
+        if (!is_dir(dirname($cacheFile))) {
+            mkdir(dirname($cacheFile), 0755, true);
+        }
+        file_put_contents($cacheFile, json_encode($data));
+    }
+    
+    return $data;
 }
+
