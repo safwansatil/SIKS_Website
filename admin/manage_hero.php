@@ -1,155 +1,182 @@
 <?php
-require_once 'auth.php';
+$activeNav = 'hero';
+$pageTitle = 'Hero Carousel';
+require_once 'header.php';
+
+// Ensure table exists (defensive check)
+try {
+    $pdo->query("SELECT 1 FROM hero_slides LIMIT 1");
+} catch (PDOException $e) {
+    // Table might be missing, try to create it
+    $pdo->exec("CREATE TABLE IF NOT EXISTS hero_slides (
+        id INT AUTO_INCREMENT PRIMARY KEY,
+        image_path VARCHAR(255) NOT NULL,
+        title VARCHAR(255),
+        subtitle TEXT,
+        sort_order INT DEFAULT 0,
+        is_active BOOLEAN DEFAULT TRUE,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;");
+}
 
 $message = '';
+$messageType = 'success';
 
 // Handle Delete
 if (isset($_GET['delete'])) {
     $id = $_GET['delete'];
     try {
-        // Get image path before deleting
         $stmt = $pdo->prepare("SELECT image_path FROM hero_slides WHERE id = ?");
         $stmt->execute([$id]);
-        $slide = $stmt->fetch();
-        
+        $row = $stmt->fetch();
+        if ($row && file_exists(dirname(__DIR__) . '/' . $row['image_path'])) {
+            unlink(dirname(__DIR__) . '/' . $row['image_path']);
+        }
         $stmt = $pdo->prepare("DELETE FROM hero_slides WHERE id = ?");
         $stmt->execute([$id]);
-        
-        // Delete file
-        if ($slide && file_exists(dirname(__DIR__) . '/' . $slide['image_path'])) {
-            unlink(dirname(__DIR__) . '/' . $slide['image_path']);
-        }
-        $message = "Slide deleted successfully.";
+        $message = "Slide removed successfully.";
     } catch (PDOException $e) {
         $message = "Error: " . $e->getMessage();
+        $messageType = 'error';
     }
 }
 
-// Handle Add
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $title = $_POST['title'] ?? '';
-    $subtitle = $_POST['subtitle'] ?? '';
-    $sort_order = $_POST['sort_order'] ?? 0;
-    $is_active = isset($_POST['is_active']) ? 1 : 0;
-    
-    $imagePath = handleFileUpload($_FILES['image'] ?? [], 'hero');
-    
-    if ($imagePath) {
-        try {
-            $stmt = $pdo->prepare("INSERT INTO hero_slides (image_path, title, subtitle, sort_order, is_active) VALUES (?, ?, ?, ?, ?)");
-            $stmt->execute([$imagePath, $title, $subtitle, $sort_order, $is_active]);
-            $message = "Slide added successfully.";
-        } catch (PDOException $e) {
-            $message = "Error: " . $e->getMessage();
+// Handle Add Slide
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add_slide'])) {
+    $subtitle = $_POST['subtitle']; // This is our short description
+    $sort_order = (int)$_POST['sort_order'];
+
+    if (isset($_FILES['hero_image']) && $_FILES['hero_image']['error'] === UPLOAD_ERR_OK) {
+        $imagePath = handleFileUpload($_FILES['hero_image'], 'hero');
+        if ($imagePath) {
+            try {
+                $stmt = $pdo->prepare("INSERT INTO hero_slides (image_path, subtitle, sort_order) VALUES (?, ?, ?)");
+                $stmt->execute([$imagePath, $subtitle, $sort_order]);
+                $message = "New slide added successfully.";
+            } catch (PDOException $e) {
+                $message = "Database Error: " . $e->getMessage();
+                $messageType = 'error';
+            }
+        } else {
+            $message = "Failed to process image. Make sure GD library is enabled.";
+            $messageType = 'error';
         }
     } else {
-        $message = "Error: Please select a valid image file (JPG, PNG, GIF, WebP).";
+        $message = "Please select a valid image.";
+        $messageType = 'error';
     }
 }
 
-// Fetch slides
+// Handle Update Order/Status
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_slides'])) {
+    try {
+        foreach ($_POST['order'] as $id => $order) {
+            $active = isset($_POST['active'][$id]) ? 1 : 0;
+            $stmt = $pdo->prepare("UPDATE hero_slides SET sort_order = ?, is_active = ? WHERE id = ?");
+            $stmt->execute([$order, $active, $id]);
+        }
+        $message = "Carousel updated successfully.";
+    } catch (PDOException $e) {
+        $message = "Error: " . $e->getMessage();
+        $messageType = 'error';
+    }
+}
+
 $slides = [];
 try {
-    $stmt = $pdo->query("SELECT * FROM hero_slides ORDER BY sort_order ASC");
+    $stmt = $pdo->query("SELECT * FROM hero_slides ORDER BY sort_order ASC, created_at DESC");
     $slides = $stmt->fetchAll();
-} catch (PDOException $e) {
-    $slides = [];
-}
+} catch (PDOException $e) {}
 ?>
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Manage Hero Carousel - SIKS Admin</title>
-    <style>
-        body { font-family: sans-serif; margin: 2rem; background: #f4f4f4; }
-        .nav { margin-bottom: 2rem; }
-        .nav a { margin-right: 1rem; text-decoration: none; color: #047857; font-weight: bold; }
-        .msg { padding: 1rem; background: #d1fae5; color: #065f46; margin-bottom: 1rem; border-radius: 8px; }
-        .msg.error { background: #fee2e2; color: #dc2626; }
-        .card { background: white; padding: 1.5rem; border-radius: 12px; margin-bottom: 1rem; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
-        .slides-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 1rem; }
-        .slide-card { background: white; border-radius: 12px; overflow: hidden; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
-        .slide-card img { width: 100%; height: 180px; object-fit: cover; }
-        .slide-card .info { padding: 1rem; }
-        .form-group { margin-bottom: 1rem; }
-        label { display: block; margin-bottom: 0.25rem; font-weight: bold; }
-        input, textarea { width: 100%; padding: 0.5rem; border: 1px solid #ccc; border-radius: 6px; box-sizing: border-box; }
-        .btn { padding: 0.5rem 1rem; background: #065f46; color: white; border: none; border-radius: 6px; cursor: pointer; text-decoration: none; display: inline-block; font-weight: bold; }
-        .btn-red { background: #dc2626; }
-        .badge { display: inline-block; padding: 2px 8px; border-radius: 4px; font-size: 0.75rem; font-weight: bold; }
-        .badge-green { background: #d1fae5; color: #065f46; }
-        .badge-gray { background: #f3f4f6; color: #6b7280; }
-    </style>
-</head>
-<body>
-    <div class="nav">
-        <a href="index.php">&larr; Dashboard</a>
+
+<div class="page-header">
+    <h1 class="page-title">Hero Carousel</h1>
+</div>
+
+<?php if ($message): ?>
+    <div class="alert alert-<?php echo $messageType; ?>">
+        <i class="fas <?php echo $messageType === 'success' ? 'fa-check-circle' : 'fa-exclamation-circle'; ?>"></i>
+        <?php echo htmlspecialchars($message); ?>
     </div>
-    <h1>Manage Homepage Carousel</h1>
+<?php endif; ?>
 
-    <?php if ($message): ?>
-        <div class="msg <?php echo strpos($message, 'Error') !== false ? 'error' : ''; ?>">
-            <?php echo htmlspecialchars($message); ?>
-        </div>
-    <?php endif; ?>
-
+<div class="grid-2">
     <!-- Add New Slide -->
     <div class="card">
-        <h2>Add New Slide</h2>
-        <p style="color: #666; font-size: 0.85rem; margin-bottom: 1rem;">Upload high-resolution images (1920x1080 recommended). Only the image and a short description will be shown.</p>
+        <h2 style="font-family: 'Outfit', sans-serif; margin-bottom: 1.5rem; font-size: 1.25rem;">Add New Slide</h2>
         <form method="POST" enctype="multipart/form-data">
             <div class="form-group">
-                <label>Background Image *</label>
-                <input type="file" name="image" accept="image/*" required>
+                <label>Select Background Image *</label>
+                <input type="file" name="hero_image" accept="image/*" required id="hero-img-input">
+                <div id="hero-img-preview" style="margin-top: 1rem; border-radius: 0.75rem; overflow: hidden; display: none; aspect-ratio: 16/9; background: #eee;">
+                    <img id="preview-img" style="width: 100%; height: 100%; object-fit: cover;">
+                </div>
+                <p style="font-size: 0.75rem; color: var(--text-muted); mt: 0.5rem;">Recommended size: 1920x1080. It will be auto-cropped.</p>
             </div>
             <div class="form-group">
                 <label>Short Description (Optional)</label>
-                <textarea name="subtitle" rows="2" placeholder="This will be shown gracefully over the image..."></textarea>
-                <input type="hidden" name="title" value=""> <!-- Keep for DB compatibility -->
+                <textarea name="subtitle" rows="3" placeholder="A short meaningful text to show over the image..."></textarea>
             </div>
-            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
-                <div class="form-group">
-                    <label>Sort Order</label>
-                    <input type="number" name="sort_order" value="0">
-                </div>
-                <div class="form-group" style="display: flex; align-items: flex-end; padding-bottom: 0.5rem;">
-                    <label style="margin-bottom: 0; cursor: pointer;">
-                        <input type="checkbox" name="is_active" checked style="width: auto;"> Active
-                    </label>
-                </div>
+            <div class="form-group">
+                <label>Sort Order</label>
+                <input type="number" name="sort_order" value="0">
             </div>
-            <button type="submit" class="btn">Upload & Add to Carousel</button>
+            <button type="submit" name="add_slide" class="btn btn-primary" style="width: 100%;">
+                <i class="fas fa-upload"></i> Upload & Add to Carousel
+            </button>
         </form>
     </div>
 
     <!-- Current Slides -->
-    <h2 style="margin-top: 2rem;">Current Slides (<?php echo count($slides); ?>)</h2>
-    <?php if ($slides): ?>
-        <div class="slides-grid">
-            <?php foreach ($slides as $slide): ?>
-                <div class="slide-card">
-                    <img src="../<?php echo htmlspecialchars($slide['image_path']); ?>" alt="Slide">
-                    <div class="info">
-                        <p style="color: #333; font-size: 0.9rem; margin: 0 0 0.5rem 0; height: 3em; overflow: hidden; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical;">
-                            <?php echo htmlspecialchars($slide['subtitle'] ?: '(No description)'); ?>
-                        </p>
-                        <div style="display: flex; justify-content: space-between; align-items: center;">
-                            <span class="badge <?php echo $slide['is_active'] ? 'badge-green' : 'badge-gray'; ?>">
-                                <?php echo $slide['is_active'] ? 'Active' : 'Inactive'; ?>
-                            </span>
-                            <span style="color: #999; font-size: 0.75rem;">Order: <?php echo $slide['sort_order']; ?></span>
+    <div class="card" style="padding: 1.5rem;">
+        <h2 style="font-family: 'Outfit', sans-serif; margin-bottom: 1.5rem; font-size: 1.25rem;">Manage Carousel</h2>
+        <?php if ($slides): ?>
+            <form method="POST">
+                <div style="display: flex; flex-direction: column; gap: 1rem; margin-bottom: 2rem;">
+                    <?php foreach ($slides as $slide): ?>
+                        <div style="display: flex; align-items: center; gap: 1rem; padding: 1rem; border: 1px solid var(--border); border-radius: 0.75rem; background: #fff;">
+                            <img src="../<?php echo htmlspecialchars($slide['image_path']); ?>" style="width: 80px; height: 50px; object-fit: cover; border-radius: 0.25rem;">
+                            <div style="flex: 1;">
+                                <div style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 0.25rem;">Order</div>
+                                <input type="number" name="order[<?php echo $slide['id']; ?>]" value="<?php echo $slide['sort_order']; ?>" style="width: 60px; padding: 0.25rem 0.5rem;">
+                            </div>
+                            <div style="display: flex; align-items: center; gap: 0.5rem;">
+                                <input type="checkbox" name="active[<?php echo $slide['id']; ?>]" <?php echo $slide['is_active'] ? 'checked' : ''; ?> id="active-<?php echo $slide['id']; ?>">
+                                <label for="active-<?php echo $slide['id']; ?>" style="margin-bottom: 0; font-weight: 500;">Active</label>
+                            </div>
+                            <a href="manage_hero.php?delete=<?php echo $slide['id']; ?>" class="btn btn-danger" style="padding: 0.4rem;" onclick="return confirm('Remove this slide?')">
+                                <i class="fas fa-times"></i>
+                            </a>
                         </div>
-                        <br>
-                        <a href="manage_hero.php?delete=<?php echo $slide['id']; ?>" onclick="return confirm('Delete this slide?')" class="btn btn-red" style="font-size: 0.8rem; padding: 0.3rem 0.7rem; width: 100%; text-align: center;">Delete Slide</a>
-                    </div>
+                    <?php endforeach; ?>
                 </div>
-            <?php endforeach; ?>
-        </div>
-    <?php else: ?>
-        <div class="card" style="text-align: center; color: #999;">
-            <p>No slides uploaded yet. Add your first carousel image above.</p>
-        </div>
-    <?php endif; ?>
-</body>
-</html>
+                <button type="submit" name="update_slides" class="btn btn-secondary" style="width: 100%;">
+                    Save Changes
+                </button>
+            </form>
+        <?php else: ?>
+            <div style="text-align: center; padding: 3rem; color: var(--text-muted);">
+                <i class="fas fa-images" style="font-size: 2rem; opacity: 0.2; margin-bottom: 1rem;"></i>
+                <p>No slides added yet.</p>
+            </div>
+        <?php endif; ?>
+    </div>
+</div>
+
+<script>
+    document.getElementById('hero-img-input').addEventListener('change', function() {
+        const preview = document.getElementById('hero-img-preview');
+        const img = document.getElementById('preview-img');
+        const file = this.files[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                img.src = e.target.result;
+                preview.style.display = 'block';
+            }
+            reader.readAsDataURL(file);
+        }
+    });
+</script>
+
+<?php require_once 'footer.php'; ?>
