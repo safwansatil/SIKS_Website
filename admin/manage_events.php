@@ -30,6 +30,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $is_past = isset($_POST['is_past']) ? 1 : 0;
     $logo = $_POST['logo'];
 
+    // Save new category to database if it doesn't exist
+    if (!empty($category)) {
+        try {
+            $cstmt = $pdo->prepare("INSERT IGNORE INTO event_categories (name) VALUES (?)");
+            $cstmt->execute([$category]);
+        } catch (PDOException $e) {
+            // Ignore errors for unique constraint
+        }
+    }
+
     // Handle cover image upload
     $coverImage = null;
     if (isset($_FILES['cover_image']) && $_FILES['cover_image']['error'] === UPLOAD_ERR_OK) {
@@ -317,11 +327,27 @@ $iconOptions = [
                 <input type="text" name="tag" value="<?php echo htmlspecialchars($event['tag'] ?? ''); ?>" placeholder="e.g. Workshop, Seminar, Fun">
             </div>
             <div class="form-group">
-                <label>Category</label>
-                <select name="category">
-                    <option value="Community" <?php echo ($event['category'] ?? '') === 'Community' ? 'selected' : ''; ?>>Community</option>
-                    <option value="Sports" <?php echo ($event['category'] ?? '') === 'Sports' ? 'selected' : ''; ?>>Sports</option>
-                </select>
+                <label>Category *</label>
+                <div style="display: flex; gap: 0.5rem;">
+                    <select name="category" id="category-select" style="flex: 2;">
+                        <?php 
+                        $cats = getEventCategories();
+                        $currentCat = $event['category'] ?? 'Community';
+                        $catFound = false;
+                        foreach ($cats as $cat): 
+                            if ($cat['name'] === $currentCat) $catFound = true;
+                        ?>
+                            <option value="<?php echo htmlspecialchars($cat['name']); ?>" <?php echo $currentCat === $cat['name'] ? 'selected' : ''; ?>>
+                                <?php echo htmlspecialchars($cat['name']); ?>
+                            </option>
+                        <?php endforeach; ?>
+                        <?php if (!$catFound && !empty($currentCat)): ?>
+                            <option value="<?php echo htmlspecialchars($currentCat); ?>" selected><?php echo htmlspecialchars($currentCat); ?></option>
+                        <?php endif; ?>
+                    </select>
+                    <input type="text" id="new-category" placeholder="Or type new category..." style="flex: 1;" onchange="if(this.value) { const sel = document.getElementById('category-select'); const opt = document.createElement('option'); opt.value = this.value; opt.text = this.value; opt.selected = true; sel.add(opt); }">
+                </div>
+                <p style="color: #666; font-size: 0.75rem; margin-top: 4px;">Select an existing category or type a new one to add it.</p>
             </div>
             
             <!-- Icon Picker -->

@@ -37,12 +37,6 @@
                     <li><a href="about.php"
                             class="text-white/60 hover:text-white text-[11px] font-bold transition-all duration-300">About
                             SIKS</a></li>
-                    <li><a href="#"
-                            class="text-white/60 hover:text-white text-[11px] font-bold transition-all duration-300">Executive
-                            Team</a></li>
-                    <li><a href="#"
-                            class="text-white/60 hover:text-white text-[11px] font-bold transition-all duration-300">Constitution</a>
-                    </li>
                 </ul>
             </div>
 
@@ -56,9 +50,6 @@
                     <li><a href="index.php#upcoming"
                             class="text-white/60 hover:text-white text-[11px] font-bold transition-all duration-300">Jamaat
                             Times</a></li>
-                    <li><a href="#"
-                            class="text-white/60 hover:text-white text-[11px] font-bold transition-all duration-300">Mosque
-                            Gallery</a></li>
                 </ul>
             </div>
 
@@ -70,7 +61,7 @@
                             class="text-white/60 hover:text-white text-[11px] font-bold transition-all duration-300">Upcoming
                             Events</a></li>
                     <li><a href="mailto:siks@iut-dhaka.edu"
-                            class="text-white/60 hover:text-white text-[11px] font-bold transition-all duration-300">Contact
+                            class="text-white/60 hover:text-white text-[11px] font-bold transition-all duration-300">Email
                             Us</a></li>
                     <li>
                         <div class="mt-4 pt-4 border-t border-white/5">
@@ -84,20 +75,19 @@
         </div>
 
         <!-- Bottom Copyright Bar -->
-        <div
-            class="pt-8 border-t border-white/5 flex flex-col md:flex-row justify-between items-center space-y-4 md:space-y-0">
-            <p class="text-white/20 text-[8px] font-black uppercase tracking-[0.3em]">
-                &copy; <?php echo date('Y'); ?> Society of Islamic Knowledge Seekers.
-            </p>
-            <div class="flex space-x-8">
-                <a href="#"
-                    class="text-white/20 hover:text-white text-[8px] font-black uppercase tracking-[0.2em] transition-colors">Privacy
-                    Policy</a>
-                <a href="#"
-                    class="text-white/20 hover:text-white text-[8px] font-black uppercase tracking-[0.2em] transition-colors">Terms
-                    of Service</a>
-            </div>
-        </div>
+<div class="pt-8 border-t border-white/5 flex flex-col md:flex-row justify-between items-center space-y-4 md:space-y-0">
+    <p class="text-white/20 text-[8px] font-black uppercase tracking-[0.3em]">
+        &copy; <?php echo date('Y'); ?> Society of Islamic Knowledge Seekers.
+    </p>
+    <div class="flex items-center space-x-1">
+        <span class="text-white/10 text-[8px] font-black uppercase tracking-[0.2em]">Any suggestions?</span>
+        <a href="https://github.com/Tajwarbot" target="_blank"
+            class="text-white/20 hover:text-white text-[8px] font-black uppercase tracking-[0.2em] transition-colors">Tajwar</a>
+        <span class="text-white/10 text-[8px]">&</span>
+        <a href="https://github.com/safwansatil" target="_blank"
+            class="text-white/20 hover:text-white text-[8px] font-black uppercase tracking-[0.2em] transition-colors">Safwan</a>
+    </div>
+</div>
     </div>
 </footer>
 
