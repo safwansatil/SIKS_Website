@@ -345,7 +345,7 @@ function resizeImageToFit($filePath, $targetW = 1920, $targetH = 1080)
 function getRandomAyat($forceRefresh = false)
 {
     $cacheFile = dirname(__DIR__) . '/cache/ayat_cache.json';
-    $cacheTime = 3600; // 1 hour cache
+    $cacheTime = 10; // 10 seconds cache
     
     // Check cache if not forcing refresh
     if (!$forceRefresh && file_exists($cacheFile) && (time() - filemtime($cacheFile)) < $cacheTime) {
@@ -418,7 +418,7 @@ function getFallbackAyat()
 function getRandomHadith($forceRefresh = false)
 {
     $cacheFile = dirname(__DIR__) . '/cache/hadith_cache.json';
-    $cacheTime = 3600; // 1 hour cache
+    $cacheTime = 10; // 10 seconds cache
     
     // Check cache
     if (!$forceRefresh && file_exists($cacheFile) && (time() - filemtime($cacheFile)) < $cacheTime) {

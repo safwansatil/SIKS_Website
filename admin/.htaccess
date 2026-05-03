@@ -1,15 +1,7 @@
 # Admin panel specific rules
-# Disable mod_security for admin POST requests to prevent false positives
-# with long text, Arabic/Bengali characters, and URLs in content
 
-<!-- <IfModule mod_security2.c>
-    SecRuleEngine Off
-</IfModule>
-
-<IfModule mod_security.c>
-    SecFilterEngine Off
-    SecFilterScanPOST Off
-</IfModule> -->
+# Note: ModSecurity directives are disabled in .htaccess on this server
+# They must be configured by server admin in httpd.conf
 
 # Allow large uploads for images
 <IfModule mod_php.c>
@@ -19,3 +11,18 @@
     php_value max_input_vars 5000
     php_value max_input_time 300
 </IfModule>
+
+# Alternative for PHP 8.x (if mod_php doesn't work)
+<IfModule mod_php8.c>
+    php_value upload_max_filesize 20M
+    php_value post_max_size 50M
+    php_value max_execution_time 300
+</IfModule>
+
+# Deny access to protected files
+<FilesMatch "\.(sql|log|ini|conf|bak)$">
+    Require all denied
+</FilesMatch>
+
+# Prevent directory listing
+Options -Indexes
