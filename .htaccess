@@ -18,22 +18,9 @@ Options -MultiViews
     php_value max_input_vars 5000
 </IfModule>
 
-<<<<<<< HEAD
 # Note: mod_security directives are not allowed in .htaccess on this server.
 # If you experience 403 Forbidden errors, please contact your host 
 # to disable mod_security for this domain.
-=======
-# Disable mod_security if it causes 403 Forbidden on POST
-<IfModule mod_security2.c>
-    SecRuleEngine Off
-    SecRequestBodyAccess Off
-</IfModule>
-
-<IfModule mod_security.c>
-    SecFilterEngine Off
-    SecFilterScanPOST Off
-</IfModule>
->>>>>>> 0d1d875c49cc11a5030b543ddd8825049ad22632
 
 # UTF-8 encoding
 AddDefaultCharset UTF-8
