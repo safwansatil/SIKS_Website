@@ -2,14 +2,14 @@
 # Disable mod_security for admin POST requests to prevent false positives
 # with long text, Arabic/Bengali characters, and URLs in content
 
-<IfModule mod_security2.c>
+<!-- <IfModule mod_security2.c>
     SecRuleEngine Off
 </IfModule>
 
 <IfModule mod_security.c>
     SecFilterEngine Off
     SecFilterScanPOST Off
-</IfModule>
+</IfModule> -->
 
 # Allow large uploads for images
 <IfModule mod_php.c>

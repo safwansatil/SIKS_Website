@@ -357,7 +357,6 @@ function getRandomAyat($forceRefresh = false)
     
     // Try multiple API endpoints for redundancy
     $apis = [
-        'https://api.alquran.cloud/v1/ayah/random/en.asad',
         'https://api.alquran.cloud/v1/ayah/random/en.sahih',
         'https://cdn.jsdelivr.net/gh/fawazahmed0/quran-api@1/editions/eng-asad/random.json'
     ];
