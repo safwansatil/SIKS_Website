@@ -19,14 +19,14 @@ Options -MultiViews
 </IfModule>
 
 # Disable mod_security if it causes 403 Forbidden on POST
-<IfModule mod_security2.c>
-    SecRuleEngine Off
-</IfModule>
+#<IfModule mod_security2.c>
+#    SecRuleEngine Off
+#</IfModule>
 
-<IfModule mod_security.c>
-    SecFilterEngine Off
-    SecFilterScanPOST Off
-</IfModule>
+#<IfModule mod_security.c>
+#    SecFilterEngine Off
+#    SecFilterScanPOST Off
+#</IfModule>
 
 # UTF-8 encoding
 AddDefaultCharset UTF-8
