@@ -37,19 +37,21 @@
                         },
                     },
                     fontFamily: {
-                        sans: ['Inter', 'ui-sans-serif', 'system-ui', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'Roboto', 'Helvetica Neue', 'Arial', 'Noto Sans', 'sans-serif'],
+                        sans: ['Inter', 'Noto Sans Bengali', 'Noto Sans Arabic', 'ui-sans-serif', 'system-ui', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'Roboto', 'Helvetica Neue', 'Arial', 'Noto Sans', 'sans-serif'],
                         display: ['Outfit', 'sans-serif'],
+                        arabic: ['Noto Naskh Arabic', 'Noto Sans Arabic', 'serif'],
+                        bengali: ['Noto Sans Bengali', 'sans-serif'],
                     },
                 }
             }
         }
     </script>
 
-    <!-- Google Fonts -->
+    <!-- Google Fonts (Inter, Outfit + Arabic/Bengali support) -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link
-        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Outfit:wght@400;500;600;700&display=swap"
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Outfit:wght@400;500;600;700&family=Noto+Sans+Bengali:wght@400;500;600;700&family=Noto+Naskh+Arabic:wght@400;500;600;700&display=swap"
         rel="stylesheet">
 
     <!-- Font Awesome -->
@@ -98,6 +100,14 @@
             background: rgba(255, 255, 255, 0.98) !important;
             border-bottom: 1px solid rgba(0, 0, 0, 0.05);
             box-shadow: 0 4px 30px rgba(0, 0, 0, 0.03);
+        }
+
+        /* Always white navbar */
+        #main-navbar {
+            background: rgba(255, 255, 255, 0.98) !important;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.03);
+            backdrop-filter: none;
         }
 
         .glass-dark {

@@ -5,42 +5,116 @@ require_once 'includes/header.php';
 // Data for home page highlights
 $nextPrayerTimes = getPrayerTimes();
 $currentHomePrayer = $nextPrayerTimes ? getCurrentPrayer($nextPrayerTimes) : null;
+$heroSlides = getHeroSlides();
 
 // Fetch random reminders
 $randomAyat = getRandomAyat();
 $randomHadith = getRandomHadith();
+
+// Fetch recent past events for showcase
+$recentPastEvents = [];
+if ($pdo) {
+    try {
+        $stmt = $pdo->query("SELECT * FROM events WHERE is_past = 1 ORDER BY event_date DESC LIMIT 10");
+        $recentPastEvents = $stmt->fetchAll();
+    } catch (PDOException $e) {
+        $recentPastEvents = [];
+    }
+}
 ?>
 
-<!-- Hero Section -->
-<section id="home" class="relative min-h-[90vh] flex items-center justify-center overflow-hidden">
-    <!-- Background Decor -->
-    <div class="absolute inset-0 z-0">
-        <div class="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-emerald-50 blur-[120px] rounded-full"></div>
-        <div class="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] bg-emerald-100 blur-[120px] rounded-full"></div>
-    </div>
+<!-- Hero Section with Image Carousel -->
+<section id="home" class="relative h-screen flex items-center justify-center overflow-hidden -mt-24">
+    <!-- Carousel Background -->
+    <?php if ($heroSlides && count($heroSlides) > 0): ?>
+        <div id="hero-carousel" class="absolute inset-0 z-0">
+            <?php foreach ($heroSlides as $index => $slide): ?>
+                <div class="carousel-slide absolute inset-0 transition-opacity duration-1000 <?php echo $index === 0 ? 'carousel-slide-active' : 'carousel-slide-hidden'; ?>"
+                     data-slide="<?php echo $index; ?>">
+                    <img src="<?php echo htmlspecialchars($slide['image_path']); ?>" 
+                         alt="<?php echo htmlspecialchars($slide['title'] ?? 'IUT SIKS'); ?>"
+                         class="w-full h-full object-cover">
+                </div>
+            <?php endforeach; ?>
+            <!-- Dark Blurry Overlay -->
+            <div class="absolute inset-0 bg-black/60 backdrop-blur-[2px] z-10"></div>
+        </div>
 
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 text-center">
-        <h1 class="text-7xl md:text-9xl font-display font-bold text-emerald-950 mb-8 leading-tight tracking-tight">
-            IUT <span class="text-black">SIKS</span>
+        <!-- Carousel Navigation Dots -->
+        <?php if (count($heroSlides) > 1): ?>
+            <div class="absolute bottom-8 left-1/2 -translate-x-1/2 z-30 flex items-center space-x-2">
+                <?php foreach ($heroSlides as $index => $slide): ?>
+                    <button class="carousel-dot <?php echo $index === 0 ? 'carousel-dot-active' : ''; ?>"
+                            onclick="goToSlide(<?php echo $index; ?>)"
+                            data-dot="<?php echo $index; ?>"></button>
+                <?php endforeach; ?>
+            </div>
+        <?php endif; ?>
+    <?php else: ?>
+        <!-- Fallback: decorative gradient background if no slides -->
+        <div class="absolute inset-0 z-0" style="background: linear-gradient(135deg, #0a0a0a 0%, #1a1a1a 50%, #0a0a0a 100%);">
+            <div class="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-white/5 blur-[120px] rounded-full"></div>
+            <div class="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] bg-white/3 blur-[120px] rounded-full"></div>
+        </div>
+    <?php endif; ?>
+
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-20 text-center">
+        <h1 class="text-7xl md:text-9xl font-display font-bold mb-8 leading-tight tracking-tight text-white">
+            IUT <span style="color: #88c9a1;">SIKS</span>
         </h1>
 
-        <p class="text-emerald-950/60 text-lg md:text-xl max-w-2xl mx-auto mb-12 leading-relaxed font-medium">
+        <p class="text-lg md:text-xl max-w-2xl mx-auto mb-12 leading-relaxed font-medium text-white/70">
             Fostering spiritual growth and academic excellence at Islamic University of Technology.
         </p>
 
         <div class="flex flex-col sm:flex-row items-center justify-center space-y-4 sm:space-y-0 sm:space-x-6">
             <a href="events.php"
-                class="w-full sm:w-auto px-10 py-5 bg-emerald-950 hover:bg-black text-white rounded-2xl font-bold transition-all duration-300 shadow-2xl shadow-black/10 flex items-center justify-center group">
+                class="w-full sm:w-56 px-10 py-5 border border-transparent bg-white text-emerald-950 hover:bg-emerald-50 rounded-2xl font-bold transition-all duration-300 shadow-2xl shadow-black/10 flex items-center justify-center group">
                 Explore Events
                 <i class="fas fa-chevron-right ml-3 text-xs transition-transform group-hover:translate-x-1"></i>
             </a>
             <a href="articles.php"
-                class="w-full sm:w-auto px-10 py-5 bg-white border border-black/5 hover:border-black/20 text-emerald-950 rounded-2xl font-bold transition-all duration-300 flex items-center justify-center">
+                class="w-full sm:w-56 px-10 py-5 bg-white/10 border border-white/20 text-white hover:bg-white/20 backdrop-blur-md rounded-2xl font-bold transition-all duration-300 flex items-center justify-center">
                 Read Articles
             </a>
         </div>
     </div>
 </section>
+
+<!-- Hero Carousel JS -->
+<?php if ($heroSlides && count($heroSlides) > 1): ?>
+<script>
+    let currentSlide = 0;
+    const totalSlides = <?php echo count($heroSlides); ?>;
+    let slideInterval;
+
+    function goToSlide(index) {
+        const slides = document.querySelectorAll('.carousel-slide');
+        const dots = document.querySelectorAll('.carousel-dot');
+        
+        slides.forEach(s => { s.classList.remove('carousel-slide-active'); s.classList.add('carousel-slide-hidden'); });
+        dots.forEach(d => d.classList.remove('carousel-dot-active'));
+        
+        slides[index].classList.remove('carousel-slide-hidden');
+        slides[index].classList.add('carousel-slide-active');
+        dots[index].classList.add('carousel-dot-active');
+        
+        currentSlide = index;
+        resetInterval();
+    }
+
+    function nextSlide() {
+        goToSlide((currentSlide + 1) % totalSlides);
+    }
+
+    function resetInterval() {
+        clearInterval(slideInterval);
+        slideInterval = setInterval(nextSlide, 5000);
+    }
+
+    slideInterval = setInterval(nextSlide, 5000);
+</script>
+<?php endif; ?>
 
 <!-- Dynamic Prayer Schedule Section -->
 <section id="upcoming" class="py-20 text-white relative overflow-hidden" style="background-color: #062021;">
@@ -113,65 +187,8 @@ $randomHadith = getRandomHadith();
     </div>
 </section>
 
-<!-- Daily Reminders Section -->
-<section id="reminders" class="py-32 bg-white">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div class="text-center mb-20">
-            <h2 class="text-4xl font-display font-bold text-emerald-950 mb-6 tracking-tight">Daily Reminders</h2>
-            <p class="text-emerald-950/40 max-w-2xl mx-auto font-medium italic">Spiritual guidance to keep your heart connected.</p>
-        </div>
-
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-12">
-            <!-- Ayat Reminder -->
-            <div class="p-10 bg-emerald-50 border border-emerald-100 rounded-[40px] shadow-sm relative overflow-hidden">
-                <div class="absolute top-0 right-0 p-8 opacity-5">
-                    <i class="fas fa-book-quran text-7xl text-emerald-950"></i>
-                </div>
-                <span class="inline-block px-4 py-1.5 rounded-full bg-emerald-100 text-emerald-700 text-[10px] font-bold uppercase tracking-widest mb-6">Ayat of the Day</span>
-                <?php if ($randomAyat): ?>
-                    <p class="text-xl font-display font-medium text-emerald-950 leading-relaxed mb-8 italic">"<?php echo htmlspecialchars($randomAyat['text']); ?>"</p>
-                    <div class="flex items-center space-x-3">
-                        <div class="w-10 h-10 rounded-full bg-emerald-950 flex items-center justify-center text-white">
-                            <i class="fas fa-leaf text-xs"></i>
-                        </div>
-                        <div>
-                            <p class="text-emerald-950 font-bold text-sm">Surah <?php echo $randomAyat['surah']; ?></p>
-                            <p class="text-emerald-600/60 text-[10px] font-bold uppercase tracking-widest">Verse <?php echo $randomAyat['ayah']; ?></p>
-                        </div>
-                    </div>
-                <?php else: ?>
-                    <p class="text-emerald-950/40 italic">Unable to fetch Ayat at the moment.</p>
-                <?php endif; ?>
-            </div>
-
-            <!-- Hadith Reminder -->
-            <div class="p-10 bg-white border border-emerald-100 rounded-[40px] shadow-xl shadow-emerald-900/5 relative overflow-hidden">
-                <div class="absolute top-0 right-0 p-8 opacity-5">
-                    <i class="fas fa-quote-right text-7xl text-emerald-950"></i>
-                </div>
-                <span class="inline-block px-4 py-1.5 rounded-full bg-emerald-50 text-emerald-600 text-[10px] font-bold uppercase tracking-widest mb-6">Hadith of the Day</span>
-                <?php if ($randomHadith): ?>
-                    <p class="text-xl font-display font-medium text-emerald-950 leading-relaxed mb-8 italic">"<?php echo htmlspecialchars($randomHadith['text']); ?>"</p>
-                    <div class="flex items-center space-x-3">
-                        <div class="w-10 h-10 rounded-full bg-emerald-600 flex items-center justify-center text-white">
-                            <i class="fas fa-heart text-xs"></i>
-                        </div>
-                        <div>
-                            <p class="text-emerald-950 font-bold text-sm"><?php echo $randomHadith['source']; ?></p>
-                            <p class="text-emerald-600/60 text-[10px] font-bold uppercase tracking-widest">Random Selection</p>
-                        </div>
-                    </div>
-                <?php else: ?>
-                    <p class="text-emerald-950/40 italic">Unable to fetch Hadith at the moment.</p>
-                <?php endif; ?>
-            </div>
-        </div>
-    </div>
-</section>
-
 <script>
     // Sync the section countdown with the header countdown
-    const prayers = <?php echo json_encode($nextPrayerTimes); ?>;
     function updateSectionCountdown() {
         if (!prayers || prayers.length === 0) return;
         const now = new Date();
@@ -204,22 +221,186 @@ $randomHadith = getRandomHadith();
     updateSectionCountdown();
 </script>
 
-<style>
-    @keyframes fade-in {
-        from {
-            opacity: 0;
-            transform: translateY(20px);
+<!-- Daily Reminders Section -->
+<section id="reminders" class="py-32 bg-white">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="text-center mb-20">
+            <h2 class="text-4xl font-display font-bold text-emerald-950 mb-6 tracking-tight">Daily Reminders</h2>
+            <p class="text-emerald-950/40 max-w-2xl mx-auto font-medium italic">Spiritual guidance to keep your heart connected.</p>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-12">
+            <!-- Ayat Reminder -->
+            <div class="card-professional p-10 relative overflow-hidden">
+                <div class="absolute top-0 right-0 p-8 opacity-5">
+                    <i class="fas fa-book-quran text-7xl text-emerald-950"></i>
+                </div>
+                <span class="inline-block px-4 py-1.5 rounded-full bg-emerald-50 text-emerald-700 text-[10px] font-bold uppercase tracking-widest mb-6 border border-emerald-100">Ayat of the Day</span>
+                <?php if ($randomAyat): ?>
+                    <p class="text-xl font-display font-medium text-emerald-950 leading-relaxed mb-8 italic">"<?php echo htmlspecialchars($randomAyat['text']); ?>"</p>
+                    <div class="flex items-center space-x-3">
+                        <div class="w-10 h-10 rounded-full bg-emerald-950 flex items-center justify-center text-white">
+                            <i class="fas fa-leaf text-xs"></i>
+                        </div>
+                        <div>
+                            <p class="text-emerald-950 font-bold text-sm">Surah <?php echo $randomAyat['surah']; ?></p>
+                            <p class="text-emerald-600/60 text-[10px] font-bold uppercase tracking-widest">Verse <?php echo $randomAyat['ayah']; ?></p>
+                        </div>
+                    </div>
+                <?php else: ?>
+                    <p class="text-emerald-950/40 italic">Unable to fetch Ayat at the moment.</p>
+                <?php endif; ?>
+            </div>
+
+            <!-- Hadith Reminder -->
+            <div class="card-professional p-10 relative overflow-hidden shadow-xl shadow-emerald-900/5">
+                <div class="absolute top-0 right-0 p-8 opacity-5">
+                    <i class="fas fa-quote-right text-7xl text-emerald-950"></i>
+                </div>
+                <span class="inline-block px-4 py-1.5 rounded-full bg-emerald-50 text-emerald-600 text-[10px] font-bold uppercase tracking-widest mb-6 border border-emerald-100">Hadith of the Day</span>
+                <?php if ($randomHadith): ?>
+                    <p class="text-xl font-display font-medium text-emerald-950 leading-relaxed mb-8 italic">"<?php echo htmlspecialchars($randomHadith['text']); ?>"</p>
+                    <div class="flex items-center space-x-3">
+                        <div class="w-10 h-10 rounded-full bg-emerald-600 flex items-center justify-center text-white">
+                            <i class="fas fa-heart text-xs"></i>
+                        </div>
+                        <div>
+                            <p class="text-emerald-950 font-bold text-sm"><?php echo $randomHadith['source']; ?></p>
+                            <p class="text-emerald-600/60 text-[10px] font-bold uppercase tracking-widest">Random Selection</p>
+                        </div>
+                    </div>
+                <?php else: ?>
+                    <p class="text-emerald-950/40 italic">Unable to fetch Hadith at the moment.</p>
+                <?php endif; ?>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Recent Past Events Carousel -->
+<?php if ($recentPastEvents && count($recentPastEvents) > 0): ?>
+<section class="py-24 bg-white overflow-hidden">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-14">
+        <div class="flex items-center justify-between">
+            <div>
+                <div class="inline-flex items-center space-x-2 px-3 py-1 rounded-full bg-emerald-50 border border-emerald-100 mb-4">
+                    <span class="text-[9px] font-black uppercase tracking-widest text-emerald-600">Memories</span>
+                </div>
+                <h2 class="text-4xl font-display font-bold text-emerald-950 tracking-tight">Recent Events</h2>
+            </div>
+            <a href="events.php" class="hidden sm:inline-flex items-center px-6 py-3 rounded-full bg-emerald-950/5 border border-emerald-950/10 text-emerald-950/60 text-sm font-bold hover:bg-emerald-950/10 transition-colors">
+                View All <i class="fas fa-arrow-right ml-2 text-xs"></i>
+            </a>
+        </div>
+    </div>
+
+    <!-- Step Carousel Track -->
+    <div class="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="overflow-hidden rounded-3xl">
+            <div id="events-track" class="flex transition-transform duration-700 ease-in-out" style="gap: 1.5rem;">
+                <?php foreach ($recentPastEvents as $idx => $evt): ?>
+                    <a href="event_details.php?id=<?php echo $evt['id']; ?>" class="events-slide flex-none group" style="width: calc((100% - 3rem) / 3);">
+                        <div class="rounded-3xl overflow-hidden bg-emerald-950 border border-emerald-950/10 shadow-lg hover:shadow-xl transition-all duration-300 h-full">
+                            <!-- Card Image -->
+                            <div class="h-48 overflow-hidden">
+                                <?php if (!empty($evt['cover_image'])): ?>
+                                    <img src="<?php echo htmlspecialchars($evt['cover_image']); ?>" 
+                                         alt="<?php echo htmlspecialchars($evt['name']); ?>"
+                                         class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700">
+                                <?php else: ?>
+                                    <div class="w-full h-full bg-emerald-900/50 flex items-center justify-center">
+                                        <i class="fas <?php echo htmlspecialchars($evt['logo'] ?? 'fa-calendar'); ?> text-4xl text-white/20"></i>
+                                    </div>
+                                <?php endif; ?>
+                            </div>
+                            <!-- Card Info -->
+                            <div class="p-5">
+                                <p class="text-[10px] font-bold uppercase tracking-widest text-white/30 mb-2">
+                                    <?php echo date('M d, Y', strtotime($evt['event_date'])); ?>
+                                </p>
+                                <h3 class="text-white font-bold text-lg leading-snug line-clamp-2 group-hover:text-emerald-300 transition-colors">
+                                    <?php echo htmlspecialchars($evt['name']); ?>
+                                </h3>
+                                <?php if (!empty($evt['venue'])): ?>
+                                    <p class="text-white/30 text-xs font-medium mt-2">
+                                        <i class="fas fa-map-marker-alt mr-1"></i>
+                                        <?php echo htmlspecialchars($evt['venue']); ?>
+                                    </p>
+                                <?php endif; ?>
+                            </div>
+                        </div>
+                    </a>
+                <?php endforeach; ?>
+            </div>
+        </div>
+
+        <!-- Navigation Dots -->
+        <?php $totalEvents = count($recentPastEvents); $perPage = 3; $totalPages = ceil($totalEvents / $perPage); ?>
+        <?php if ($totalPages > 1): ?>
+        <div class="flex items-center justify-center mt-8 space-x-2">
+            <?php for ($p = 0; $p < $totalPages; $p++): ?>
+                <button class="events-dot w-2 h-2 rounded-full transition-all duration-300 <?php echo $p === 0 ? 'bg-emerald-950 w-6' : 'bg-emerald-950/20'; ?>"
+                        onclick="goToEventSlide(<?php echo $p; ?>)" data-edot="<?php echo $p; ?>"></button>
+            <?php endfor; ?>
+        </div>
+        <?php endif; ?>
+    </div>
+
+    <!-- Mobile CTA -->
+    <div class="sm:hidden text-center mt-10">
+        <a href="events.php" class="inline-flex items-center px-6 py-3 rounded-full bg-emerald-950 text-white text-sm font-bold hover:bg-black transition-colors">
+            View All Events <i class="fas fa-arrow-right ml-2 text-xs"></i>
+        </a>
+    </div>
+</section>
+
+<script>
+(function() {
+    const track = document.getElementById('events-track');
+    if (!track) return;
+
+    const slides = track.querySelectorAll('.events-slide');
+    const perPage = window.innerWidth < 768 ? 1 : 3;
+    const totalPages = Math.ceil(slides.length / perPage);
+    let current = 0;
+    let autoInterval;
+
+    window.eventTotalPages = totalPages;
+    window.currentEventSlide = 0;
+
+    window.goToEventSlide = function(page) {
+        current = page;
+        window.currentEventSlide = page;
+        const slideWidth = slides[0].offsetWidth + 24; // width + gap
+        const offset = page * perPage * slideWidth;
+        track.style.transform = `translateX(-${offset}px)`;
+
+        // Update dots
+        document.querySelectorAll('.events-dot').forEach(d => {
+            d.classList.remove('bg-emerald-950', 'w-6');
+            d.classList.add('bg-emerald-950/20');
+        });
+        const activeDot = document.querySelector(`[data-edot="${page}"]`);
+        if (activeDot) {
+            activeDot.classList.add('bg-emerald-950', 'w-6');
+            activeDot.classList.remove('bg-emerald-950/20');
         }
 
-        to {
-            opacity: 1;
-            transform: translateY(0);
-        }
+        resetAutoSlide();
+    };
+
+    function nextSlide() {
+        goToEventSlide((current + 1) % totalPages);
     }
 
-    .animate-fade-in {
-        animation: fade-in 1s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    function resetAutoSlide() {
+        clearInterval(autoInterval);
+        autoInterval = setInterval(nextSlide, 4000);
     }
-</style>
+
+    autoInterval = setInterval(nextSlide, 4000);
+})();
+</script>
+<?php endif; ?>
 
 <?php require_once 'includes/footer.php'; ?>

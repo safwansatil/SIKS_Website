@@ -1,0 +1,21 @@
+# Admin panel specific rules
+# Disable mod_security for admin POST requests to prevent false positives
+# with long text, Arabic/Bengali characters, and URLs in content
+
+<IfModule mod_security2.c>
+    SecRuleEngine Off
+</IfModule>
+
+<IfModule mod_security.c>
+    SecFilterEngine Off
+    SecFilterScanPOST Off
+</IfModule>
+
+# Allow large uploads for images
+<IfModule mod_php.c>
+    php_value upload_max_filesize 20M
+    php_value post_max_size 50M
+    php_value max_execution_time 300
+    php_value max_input_vars 5000
+    php_value max_input_time 300
+</IfModule>

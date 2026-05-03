@@ -50,7 +50,7 @@
             <div class="space-y-6">
                 <h3 class="text-white/30 font-black text-[9px] uppercase tracking-[0.2em]">Resources</h3>
                 <ul class="space-y-4">
-                    <li><a href="reminders.php"
+                    <li><a href="index.php#reminders"
                             class="text-white/60 hover:text-white text-[11px] font-bold transition-all duration-300">Daily
                             Reminders</a></li>
                     <li><a href="index.php#upcoming"
@@ -69,7 +69,7 @@
                     <li><a href="events.php"
                             class="text-white/60 hover:text-white text-[11px] font-bold transition-all duration-300">Upcoming
                             Events</a></li>
-                    <li><a href="contact.php"
+                    <li><a href="mailto:siks@iut-dhaka.edu"
                             class="text-white/60 hover:text-white text-[11px] font-bold transition-all duration-300">Contact
                             Us</a></li>
                     <li>

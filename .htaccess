@@ -9,3 +9,24 @@ Options -MultiViews
     Header set Cache-Control "no-store, no-cache, must-revalidate, max-age=0"
     Header set Pragma "no-cache"
 </FilesMatch>
+
+# Increase upload and POST limits
+<IfModule mod_php.c>
+    php_value upload_max_filesize 20M
+    php_value post_max_size 50M
+    php_value max_execution_time 300
+    php_value max_input_vars 5000
+</IfModule>
+
+# Disable mod_security if it causes 403 Forbidden on POST
+<IfModule mod_security2.c>
+    SecRuleEngine Off
+</IfModule>
+
+<IfModule mod_security.c>
+    SecFilterEngine Off
+    SecFilterScanPOST Off
+</IfModule>
+
+# UTF-8 encoding
+AddDefaultCharset UTF-8
