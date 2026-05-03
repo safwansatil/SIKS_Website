@@ -19,3 +19,6 @@ Thumbs.db
 # Logs
 error_log
 php_errors.log
+
+
+.env
