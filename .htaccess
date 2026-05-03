@@ -1,0 +1,11 @@
+# Prevent directory listing
+Options -Indexes
+
+# Disable MultiViews to prevent extension guessing loops
+Options -MultiViews
+
+# Ensure PHP files are handled correctly
+<FilesMatch "\.php$">
+    Header set Cache-Control "no-store, no-cache, must-revalidate, max-age=0"
+    Header set Pragma "no-cache"
+</FilesMatch>

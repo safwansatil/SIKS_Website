@@ -9,6 +9,9 @@
 // Timezone Setting
 date_default_timezone_set('Asia/Dhaka');
 
+// Include Database Connection
+require_once __DIR__ . '/db.php';
+
 // Include Composer Autoloader
 require_once dirname(__DIR__) . '/vendor/autoload.php';
 
@@ -17,122 +20,28 @@ define('SITE_NAME', 'IUT-SIKS');
 define('SITE_TAGLINE', 'Society of Islamic Knowledge Seekers');
 define('IUT_ADDRESS', 'Islamic University of Technology, Board Bazar, Gazipur-1704');
 define('MAPS_URL', 'https://www.google.com/maps/search/?api=1&query=Islamic+University+of+Technology');
+define('MASJID_NAME', 'Masjid-e-Zainab IUT');
 
 // Social Media Links
 define('YOUTUBE_URL', 'https://www.youtube.com/@IUTSIKSOfficial');
-define('FACEBOOK_URL', 'https://www.facebook.com/iutsiks'); // Placeholder, PRD said "Link to official page"
-
-// Data Source Configuration
-define('GOOGLE_SHEETS_CSV_URL', 'https://docs.google.com/spreadsheets/d/1oD22Op0-b0D5tgNqZFbDWJPaju0mQ_H234Rx0ZgRtKM/export?format=csv');
-define('CACHE_FILE', 'prayer_cache.json');
-define('CACHE_EXPIRATION', 3600); // 1 hour
+define('FACEBOOK_URL', 'https://www.facebook.com/iutsiks');
 
 /**
- * Fetches prayer times from Google Sheets or local cache.
+ * Fetches prayer times from the database.
  * 
  * @return array|null Returns an array of prayer times or null on failure.
  */
 function getPrayerTimes()
 {
-    $cachePath = dirname(__DIR__) . DIRECTORY_SEPARATOR . CACHE_FILE;
+    global $pdo;
+    if (!$pdo) return null;
 
-    // Check if cache exists and is valid
-    if (file_exists($cachePath) && (time() - filemtime($cachePath) < CACHE_EXPIRATION)) {
-        $cachedData = json_decode(file_get_contents($cachePath), true);
-        if ($cachedData) {
-            return $cachedData;
-        }
+    try {
+        $stmt = $pdo->query("SELECT prayer_name as name, prayer_time as time FROM prayer_times ORDER BY id ASC");
+        return $stmt->fetchAll();
+    } catch (PDOException $e) {
+        return null;
     }
-
-    // Cache invalid or missing, fetch from source
-    $csvData = fetchUrlContent(GOOGLE_SHEETS_CSV_URL);
-    if ($csvData) {
-        $parsedData = parsePrayerCsv($csvData);
-        if ($parsedData) {
-            file_put_contents($cachePath, json_encode($parsedData));
-            return $parsedData;
-        }
-    }
-
-    // Fallback to cache if network fails, even if expired
-    if (file_exists($cachePath)) {
-        return json_decode(file_get_contents($cachePath), true);
-    }
-
-    return null;
-}
-
-/**
- * Robustly fetches content from a URL using file_get_contents or cURL.
- * 
- * @param string $url The URL to fetch.
- * @return string|false The content or false on failure.
- */
-function fetchUrlContent($url)
-{
-    // Try file_get_contents first
-    $context = stream_context_create([
-        "http" => [
-            "header" => "User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) PHP/" . PHP_VERSION . "\r\n",
-            "follow_location" => 1,
-            "timeout" => 10
-        ]
-    ]);
-
-    $content = @file_get_contents($url, false, $context);
-
-    if ($content === false && function_exists('curl_init')) {
-        $ch = curl_init();
-        curl_setopt($ch, CURLOPT_URL, $url);
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
-        curl_setopt($ch, CURLOPT_FOLLOWLOCATION, 1);
-        curl_setopt($ch, CURLOPT_USERAGENT, 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) PHP/' . PHP_VERSION);
-        curl_setopt($ch, CURLOPT_TIMEOUT, 10);
-        $content = curl_exec($ch);
-        curl_close($ch);
-    }
-
-    return $content;
-}
-
-/**
- * Parses the prayer time CSV data.
- * Assumes CSV structure: Prayer Name, Time
- * 
- * @param string $csvContent The CSV content.
- * @return array Parsed prayer times.
- */
-function parsePrayerCsv($csvContent)
-{
-    $lines = explode("\n", str_replace("\r", "", $csvContent));
-    $prayers = [];
-
-    foreach ($lines as $line) {
-        $data = str_getcsv($line);
-        if (count($data) >= 2) {
-            $name = trim($data[0]);
-            $time = trim($data[1]);
-
-            // Aggressive Regex Filtering for Sunrise and Headers
-            // Catch: Sunrise, Shurooq, Churooq, Prayer Name, Time
-            if (
-                preg_match('/(sunrise|shurooq|churooq|prayer\s*name|time)/i', $name) ||
-                preg_match('/(time)/i', $time)
-            ) {
-                continue;
-            }
-
-            // Basic validation to ensure it looks like a prayer time (e.g., "5:15 AM")
-            if (!empty($name) && !empty($time)) {
-                $prayers[] = [
-                    'name' => $name,
-                    'time' => $time
-                ];
-            }
-        }
-    }
-
-    return $prayers;
 }
 
 /**
@@ -167,9 +76,6 @@ function getCurrentPrayer($prayers)
 
     // Default to the last prayer if it's late at night (e.g., after Isha but before next Fajr)
     if ($activePrayer === null && !empty($prayers)) {
-        // If it's before the first prayer (Fajr), the "current" might be Isha from yesterday, 
-        // but highlighting Fajr as "Next" is usually better. 
-        // For simplicity, if after all prayers, last one is active. If before all, last one (from yesterday) is technically active.
         $activePrayer = end($prayers)['name'];
     }
 
@@ -177,87 +83,79 @@ function getCurrentPrayer($prayers)
 }
 
 /**
- * Static Events Data
+ * Helper to get About Content by type
  */
-define('EVENTS', [
-    [
-        'id' => 1,
-        'title' => 'Annual Quran Competition',
-        'category' => 'Community',
-        'date' => '2026-03-15',
-        'time' => '10:00 AM',
-        'location' => 'IUT Auditorium',
-        'description' => 'A university-wide competition focused on Quranic recitation and memorization. Open to all students.',
-        'icon' => 'fa-book-quran'
-    ],
-    [
-        'id' => 2,
-        'title' => 'Islamic Calligraphy Workshop',
-        'category' => 'Community',
-        'date' => '2026-03-20',
-        'time' => '02:30 PM',
-        'location' => 'Art Studio',
-        'description' => 'Learn the foundations of Thuluth and Naskh scripts from professional calligraphers.',
-        'icon' => 'fa-pen-nib'
-    ],
-    [
-        'id' => 3,
-        'title' => 'SIKS Futsal Cup',
-        'category' => 'Sports',
-        'date' => '2026-04-05',
-        'time' => '05:00 PM',
-        'location' => 'IUT Sports Ground',
-        'description' => 'A friendly football tournament to build brotherhood and physical well-being among society members.',
-        'icon' => 'fa-futbol'
-    ],
-    [
-        'id' => 4,
-        'title' => 'Ramadan Preparation Seminar',
-        'category' => 'Community',
-        'date' => '2026-02-28',
-        'time' => '07:30 PM',
-        'location' => 'IUT Mosque',
-        'description' => 'A special lecture series dedicated to spiritual and physical preparation for the holy month of Ramadan.',
-        'icon' => 'fa-moon'
-    ]
-]);
+function getAboutContent($type = null)
+{
+    global $pdo;
+    if (!$pdo) return [];
+
+    try {
+        if ($type) {
+            $stmt = $pdo->prepare("SELECT * FROM about_content WHERE type = ? ORDER BY sort_order ASC");
+            $stmt->execute([$type]);
+        } else {
+            $stmt = $pdo->query("SELECT * FROM about_content ORDER BY sort_order ASC");
+        }
+        return $stmt->fetchAll();
+    } catch (PDOException $e) {
+        return [];
+    }
+}
 
 /**
- * Moments of Community Data
+ * Helper to get Events
  */
-define('MOMENTS', [
-    ['title' => 'Annual Gathering', 'icon' => 'fa-users'],
-    ['title' => 'Islamic Congregation', 'icon' => 'fa-mosque'],
-    ['title' => 'Cricket Tournament', 'icon' => 'fa-trophy'],
-    ['title' => 'Fundraiser For Palestine', 'icon' => 'fa-hand-holding-heart'],
-    ['title' => 'Islamic Lecture', 'icon' => 'fa-chalkboard-teacher'],
-    ['title' => 'Charity Drive', 'icon' => 'fa-box-open']
-]);
+function getEvents($is_past = false, $limit = null)
+{
+    global $pdo;
+    if (!$pdo) return [];
+
+    try {
+        $sql = "SELECT * FROM events WHERE is_past = ? ORDER BY event_date DESC";
+        if ($limit) $sql .= " LIMIT " . (int)$limit;
+        
+        $stmt = $pdo->prepare($sql);
+        $stmt->execute([$is_past ? 1 : 0]);
+        return $stmt->fetchAll();
+    } catch (PDOException $e) {
+        return [];
+    }
+}
 
 /**
- * Growing Together Values
+ * Fetch random Ayat from Al Quran Cloud API
  */
-define('VALUES', [
-    [
-        'title' => 'Purpose-Driven',
-        'desc' => 'Guided by Islamic values and principles',
-        'icon' => 'fa-compass'
-    ],
-    [
-        'title' => 'Community',
-        'desc' => 'Building a stronger community every day',
-        'icon' => 'fa-people-group'
-    ],
-    [
-        'title' => 'Knowledge',
-        'desc' => 'Continuous learning and spiritual growth',
-        'icon' => 'fa-book-open'
-    ],
-    [
-        'title' => 'Excellence',
-        'desc' => 'Striving for the highest standards',
-        'icon' => 'fa-star'
-    ]
-]);
+function getRandomAyat()
+{
+    $url = "https://api.alquran.cloud/v1/ayah/random/en.asad";
+    $data = @json_decode(file_get_contents($url), true);
+    if ($data && isset($data['data'])) {
+        return [
+            'text' => $data['data']['text'],
+            'surah' => $data['data']['surah']['englishName'],
+            'ayah' => $data['data']['numberInSurah']
+        ];
+    }
+    return null;
+}
+
+/**
+ * Fetch random Hadith from fawazahmed0/hadith-api
+ */
+function getRandomHadith()
+{
+    $randomId = rand(1, 500);
+    $url = "https://cdn.jsdelivr.net/gh/fawazahmed0/hadith-api@1/editions/eng-bukhari/$randomId.json";
+    $data = @json_decode(file_get_contents($url), true);
+    if ($data && isset($data['hadiths'][0])) {
+        return [
+            'text' => $data['hadiths'][0]['text'],
+            'source' => 'Sahih al-Bukhari'
+        ];
+    }
+    return null;
+}
+
 
 

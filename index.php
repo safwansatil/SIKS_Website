@@ -5,6 +5,10 @@ require_once 'includes/header.php';
 // Data for home page highlights
 $nextPrayerTimes = getPrayerTimes();
 $currentHomePrayer = $nextPrayerTimes ? getCurrentPrayer($nextPrayerTimes) : null;
+
+// Fetch random reminders
+$randomAyat = getRandomAyat();
+$randomHadith = getRandomHadith();
 ?>
 
 <!-- Hero Section -->
@@ -30,9 +34,9 @@ $currentHomePrayer = $nextPrayerTimes ? getCurrentPrayer($nextPrayerTimes) : nul
                 Explore Events
                 <i class="fas fa-chevron-right ml-3 text-xs transition-transform group-hover:translate-x-1"></i>
             </a>
-            <a href="reminders.php"
+            <a href="articles.php"
                 class="w-full sm:w-auto px-10 py-5 bg-white border border-black/5 hover:border-black/20 text-emerald-950 rounded-2xl font-bold transition-all duration-300 flex items-center justify-center">
-                Daily Reminders
+                Read Articles
             </a>
         </div>
     </div>
@@ -53,7 +57,7 @@ $currentHomePrayer = $nextPrayerTimes ? getCurrentPrayer($nextPrayerTimes) : nul
                     class="inline-flex items-center space-x-2 px-3 py-1 rounded-full bg-white/5 border border-white/10 mb-4">
                     <span class="text-[9px] font-black uppercase tracking-widest text-white/50">Jamaat Timetable</span>
                 </div>
-                <h2 class="text-4xl font-display font-bold text-white tracking-tight">Today's Schedule</h2>
+                <h2 class="text-4xl font-display font-bold text-white tracking-tight"><?php echo MASJID_NAME; ?></h2>
             </div>
 
             <!-- Redesigned Minimal Countdown Capsule -->
@@ -109,8 +113,65 @@ $currentHomePrayer = $nextPrayerTimes ? getCurrentPrayer($nextPrayerTimes) : nul
     </div>
 </section>
 
+<!-- Daily Reminders Section -->
+<section id="reminders" class="py-32 bg-white">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="text-center mb-20">
+            <h2 class="text-4xl font-display font-bold text-emerald-950 mb-6 tracking-tight">Daily Reminders</h2>
+            <p class="text-emerald-950/40 max-w-2xl mx-auto font-medium italic">Spiritual guidance to keep your heart connected.</p>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-12">
+            <!-- Ayat Reminder -->
+            <div class="p-10 bg-emerald-50 border border-emerald-100 rounded-[40px] shadow-sm relative overflow-hidden">
+                <div class="absolute top-0 right-0 p-8 opacity-5">
+                    <i class="fas fa-book-quran text-7xl text-emerald-950"></i>
+                </div>
+                <span class="inline-block px-4 py-1.5 rounded-full bg-emerald-100 text-emerald-700 text-[10px] font-bold uppercase tracking-widest mb-6">Ayat of the Day</span>
+                <?php if ($randomAyat): ?>
+                    <p class="text-xl font-display font-medium text-emerald-950 leading-relaxed mb-8 italic">"<?php echo htmlspecialchars($randomAyat['text']); ?>"</p>
+                    <div class="flex items-center space-x-3">
+                        <div class="w-10 h-10 rounded-full bg-emerald-950 flex items-center justify-center text-white">
+                            <i class="fas fa-leaf text-xs"></i>
+                        </div>
+                        <div>
+                            <p class="text-emerald-950 font-bold text-sm">Surah <?php echo $randomAyat['surah']; ?></p>
+                            <p class="text-emerald-600/60 text-[10px] font-bold uppercase tracking-widest">Verse <?php echo $randomAyat['ayah']; ?></p>
+                        </div>
+                    </div>
+                <?php else: ?>
+                    <p class="text-emerald-950/40 italic">Unable to fetch Ayat at the moment.</p>
+                <?php endif; ?>
+            </div>
+
+            <!-- Hadith Reminder -->
+            <div class="p-10 bg-white border border-emerald-100 rounded-[40px] shadow-xl shadow-emerald-900/5 relative overflow-hidden">
+                <div class="absolute top-0 right-0 p-8 opacity-5">
+                    <i class="fas fa-quote-right text-7xl text-emerald-950"></i>
+                </div>
+                <span class="inline-block px-4 py-1.5 rounded-full bg-emerald-50 text-emerald-600 text-[10px] font-bold uppercase tracking-widest mb-6">Hadith of the Day</span>
+                <?php if ($randomHadith): ?>
+                    <p class="text-xl font-display font-medium text-emerald-950 leading-relaxed mb-8 italic">"<?php echo htmlspecialchars($randomHadith['text']); ?>"</p>
+                    <div class="flex items-center space-x-3">
+                        <div class="w-10 h-10 rounded-full bg-emerald-600 flex items-center justify-center text-white">
+                            <i class="fas fa-heart text-xs"></i>
+                        </div>
+                        <div>
+                            <p class="text-emerald-950 font-bold text-sm"><?php echo $randomHadith['source']; ?></p>
+                            <p class="text-emerald-600/60 text-[10px] font-bold uppercase tracking-widest">Random Selection</p>
+                        </div>
+                    </div>
+                <?php else: ?>
+                    <p class="text-emerald-950/40 italic">Unable to fetch Hadith at the moment.</p>
+                <?php endif; ?>
+            </div>
+        </div>
+    </div>
+</section>
+
 <script>
     // Sync the section countdown with the header countdown
+    const prayers = <?php echo json_encode($nextPrayerTimes); ?>;
     function updateSectionCountdown() {
         if (!prayers || prayers.length === 0) return;
         const now = new Date();
@@ -142,37 +203,6 @@ $currentHomePrayer = $nextPrayerTimes ? getCurrentPrayer($nextPrayerTimes) : nul
     setInterval(updateSectionCountdown, 1000);
     updateSectionCountdown();
 </script>
-
-<!-- Moments of Community -->
-<section id="moments" class="py-32">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div class="text-center mb-20">
-            <h2 class="text-4xl font-display font-bold text-emerald-950 mb-6 tracking-tight">Moments of Community</h2>
-            <p class="text-emerald-950/40 max-w-2xl mx-auto font-medium italic">A glimpse into life, events, and
-                spirituality
-                at IUT SIKS through our shared journey.</p>
-        </div>
-
-        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-8">
-            <?php foreach (MOMENTS as $moment): ?>
-                <div
-                    class="group relative aspect-video rounded-[40px] overflow-hidden bg-white border border-emerald-100 cursor-pointer shadow-sm hover:shadow-2xl hover:shadow-emerald-100 transition-all duration-500">
-                    <div class="absolute inset-0 bg-gradient-to-t from-emerald-950/60 via-transparent to-transparent z-10">
-                    </div>
-                    <div
-                        class="absolute inset-0 flex items-center justify-center scale-90 opacity-5 group-hover:scale-100 group-hover:opacity-10 transition-all duration-700">
-                        <i class="fas <?php echo $moment['icon']; ?> text-[100px] text-emerald-950"></i>
-                    </div>
-                    <div class="absolute bottom-8 left-8 z-20 transition-transform duration-500 group-hover:translate-x-2">
-                        <h3 class="text-xl font-bold text-white tracking-wide">
-                            <?php echo $moment['title']; ?>
-                        </h3>
-                    </div>
-                </div>
-            <?php endforeach; ?>
-        </div>
-    </div>
-</section>
 
 <style>
     @keyframes fade-in {
