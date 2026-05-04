@@ -2,8 +2,11 @@
 require_once 'includes/config.php';
 require_once 'includes/header.php';
 
-$upcomingEvents = getEvents(false);  // is_past = false → upcoming
-$pastEvents = getEvents(true);       // is_past = true → past
+$selectedCategory = $_GET['category'] ?? null;
+$categories = getEventCategories();
+
+$upcomingEvents = getEvents(false, null, $selectedCategory);
+$pastEvents = getEvents(true, null, $selectedCategory);
 ?>
 
 <section class="py-24">
@@ -11,6 +14,20 @@ $pastEvents = getEvents(true);       // is_past = true → past
         <div class="text-center mb-16">
             <h2 class="text-4xl font-display font-bold text-emerald-950 mb-4 tracking-tight">Society Events</h2>
             <p class="text-emerald-950/40 max-w-2xl mx-auto font-medium italic">Stay updated with our upcoming programs, workshops, and activities.</p>
+        </div>
+
+        <!-- Category Filter -->
+        <div class="flex flex-wrap items-center justify-center gap-3 mb-16">
+            <a href="events.php" 
+               class="px-6 py-2 rounded-full font-bold text-xs uppercase tracking-widest transition-all <?php echo !$selectedCategory ? 'bg-emerald-950 text-white shadow-lg' : 'bg-emerald-50 text-emerald-950/40 hover:bg-emerald-100'; ?>">
+                All Events
+            </a>
+            <?php foreach ($categories as $cat): ?>
+                <a href="events.php?category=<?php echo urlencode($cat['name']); ?>" 
+                   class="px-6 py-2 rounded-full font-bold text-xs uppercase tracking-widest transition-all <?php echo $selectedCategory === $cat['name'] ? 'bg-emerald-950 text-white shadow-lg' : 'bg-emerald-50 text-emerald-950/40 hover:bg-emerald-100'; ?>">
+                    <?php echo htmlspecialchars($cat['name']); ?>
+                </a>
+            <?php endforeach; ?>
         </div>
 
         <!-- Upcoming Events -->

@@ -117,34 +117,42 @@ function getAboutContent($type = null)
  * @param int|null $limit Max results
  * @return array
  */
-function getEvents($is_past = false, $limit = null)
+function getEvents($is_past = false, $limit = null, $category = null)
 {
     global $pdo;
     if (!$pdo) return [];
 
     $today = date('Y-m-d');
     try {
+        $params = [];
         if ($is_past === null) {
-            // Get all events
-            $sql = "SELECT * FROM events ORDER BY event_date DESC";
+            $sql = "SELECT * FROM events";
+            if ($category) {
+                $sql .= " WHERE category = ?";
+                $params[] = $category;
+            }
+            $sql .= " ORDER BY event_date DESC";
         } else {
             if ($is_past) {
-                // Past events: strictly before today, ordered most recent first
-                $sql = "SELECT * FROM events WHERE event_date < ? ORDER BY event_date DESC";
+                $sql = "SELECT * FROM events WHERE event_date < ?";
+                $params[] = $today;
             } else {
-                // Upcoming events: today and onwards, ordered soonest first
-                $sql = "SELECT * FROM events WHERE event_date >= ? ORDER BY event_date ASC";
+                $sql = "SELECT * FROM events WHERE event_date >= ?";
+                $params[] = $today;
             }
+            
+            if ($category) {
+                $sql .= " AND category = ?";
+                $params[] = $category;
+            }
+            
+            $sql .= $is_past ? " ORDER BY event_date DESC" : " ORDER BY event_date ASC";
         }
         
         if ($limit) $sql .= " LIMIT " . (int)$limit;
         
-        if ($is_past === null) {
-            $stmt = $pdo->query($sql);
-        } else {
-            $stmt = $pdo->prepare($sql);
-            $stmt->execute([$today]);
-        }
+        $stmt = $pdo->prepare($sql);
+        $stmt->execute($params);
         return $stmt->fetchAll();
     } catch (PDOException $e) {
         return [];

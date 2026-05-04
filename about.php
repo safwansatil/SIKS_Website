@@ -49,7 +49,7 @@ $aboutCards = getAboutContent('card');
         <?php if ($pastEvents): ?>
             <div class="mt-32">
                 <div class="inline-flex items-center space-x-2 px-4 py-1.5 rounded-full bg-emerald-50 border border-emerald-200 mb-10">
-                    <span class="text-[10px] font-black uppercase tracking-widest text-emerald-700">Legacy of Excellence</span>
+                    <span class="text-[10px] font-black uppercase tracking-widest text-emerald-700">Past Events</span>
                 </div>
                 <h2 class="text-4xl font-display font-bold text-emerald-950 mb-12 tracking-tight">Our Journey Through Events</h2>
                 

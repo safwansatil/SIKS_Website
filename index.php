@@ -43,14 +43,14 @@ $upcomingEvents = getEvents(false, 3); // Get next 3 upcoming events
         </div>
 
             <!-- Hero Carousel Navigation Buttons -->
-            <div class="absolute inset-y-0 left-4 md:left-8 z-30 hidden md:flex items-center">
-                <button onclick="prevSlide()" class="w-14 h-14 rounded-full bg-black/10 hover:bg-black/30 backdrop-blur-md border border-white/10 text-white flex items-center justify-center transition-all group">
-                    <i class="fas fa-chevron-left group-hover:-translate-x-1 transition-transform"></i>
+            <div class="absolute inset-y-0 left-2 md:left-8 z-30 flex items-center">
+                <button onclick="prevSlide()" class="w-10 h-10 md:w-14 md:h-14 rounded-full bg-black/10 hover:bg-black/30 backdrop-blur-md border border-white/10 text-white flex items-center justify-center transition-all group">
+                    <i class="fas fa-chevron-left group-hover:-translate-x-1 transition-transform text-xs md:text-base"></i>
                 </button>
             </div>
-            <div class="absolute inset-y-0 right-4 md:right-8 z-30 hidden md:flex items-center">
-                <button onclick="nextSlide()" class="w-14 h-14 rounded-full bg-black/10 hover:bg-black/30 backdrop-blur-md border border-white/10 text-white flex items-center justify-center transition-all group">
-                    <i class="fas fa-chevron-right group-hover:translate-x-1 transition-transform"></i>
+            <div class="absolute inset-y-0 right-2 md:right-8 z-30 flex items-center">
+                <button onclick="nextSlide()" class="w-10 h-10 md:w-14 md:h-14 rounded-full bg-black/10 hover:bg-black/30 backdrop-blur-md border border-white/10 text-white flex items-center justify-center transition-all group">
+                    <i class="fas fa-chevron-right group-hover:translate-x-1 transition-transform text-xs md:text-base"></i>
                 </button>
             </div>
 
@@ -100,15 +100,23 @@ $upcomingEvents = getEvents(false, 3); // Get next 3 upcoming events
     let slideInterval;
 
     function goToSlide(index) {
+        if (index < 0) index = totalSlides - 1;
+        if (index >= totalSlides) index = 0;
+        
         const slides = document.querySelectorAll('.carousel-slide');
         const dots = document.querySelectorAll('.carousel-dot-v');
         
-        slides.forEach(s => { s.classList.remove('carousel-slide-active'); s.classList.add('carousel-slide-hidden'); });
+        if (!slides.length) return;
+
+        slides.forEach(s => { 
+            s.classList.remove('carousel-slide-active'); 
+            s.classList.add('carousel-slide-hidden'); 
+        });
         dots.forEach(d => d.classList.remove('carousel-dot-v-active'));
         
         slides[index].classList.remove('carousel-slide-hidden');
         slides[index].classList.add('carousel-slide-active');
-        dots[index].classList.add('carousel-dot-v-active');
+        if (dots[index]) dots[index].classList.add('carousel-dot-v-active');
         
         currentSlide = index;
         resetInterval();

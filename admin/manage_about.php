@@ -27,6 +27,22 @@ if (isset($_GET['delete'])) {
     } catch (PDOException $e) { $message = "Error: " . $e->getMessage(); $messageType = 'error'; }
 }
 
+// Remove image
+if (isset($_GET['remove_image'])) {
+    $id = $_GET['remove_image'];
+    try {
+        $stmt = $pdo->prepare("SELECT image_path FROM about_content WHERE id = ?");
+        $stmt->execute([$id]);
+        $row = $stmt->fetch();
+        if ($row && $row['image_path'] && file_exists(dirname(__DIR__) . '/' . $row['image_path'])) {
+            unlink(dirname(__DIR__) . '/' . $row['image_path']);
+        }
+        $stmt = $pdo->prepare("UPDATE about_content SET image_path = NULL WHERE id = ?");
+        $stmt->execute([$id]);
+        $message = "Image removed.";
+    } catch (PDOException $e) { $message = "Error: " . $e->getMessage(); $messageType = 'error'; }
+}
+
 // Handle Add/Update
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (isset($_POST['add_card'])) {
@@ -71,7 +87,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         try {
             $sql = "UPDATE about_content SET title=?, description=?, sort_order=?";
             $params = [$title, $desc, $sort];
-            if ($imagePath) { $sql .= ", image_path=?"; $params[] = $imagePath; }
+            if ($imagePath) { 
+                // Delete old image if replacing
+                $stmt = $pdo->prepare("SELECT image_path FROM about_content WHERE id = ?");
+                $stmt->execute([$id]);
+                $oldImg = $stmt->fetchColumn();
+                if ($oldImg && $oldImg !== $imagePath && file_exists(dirname(__DIR__) . '/' . $oldImg)) {
+                    unlink(dirname(__DIR__) . '/' . $oldImg);
+                }
+                $sql .= ", image_path=?"; $params[] = $imagePath; 
+            }
             $sql .= " WHERE id=?"; $params[] = $id;
             $stmt = $pdo->prepare($sql);
             $stmt->execute($params);
@@ -124,6 +149,13 @@ $contents = getAboutContent();
                         </div>
                         <div class="form-group">
                             <label>Replace Image</label>
+                            <?php if ($c['image_path']): ?>
+                                <div style="position: relative; width: 100px; height: 60px; margin-bottom: 0.5rem;">
+                                    <img src="../<?php echo htmlspecialchars($c['image_path']); ?>" style="width: 100%; height: 100%; object-fit: cover; border-radius: 0.5rem;">
+                                    <a href="manage_about.php?remove_image=<?php echo $c['id']; ?>" 
+                                       style="position: absolute; top: -5px; right: -5px; background: var(--danger); color: white; width: 18px; height: 18px; border-radius: 50%; display: flex; align-items: center; justify-content: center; text-decoration: none; font-size: 0.6rem;">&times;</a>
+                                </div>
+                            <?php endif; ?>
                             <input type="file" name="image" accept="image/*">
                         </div>
                     </div>

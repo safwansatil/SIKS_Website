@@ -79,6 +79,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $params = [$name, $date, $time, $venue, $short_desc, $desc, $tag, $category, $is_past, $logo];
             
             if ($coverImage) {
+                // Delete old cover image if replacing
+                $stmt = $pdo->prepare("SELECT cover_image FROM events WHERE id = ?");
+                $stmt->execute([$edit_id]);
+                $oldCover = $stmt->fetchColumn();
+                if ($oldCover && $oldCover !== $coverImage && file_exists(dirname(__DIR__) . '/' . $oldCover)) {
+                    unlink(dirname(__DIR__) . '/' . $oldCover);
+                }
+                
                 $sql .= ", cover_image=?";
                 $params[] = $coverImage;
             }
@@ -173,7 +181,16 @@ $event = [];
 $eventImages = [];
 
 if ($mode === 'list') {
-    $stmt = $pdo->query("SELECT * FROM events ORDER BY event_date DESC");
+    $catFilter = $_GET['cat'] ?? null;
+    $sql = "SELECT * FROM events";
+    $params = [];
+    if ($catFilter) {
+        $sql .= " WHERE category = ?";
+        $params[] = $catFilter;
+    }
+    $sql .= " ORDER BY event_date DESC";
+    $stmt = $pdo->prepare($sql);
+    $stmt->execute($params);
     $events = $stmt->fetchAll();
 } elseif ($edit_id) {
     $stmt = $pdo->prepare("SELECT * FROM events WHERE id = ?");
@@ -193,12 +210,25 @@ $iconOptions = [
 ];
 ?>
 
-<div class="page-header">
+<div class="page-header" style="flex-wrap: wrap; gap: 1rem;">
     <h1 class="page-title">Events Management</h1>
     <?php if ($mode === 'list'): ?>
-        <a href="manage_events.php?mode=add" class="btn btn-primary">
-            <i class="fas fa-plus"></i> Add New Event
-        </a>
+        <div style="display: flex; gap: 1rem; align-items: center;">
+            <select onchange="window.location.href='manage_events.php?cat=' + this.value" style="padding: 0.5rem; border-radius: 0.5rem; border: 1px solid var(--border); font-size: 0.85rem;">
+                <option value="">All Categories</option>
+                <?php 
+                $allCats = getEventCategories();
+                $currentCatFilter = $_GET['cat'] ?? '';
+                foreach ($allCats as $c): ?>
+                    <option value="<?php echo htmlspecialchars($c['name']); ?>" <?php echo $currentCatFilter === $c['name'] ? 'selected' : ''; ?>>
+                        <?php echo htmlspecialchars($c['name']); ?>
+                    </option>
+                <?php endforeach; ?>
+            </select>
+            <a href="manage_events.php?mode=add" class="btn btn-primary">
+                <i class="fas fa-plus"></i> Add New Event
+            </a>
+        </div>
     <?php endif; ?>
 </div>
 

@@ -12,9 +12,37 @@ $edit_id = $_GET['id'] ?? null;
 if (isset($_GET['delete'])) {
     $id = $_GET['delete'];
     try {
+        // Delete image file first
+        $stmt = $pdo->prepare("SELECT cover_image FROM articles WHERE id = ?");
+        $stmt->execute([$id]);
+        $row = $stmt->fetch();
+        if ($row && $row['cover_image'] && file_exists(dirname(__DIR__) . '/' . $row['cover_image'])) {
+            unlink(dirname(__DIR__) . '/' . $row['cover_image']);
+        }
+        
         $stmt = $pdo->prepare("DELETE FROM articles WHERE id = ?");
         $stmt->execute([$id]);
         $message = "Article deleted successfully.";
+    } catch (PDOException $e) {
+        $message = "Error: " . $e->getMessage();
+        $messageType = 'error';
+    }
+}
+
+// Remove cover image
+if (isset($_GET['remove_cover'])) {
+    $id = $_GET['remove_cover'];
+    try {
+        $stmt = $pdo->prepare("SELECT cover_image FROM articles WHERE id = ?");
+        $stmt->execute([$id]);
+        $row = $stmt->fetch();
+        if ($row && $row['cover_image'] && file_exists(dirname(__DIR__) . '/' . $row['cover_image'])) {
+            unlink(dirname(__DIR__) . '/' . $row['cover_image']);
+        }
+        $stmt = $pdo->prepare("UPDATE articles SET cover_image = NULL WHERE id = ?");
+        $stmt->execute([$id]);
+        $message = "Cover image removed.";
+        $mode = 'edit'; $edit_id = $id;
     } catch (PDOException $e) {
         $message = "Error: " . $e->getMessage();
         $messageType = 'error';
@@ -51,6 +79,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $params = [$title, $writer, $desc, $readingTime, $slug];
             
             if ($coverImage) {
+                // Delete old cover image if replacing
+                $stmt = $pdo->prepare("SELECT cover_image FROM articles WHERE id = ?");
+                $stmt->execute([$edit_id]);
+                $oldCover = $stmt->fetchColumn();
+                if ($oldCover && $oldCover !== $coverImage && file_exists(dirname(__DIR__) . '/' . $oldCover)) {
+                    unlink(dirname(__DIR__) . '/' . $oldCover);
+                }
+                
                 $sql .= ", cover_image=?";
                 $params[] = $coverImage;
             }
@@ -174,7 +210,12 @@ if ($mode === 'list') {
             <div class="form-group">
                 <label>Cover Image</label>
                 <?php if (!empty($article['cover_image'])): ?>
-                    <img src="../<?php echo htmlspecialchars($article['cover_image']); ?>" style="width: 150px; height: 100px; object-fit: cover; border-radius: 0.5rem; margin-bottom: 0.5rem; display: block;">
+                    <div style="position: relative; width: 150px; height: 100px; margin-bottom: 0.5rem;">
+                        <img src="../<?php echo htmlspecialchars($article['cover_image']); ?>" style="width: 100%; height: 100%; object-fit: cover; border-radius: 0.5rem; display: block;">
+                        <a href="manage_articles.php?remove_cover=<?php echo $edit_id; ?>" 
+                           style="position: absolute; top: -5px; right: -5px; background: var(--danger); color: white; width: 20px; height: 20px; border-radius: 50%; display: flex; align-items: center; justify-content: center; text-decoration: none; font-size: 0.7rem;" 
+                           title="Remove cover">&times;</a>
+                    </div>
                 <?php endif; ?>
                 <input type="file" name="cover_image" accept="image/*" id="article-cover-input">
                 <div id="article-cover-preview" style="margin-top: 1rem; display: none;">
