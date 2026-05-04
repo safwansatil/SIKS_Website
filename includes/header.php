@@ -297,46 +297,71 @@
     ?>
     <script>
         const prayers = <?php echo json_encode($prayerData); ?>;
+        // Helper function to parse time string like "5:00 PM" or "05:00 PM"
+function parseTimeToDate(timeStr, baseDate) {
+    // Create a copy of the base date
+    const targetDate = new Date(baseDate);
+    
+    // Parse time like "5:00 PM" or "05:00 AM"
+    const timeMatch = timeStr.match(/(\d+):(\d+)\s*(AM|PM)/i);
+    if (!timeMatch) return null;
+    
+    let hours = parseInt(timeMatch[1]);
+    const minutes = parseInt(timeMatch[2]);
+    const ampm = timeMatch[3].toUpperCase();
+    
+    // Convert to 24-hour format
+    if (ampm === 'PM' && hours !== 12) {
+        hours += 12;
+    } else if (ampm === 'AM' && hours === 12) {
+        hours = 0;
+    }
+    
+    targetDate.setHours(hours, minutes, 0, 0);
+    return targetDate;
+}
 
-        function updateCountdown() {
-            if (!prayers || prayers.length === 0) return;
+function updateCountdown() {
+    if (!prayers || prayers.length === 0) return;
 
-            const now = new Date();
-            const todayStr = now.getFullYear() + '-' + (now.getMonth() + 1) + '-' + now.getDate() + ' ';
+    const now = new Date();
+    let nextPrayer = null;
+    let minDiff = Infinity;
 
-            let nextPrayer = null;
-            let minDiff = Infinity;
+    prayers.forEach(p => {
+        // Use the helper function instead of direct Date parsing
+        let pTime = parseTimeToDate(p.time, now);
+        
+        if (!pTime) return;
+        
+        let diff = pTime - now;
 
-            prayers.forEach(p => {
-                const pTime = new Date(todayStr + p.time);
-                let diff = pTime - now;
-
-                if (diff < 0) {
-                    pTime.setDate(pTime.getDate() + 1);
-                    diff = pTime - now;
-                }
-
-                if (diff < minDiff) {
-                    minDiff = diff;
-                    nextPrayer = p;
-                }
-            });
-
-            if (nextPrayer) {
-                const nameEl = document.getElementById('header-next-name');
-                const timeEl = document.getElementById('header-next-time');
-                const timerEl = document.getElementById('header-countdown-timer');
-
-                if (nameEl) nameEl.innerText = nextPrayer.name;
-                if (timeEl) timeEl.innerText = nextPrayer.time;
-
-                const h = Math.floor(minDiff / 3600000);
-                const m = Math.floor((minDiff % 3600000) / 60000);
-                const s = Math.floor((minDiff % 60000) / 1000);
-                if (timerEl) timerEl.innerText = `${h.toString().padStart(2, '0')}:${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
-            }
+        // If this prayer time has passed today, add 24 hours
+        if (diff < 0) {
+            pTime = new Date(pTime.getTime() + (24 * 60 * 60 * 1000));
+            diff = pTime - now;
         }
 
+        if (diff < minDiff) {
+            minDiff = diff;
+            nextPrayer = p;
+        }
+    });
+
+    if (nextPrayer) {
+        const nameEl = document.getElementById('header-next-name');
+        const timeEl = document.getElementById('header-next-time');
+        const timerEl = document.getElementById('header-countdown-timer');
+
+        if (nameEl) nameEl.innerText = nextPrayer.name;
+        if (timeEl) timeEl.innerText = nextPrayer.time;
+
+        const h = Math.floor(minDiff / 3600000);
+        const m = Math.floor((minDiff % 3600000) / 60000);
+        const s = Math.floor((minDiff % 60000) / 1000);
+        if (timerEl) timerEl.innerText = `${h.toString().padStart(2, '0')}:${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
+    }
+}
         // Header scroll interaction
         window.addEventListener('scroll', () => {
             const navbar = document.getElementById('main-navbar');
