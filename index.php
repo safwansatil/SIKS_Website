@@ -203,35 +203,56 @@ $upcomingEvents = getEvents(false, 3); // Get next 3 upcoming events
 </section>
 
 <script>
-    // Sync the section countdown with the header countdown
-    function updateSectionCountdown() {
-        if (!prayers || prayers.length === 0) return;
-        const now = new Date();
-        const todayStr = now.getFullYear() + '-' + (now.getMonth() + 1) + '-' + now.getDate() + ' ';
-        let nextPrayer = null;
-        let minDiff = Infinity;
-
-        prayers.forEach(p => {
-            const pTime = new Date(todayStr + p.time);
-            let diff = pTime - now;
-            if (diff < 0) {
-                pTime.setDate(pTime.getDate() + 1);
-                diff = pTime - now;
-            }
-            if (diff < minDiff) {
-                minDiff = diff;
-                nextPrayer = p;
-            }
-        });
-
-        if (nextPrayer) {
-            document.getElementById('section-next-name').innerText = nextPrayer.name;
-            const h = Math.floor(minDiff / 3600000);
-            const m = Math.floor((minDiff % 3600000) / 60000);
-            const s = Math.floor((minDiff % 60000) / 1000);
-            document.getElementById('section-countdown-timer').innerText = `${h.toString().padStart(2, '0')}:${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
-        }
+    function parseTimeToDate(timeStr, baseDate) {
+    const targetDate = new Date(baseDate);
+    const timeMatch = timeStr.match(/(\d+):(\d+)\s*(AM|PM)/i);
+    if (!timeMatch) return null;
+    
+    let hours = parseInt(timeMatch[1]);
+    const minutes = parseInt(timeMatch[2]);
+    const ampm = timeMatch[3].toUpperCase();
+    
+    if (ampm === 'PM' && hours !== 12) {
+        hours += 12;
+    } else if (ampm === 'AM' && hours === 12) {
+        hours = 0;
     }
+    
+    targetDate.setHours(hours, minutes, 0, 0);
+    return targetDate;
+}
+    // Sync the section countdown with the header countdown
+    
+function updateSectionCountdown() {
+    if (!prayers || prayers.length === 0) return;
+    const now = new Date();
+    let nextPrayer = null;
+    let minDiff = Infinity;
+
+    prayers.forEach(p => {
+        let pTime = parseTimeToDate(p.time, now);
+        if (!pTime) return;
+        
+        let diff = pTime - now;
+        if (diff < 0) {
+            pTime = new Date(pTime.getTime() + (24 * 60 * 60 * 1000));
+            diff = pTime - now;
+        }
+        if (diff < minDiff) {
+            minDiff = diff;
+            nextPrayer = p;
+        }
+    });
+
+    if (nextPrayer) {
+        document.getElementById('section-next-name').innerText = nextPrayer.name;
+        const h = Math.floor(minDiff / 3600000);
+        const m = Math.floor((minDiff % 3600000) / 60000);
+        const s = Math.floor((minDiff % 60000) / 1000);
+        document.getElementById('section-countdown-timer').innerText = `${h.toString().padStart(2, '0')}:${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
+    }
+}
+
     setInterval(updateSectionCountdown, 1000);
     updateSectionCountdown();
 </script>
