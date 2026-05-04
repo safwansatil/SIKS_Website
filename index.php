@@ -294,80 +294,59 @@ $upcomingEvents = getEvents(false, 3); // Get next 3 upcoming events
 
 <!-- Upcoming Events Showcase Section -->
 <?php if ($upcomingEvents && count($upcomingEvents) > 0): ?>
-<section class="py-24 bg-white overflow-hidden">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-14">
-        <div class="flex items-center justify-between">
+<section class="py-24 bg-white">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="flex items-center justify-between mb-14 flex-wrap gap-4">
             <div>
                 <div class="inline-flex items-center space-x-2 px-3 py-1 rounded-full bg-emerald-50 border border-emerald-100 mb-4">
                     <span class="text-[9px] font-black uppercase tracking-widest text-emerald-600">Join Us</span>
                 </div>
-                <h2 class="text-4xl font-display font-bold text-emerald-950 tracking-tight">Upcoming Events</h2>
+                <h2 class="text-3xl sm:text-4xl font-display font-bold text-emerald-950 tracking-tight">Upcoming Events</h2>
             </div>
-            <a href="events.php" class="hidden sm:inline-flex items-center px-6 py-3 rounded-full bg-emerald-950/5 border border-emerald-950/10 text-emerald-950/60 text-sm font-bold hover:bg-emerald-950/10 transition-colors">
+            <a href="events.php" class="inline-flex items-center px-6 py-3 rounded-full bg-emerald-950/5 border border-emerald-950/10 text-emerald-950/60 text-sm font-bold hover:bg-emerald-950/10 transition-colors">
                 View All <i class="fas fa-arrow-right ml-2 text-xs"></i>
             </a>
         </div>
-    </div>
 
-    <!-- Step Carousel Track -->
-    <div class="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div class="overflow-hidden rounded-3xl">
-            <div id="events-track" class="flex transition-transform duration-700 ease-in-out" style="gap: 1.5rem;">
-                <?php foreach ($upcomingEvents as $idx => $evt): ?>
-                    <a href="event_details.php?id=<?php echo $evt['id']; ?>" class="events-slide flex-none group" style="width: calc((100% - 3rem) / 3);">
-                        <div class="rounded-3xl overflow-hidden bg-emerald-950 border border-emerald-950/10 shadow-lg hover:shadow-xl transition-all duration-300 h-full">
-                            <!-- Card Image -->
-                            <div class="h-48 overflow-hidden">
-                                <?php if (!empty($evt['cover_image'])): ?>
-                                    <img src="<?php echo htmlspecialchars($evt['cover_image']); ?>" 
-                                         alt="<?php echo htmlspecialchars($evt['name']); ?>"
-                                         class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700">
-                                <?php else: ?>
-                                    <div class="w-full h-full bg-emerald-900/50 flex items-center justify-center">
-                                        <i class="fas <?php echo htmlspecialchars($evt['logo'] ?? 'fa-calendar'); ?> text-4xl text-white/20"></i>
-                                    </div>
-                                <?php endif; ?>
-                            </div>
-                            <!-- Card Info -->
-                            <div class="p-5">
-                                <p class="text-[10px] font-bold uppercase tracking-widest text-white/30 mb-2">
-                                    <?php echo date('M d, Y', strtotime($evt['event_date'])); ?>
-                                </p>
-                                <h3 class="text-white font-bold text-lg leading-snug line-clamp-2 group-hover:text-emerald-300 transition-colors">
-                                    <?php echo htmlspecialchars($evt['name']); ?>
-                                </h3>
-                                <?php if (!empty($evt['venue'])): ?>
-                                    <p class="text-white/30 text-xs font-medium mt-2">
-                                        <i class="fas fa-map-marker-alt mr-1"></i>
-                                        <?php echo htmlspecialchars($evt['venue']); ?>
-                                    </p>
-                                <?php endif; ?>
-                            </div>
+        <!-- Responsive Grid - Same as About Page -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
+            <?php foreach ($upcomingEvents as $evt): ?>
+                <a href="event_details.php?id=<?php echo $evt['id']; ?>" class="group block transition-all duration-300 hover:-translate-y-2">
+                    <div class="rounded-3xl overflow-hidden bg-emerald-950 border border-emerald-950/10 shadow-lg hover:shadow-xl transition-all duration-300 h-full">
+                        <!-- Card Image -->
+                        <div class="h-52 sm:h-56 overflow-hidden">
+                            <?php if (!empty($evt['cover_image'])): ?>
+                                <img src="<?php echo htmlspecialchars($evt['cover_image']); ?>" 
+                                     alt="<?php echo htmlspecialchars($evt['name']); ?>"
+                                     class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700">
+                            <?php else: ?>
+                                <div class="w-full h-full bg-emerald-900/50 flex items-center justify-center">
+                                    <i class="fas <?php echo htmlspecialchars($evt['logo'] ?? 'fa-calendar'); ?> text-5xl text-white/20"></i>
+                                </div>
+                            <?php endif; ?>
                         </div>
-                    </a>
-                <?php endforeach; ?>
-            </div>
+                        <!-- Card Info -->
+                        <div class="p-5">
+                            <p class="text-[10px] font-bold uppercase tracking-widest text-white/30 mb-2">
+                                <?php echo date('M d, Y', strtotime($evt['event_date'])); ?>
+                            </p>
+                            <h3 class="text-white font-bold text-lg leading-snug line-clamp-2 group-hover:text-emerald-300 transition-colors">
+                                <?php echo htmlspecialchars($evt['name']); ?>
+                            </h3>
+                            <?php if (!empty($evt['venue'])): ?>
+                                <p class="text-white/30 text-xs font-medium mt-2">
+                                    <i class="fas fa-map-marker-alt mr-1"></i>
+                                    <?php echo htmlspecialchars($evt['venue']); ?>
+                                </p>
+                            <?php endif; ?>
+                        </div>
+                    </div>
+                </a>
+            <?php endforeach; ?>
         </div>
-
-        <!-- Navigation Dots -->
-        <?php $totalEvents = count($upcomingEvents); $perPage = 3; $totalPages = ceil($totalEvents / $perPage); ?>
-        <?php if ($totalPages > 1): ?>
-        <div class="flex items-center justify-center mt-8 space-x-2">
-            <?php for ($p = 0; $p < $totalPages; $p++): ?>
-                <button class="events-dot w-2 h-2 rounded-full transition-all duration-300 <?php echo $p === 0 ? 'bg-emerald-950 w-6' : 'bg-emerald-950/20'; ?>"
-                        onclick="goToEventSlide(<?php echo $p; ?>)" data-edot="<?php echo $p; ?>"></button>
-            <?php endfor; ?>
-        </div>
-        <?php endif; ?>
-    </div>
-
-    <!-- Mobile CTA -->
-    <div class="sm:hidden text-center mt-10">
-        <a href="events.php" class="inline-flex items-center px-6 py-3 rounded-full bg-emerald-950 text-white text-sm font-bold hover:bg-black transition-colors">
-            View All Events <i class="fas fa-arrow-right ml-2 text-xs"></i>
-        </a>
     </div>
 </section>
+
 
 <script>
 (function() {
