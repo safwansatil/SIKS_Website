@@ -122,22 +122,28 @@ function getEvents($is_past = false, $limit = null)
     global $pdo;
     if (!$pdo) return [];
 
+    $today = date('Y-m-d');
     try {
         if ($is_past === null) {
             // Get all events
             $sql = "SELECT * FROM events ORDER BY event_date DESC";
         } else {
-            $sql = "SELECT * FROM events WHERE is_past = ? ORDER BY ";
-            // Upcoming: soonest first. Past: most recent first (latest at top).
-            $sql .= $is_past ? "event_date DESC" : "event_date ASC";
+            if ($is_past) {
+                // Past events: strictly before today, ordered most recent first
+                $sql = "SELECT * FROM events WHERE event_date < ? ORDER BY event_date DESC";
+            } else {
+                // Upcoming events: today and onwards, ordered soonest first
+                $sql = "SELECT * FROM events WHERE event_date >= ? ORDER BY event_date ASC";
+            }
         }
+        
         if ($limit) $sql .= " LIMIT " . (int)$limit;
         
         if ($is_past === null) {
             $stmt = $pdo->query($sql);
         } else {
             $stmt = $pdo->prepare($sql);
-            $stmt->execute([$is_past ? 1 : 0]);
+            $stmt->execute([$today]);
         }
         return $stmt->fetchAll();
     } catch (PDOException $e) {
@@ -280,7 +286,7 @@ function handleFileUpload($file, $subdir = 'general')
         return false;
     }
 
-    // Generate unique filename and use safe extension based on MIME type
+    // Generate unique filename
     $mimeToExt = [
         'image/jpeg' => 'jpg',
         'image/png' => 'png',
@@ -288,7 +294,7 @@ function handleFileUpload($file, $subdir = 'general')
         'image/webp' => 'webp',
         'image/svg+xml' => 'svg'
     ];
-    $ext = ($subdir === 'hero') ? 'jpg' : ($mimeToExt[$mimeType] ?? 'png');
+    $ext = $mimeToExt[$mimeType] ?? 'png';
     $filename = uniqid() . '_' . time() . '.' . $ext;
     $destPath = $uploadDir . $filename;
 
@@ -297,6 +303,8 @@ function handleFileUpload($file, $subdir = 'general')
         if ($subdir === 'hero') {
             resizeImageToFit($destPath, 1920, 1080);
         }
+        // For events/articles cover: optimize if needed (future proofing)
+        
         return UPLOAD_URL . $subdir . '/' . $filename;
     }
 

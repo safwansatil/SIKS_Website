@@ -86,7 +86,7 @@ $pastEvents = getEvents(true);       // is_past = true → past
                 <div class="flex items-end justify-between mb-12">
                     <div class="max-w-2xl">
                         <div class="inline-flex items-center space-x-2 px-4 py-1.5 rounded-full bg-emerald-950/5 border border-emerald-950/10 mb-6">
-                            <span class="text-[10px] font-black uppercase tracking-widest text-emerald-950/50">Legacy of Excellence</span>
+                            <span class="text-[10px] font-black uppercase tracking-widest text-emerald-950/50">Past Events</span>
                         </div>
                         <h2 class="text-3xl font-display font-bold text-emerald-950 mb-4 tracking-tight">Past Events</h2>
                         <p class="text-emerald-950/40 font-medium italic">A look back at the milestones and memories that define our journey.</p>

@@ -11,16 +11,8 @@ $heroSlides = getHeroSlides();
 $randomAyat = getRandomAyat();
 $randomHadith = getRandomHadith();
 
-// Fetch recent past events for showcase
-$recentPastEvents = [];
-if ($pdo) {
-    try {
-        $stmt = $pdo->query("SELECT * FROM events WHERE is_past = 1 ORDER BY event_date DESC LIMIT 10");
-        $recentPastEvents = $stmt->fetchAll();
-    } catch (PDOException $e) {
-        $recentPastEvents = [];
-    }
-}
+// Fetch upcoming events for showcase
+$upcomingEvents = getEvents(false, 3); // Get next 3 upcoming events
 ?>
 
 <!-- Hero Section with Image Carousel -->
@@ -50,8 +42,18 @@ if ($pdo) {
             <div class="absolute inset-0 bg-gradient-to-b from-black/60 via-black/40 to-black/80 z-10"></div>
         </div>
 
-        <!-- Carousel Navigation Dots -->
-        <?php if (count($heroSlides) > 1): ?>
+            <!-- Hero Carousel Navigation Buttons -->
+            <div class="absolute inset-y-0 left-4 md:left-8 z-30 hidden md:flex items-center">
+                <button onclick="prevSlide()" class="w-14 h-14 rounded-full bg-black/10 hover:bg-black/30 backdrop-blur-md border border-white/10 text-white flex items-center justify-center transition-all group">
+                    <i class="fas fa-chevron-left group-hover:-translate-x-1 transition-transform"></i>
+                </button>
+            </div>
+            <div class="absolute inset-y-0 right-4 md:right-8 z-30 hidden md:flex items-center">
+                <button onclick="nextSlide()" class="w-14 h-14 rounded-full bg-black/10 hover:bg-black/30 backdrop-blur-md border border-white/10 text-white flex items-center justify-center transition-all group">
+                    <i class="fas fa-chevron-right group-hover:translate-x-1 transition-transform"></i>
+                </button>
+            </div>
+
             <div class="absolute bottom-12 right-12 z-30 flex flex-col space-y-3">
                 <?php foreach ($heroSlides as $index => $slide): ?>
                     <button class="carousel-dot-v <?php echo $index === 0 ? 'carousel-dot-v-active' : ''; ?>"
@@ -59,7 +61,6 @@ if ($pdo) {
                             data-dot="<?php echo $index; ?>"></button>
                 <?php endforeach; ?>
             </div>
-        <?php endif; ?>
     <?php else: ?>
         <!-- Fallback: decorative gradient background if no slides -->
         <div class="absolute inset-0 z-0" style="background: linear-gradient(135deg, #0a0a0a 0%, #1a1a1a 50%, #0a0a0a 100%);">
@@ -113,16 +114,20 @@ if ($pdo) {
         resetInterval();
     }
 
+    function prevSlide() {
+        goToSlide((currentSlide - 1 + totalSlides) % totalSlides);
+    }
+
     function nextSlide() {
         goToSlide((currentSlide + 1) % totalSlides);
     }
 
     function resetInterval() {
         clearInterval(slideInterval);
-        slideInterval = setInterval(nextSlide, 5000);
+        slideInterval = setInterval(nextSlide, 7000);
     }
 
-    slideInterval = setInterval(nextSlide, 5000);
+    slideInterval = setInterval(nextSlide, 7000);
 </script>
 <?php endif; ?>
 
@@ -287,16 +292,16 @@ if ($pdo) {
     </div>
 </section>
 
-<!-- Recent Past Events Carousel -->
-<?php if ($recentPastEvents && count($recentPastEvents) > 0): ?>
+<!-- Upcoming Events Showcase Section -->
+<?php if ($upcomingEvents && count($upcomingEvents) > 0): ?>
 <section class="py-24 bg-white overflow-hidden">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-14">
         <div class="flex items-center justify-between">
             <div>
                 <div class="inline-flex items-center space-x-2 px-3 py-1 rounded-full bg-emerald-50 border border-emerald-100 mb-4">
-                    <span class="text-[9px] font-black uppercase tracking-widest text-emerald-600">Memories</span>
+                    <span class="text-[9px] font-black uppercase tracking-widest text-emerald-600">Join Us</span>
                 </div>
-                <h2 class="text-4xl font-display font-bold text-emerald-950 tracking-tight">Recent Events</h2>
+                <h2 class="text-4xl font-display font-bold text-emerald-950 tracking-tight">Upcoming Events</h2>
             </div>
             <a href="events.php" class="hidden sm:inline-flex items-center px-6 py-3 rounded-full bg-emerald-950/5 border border-emerald-950/10 text-emerald-950/60 text-sm font-bold hover:bg-emerald-950/10 transition-colors">
                 View All <i class="fas fa-arrow-right ml-2 text-xs"></i>
@@ -308,7 +313,7 @@ if ($pdo) {
     <div class="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="overflow-hidden rounded-3xl">
             <div id="events-track" class="flex transition-transform duration-700 ease-in-out" style="gap: 1.5rem;">
-                <?php foreach ($recentPastEvents as $idx => $evt): ?>
+                <?php foreach ($upcomingEvents as $idx => $evt): ?>
                     <a href="event_details.php?id=<?php echo $evt['id']; ?>" class="events-slide flex-none group" style="width: calc((100% - 3rem) / 3);">
                         <div class="rounded-3xl overflow-hidden bg-emerald-950 border border-emerald-950/10 shadow-lg hover:shadow-xl transition-all duration-300 h-full">
                             <!-- Card Image -->
@@ -345,7 +350,7 @@ if ($pdo) {
         </div>
 
         <!-- Navigation Dots -->
-        <?php $totalEvents = count($recentPastEvents); $perPage = 3; $totalPages = ceil($totalEvents / $perPage); ?>
+        <?php $totalEvents = count($upcomingEvents); $perPage = 3; $totalPages = ceil($totalEvents / $perPage); ?>
         <?php if ($totalPages > 1): ?>
         <div class="flex items-center justify-center mt-8 space-x-2">
             <?php for ($p = 0; $p < $totalPages; $p++): ?>

@@ -32,6 +32,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (isset($_POST['add_card'])) {
         $title = $_POST['title'];
         $desc = $_POST['description'];
+        
+        // Base64 bypass
+        if (preg_match('%^[a-zA-Z0-9/+]*={0,2}$%', $desc)) {
+            $decoded = base64_decode($desc, true);
+            if ($decoded !== false) {
+                $desc = $decoded;
+            }
+        }
+
         $sort = (int)$_POST['sort_order'];
         $imagePath = null;
         if (isset($_FILES['image']) && $_FILES['image']['error'] === UPLOAD_ERR_OK) {
@@ -43,9 +52,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $message = "Card added.";
         } catch (PDOException $e) { $message = "Error: " . $e->getMessage(); $messageType = 'error'; }
     } elseif (isset($_POST['update_content'])) {
-        $id = $_POST['id'];
         $title = $_POST['title'];
         $desc = $_POST['description'];
+
+        // Base64 bypass
+        if (preg_match('%^[a-zA-Z0-9/+]*={0,2}$%', $desc)) {
+            $decoded = base64_decode($desc, true);
+            if ($decoded !== false) {
+                $desc = $decoded;
+            }
+        }
+
         $sort = (int)$_POST['sort_order'];
         $imagePath = null;
         if (isset($_FILES['image']) && $_FILES['image']['error'] === UPLOAD_ERR_OK) {
@@ -90,7 +107,7 @@ $contents = getAboutContent();
                         <a href="manage_about.php?delete=<?php echo $c['id']; ?>" class="text-danger" style="font-size: 0.8rem; font-weight: 700; text-decoration: none;" onclick="return confirm('Delete card?')">Delete</a>
                     <?php endif; ?>
                 </div>
-                <form method="POST" enctype="multipart/form-data">
+                <form method="POST" enctype="multipart/form-data" data-b64-bypass>
                     <input type="hidden" name="id" value="<?php echo $c['id']; ?>">
                     <div class="form-group">
                         <label>Title</label>
@@ -98,7 +115,7 @@ $contents = getAboutContent();
                     </div>
                     <div class="form-group">
                         <label>Description</label>
-                        <textarea name="description" rows="4" required><?php echo htmlspecialchars($c['description']); ?></textarea>
+                        <textarea name="description" rows="4" required data-b64-target><?php echo htmlspecialchars($c['description']); ?></textarea>
                     </div>
                     <div class="grid-2">
                         <div class="form-group">
@@ -119,14 +136,14 @@ $contents = getAboutContent();
     <div>
         <div class="card" style="position: sticky; top: 1rem;">
             <h2 style="font-family: 'Outfit', sans-serif; margin-bottom: 1.5rem; font-size: 1.25rem;">Add New Info Card</h2>
-            <form method="POST" enctype="multipart/form-data">
+            <form method="POST" enctype="multipart/form-data" data-b64-bypass>
                 <div class="form-group">
                     <label>Card Title</label>
                     <input type="text" name="title" required placeholder="e.g. Our History">
                 </div>
                 <div class="form-group">
                     <label>Description</label>
-                    <textarea name="description" rows="5" required placeholder="Card details..."></textarea>
+                    <textarea name="description" rows="5" required placeholder="Card details..." data-b64-target></textarea>
                 </div>
                 <div class="form-group">
                     <label>Image (Optional)</label>

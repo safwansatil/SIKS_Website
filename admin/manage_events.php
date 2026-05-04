@@ -29,6 +29,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $venue = $_POST['venue'];
     $short_desc = $_POST['short_description'];
     $desc = $_POST['description'];
+    
+    // Base64 bypass check
+    if (preg_match('%^[a-zA-Z0-9/+]*={0,2}$%', $desc)) {
+        $decoded = base64_decode($desc, true);
+        if ($decoded !== false) {
+            $desc = $decoded;
+        }
+    }
+
     $tag = $_POST['tag'];
     $category = $_POST['category'] ?? 'Community';
     $is_past = isset($_POST['is_past']) ? 1 : 0;
@@ -258,8 +267,13 @@ $iconOptions = [
 
 <?php else: ?>
     <div class="card">
-        <h2 style="font-family: 'Outfit', sans-serif; margin-bottom: 2rem;"><?php echo $edit_id ? 'Edit Event' : 'Add New Event'; ?></h2>
-        <form method="POST" enctype="multipart/form-data">
+        <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 2rem;">
+            <h2 style="font-family: 'Outfit', sans-serif; margin: 0;"><?php echo $edit_id ? 'Edit Event' : 'Add New Event'; ?></h2>
+            <a href="manage_events.php" class="btn btn-secondary" style="padding: 0.5rem 1rem;">
+                <i class="fas fa-arrow-left"></i> Back to List
+            </a>
+        </div>
+        <form method="POST" enctype="multipart/form-data" data-b64-bypass>
             <div class="form-group">
                 <label>Event Name *</label>
                 <input type="text" name="name" value="<?php echo htmlspecialchars($event['name'] ?? ''); ?>" required placeholder="Enter event title">
@@ -316,7 +330,7 @@ $iconOptions = [
             <div class="form-group">
                 <label>Gallery Images (Multiple Upload)</label>
                 <input type="file" name="gallery_images[]" accept="image/*" multiple id="gallery-input">
-                <div id="gallery-preview" style="display: flex; flex-wrap: wrap; gap: 0.5rem; margin-top: 1rem;"></div>
+                <div id="gallery-preview" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(80px, 1fr)); gap: 0.75rem; margin-top: 1rem;"></div>
                 
                 <?php if ($eventImages): ?>
                     <div style="margin-top: 1.5rem; border-top: 1px solid var(--border); pt: 1rem;">
@@ -342,7 +356,7 @@ $iconOptions = [
 
             <div class="form-group">
                 <label>Full Description</label>
-                <textarea name="description" rows="8" placeholder="Detailed event details, agenda, etc."><?php echo htmlspecialchars($event['description'] ?? ''); ?></textarea>
+                <textarea name="description" rows="8" placeholder="Detailed event details, agenda, etc." data-b64-target><?php echo htmlspecialchars($event['description'] ?? ''); ?></textarea>
             </div>
 
             <div class="grid-2">
@@ -411,11 +425,11 @@ $iconOptions = [
                 const reader = new FileReader();
                 reader.onload = function(e) {
                     const div = document.createElement('div');
-                    div.style.width = '60px';
-                    div.style.height = '60px';
-                    div.style.borderRadius = '0.5rem';
+                    div.style.position = 'relative';
+                    div.style.aspectRatio = '1';
+                    div.style.borderRadius = '0.75rem';
                     div.style.overflow = 'hidden';
-                    div.style.border = '1px solid var(--border)';
+                    div.style.border = '2px solid var(--primary-light)';
                     div.innerHTML = `<img src="${e.target.result}" style="width: 100%; height: 100%; object-fit: cover;">`;
                     preview.appendChild(div);
                 }

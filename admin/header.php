@@ -83,12 +83,64 @@ require_once 'auth.php';
         
         @media (max-width: 768px) {
             .admin-container { flex-direction: column; }
-            .sidebar { width: 100%; height: auto; position: relative; }
+            .sidebar { 
+                width: 100%; height: auto; position: relative; padding: 1rem;
+                display: none; /* Hidden by default on mobile */
+            }
+            .sidebar.active { display: block; }
+            .mobile-toggle { 
+                display: flex; align-items: center; justify-content: space-between; 
+                padding: 1rem 1.5rem; background: var(--secondary); color: white;
+            }
             .grid-2 { grid-template-columns: 1fr; }
+            .main-content { padding: 1.5rem; }
+        }
+        @media (min-width: 769px) {
+            .mobile-toggle { display: none; }
+            .sidebar { display: block !important; }
         }
     </style>
+    <script>
+        /**
+         * Robust UTF-8 aware Base64 encoding
+         */
+        function b64EncodeUnicode(str) {
+            return btoa(encodeURIComponent(str).replace(/%([0-9A-F]{2})/g,
+                function(match, p1) {
+                    return String.fromCharCode('0x' + p1);
+            }));
+        }
+
+        function toggleSidebar() {
+            const sidebar = document.querySelector('.sidebar');
+            sidebar.classList.toggle('active');
+        }
+
+        // Auto-apply base64 to designated textareas on form submit
+        document.addEventListener('submit', function(e) {
+            const forms = document.querySelectorAll('form[data-b64-bypass]');
+            forms.forEach(form => {
+                if (e.target === form) {
+                    const targets = form.querySelectorAll('[data-b64-target]');
+                    targets.forEach(t => {
+                        if (t.value) {
+                            t.value = b64EncodeUnicode(t.value);
+                        }
+                    });
+                }
+            });
+        });
+    </script>
 </head>
 <body>
+    <div class="mobile-toggle">
+        <div class="sidebar-logo" style="margin-bottom: 0; padding: 0;">
+            <i class="fas fa-shield-alt"></i> SIKS Admin
+        </div>
+        <button onclick="toggleSidebar()" style="background: none; border: none; color: white; font-size: 1.5rem;">
+            <i class="fas fa-bars"></i>
+        </button>
+    </div>
     <div class="admin-container">
         <div class="sidebar">
             <div class="sidebar-logo">

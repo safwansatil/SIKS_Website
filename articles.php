@@ -2,11 +2,31 @@
 require_once 'includes/config.php';
 require_once 'includes/header.php';
 
-// Fetch articles
+// Pagination & Sorting Configuration
+$page = isset($_GET['page']) ? (int)$_GET['page'] : 1;
+$limit = 6;
+$offset = ($page - 1) * $limit;
+$sort = isset($_GET['sort']) ? $_GET['sort'] : 'newest';
+
+// Build SQL based on sorting
+$orderBy = "last_edited DESC";
+if ($sort === 'oldest') $orderBy = "last_edited ASC";
+if ($sort === 'title') $orderBy = "title ASC";
+if ($sort === 'reading') $orderBy = "reading_time ASC";
+
+// Fetch articles with pagination
 $articles = [];
+$totalArticles = 0;
 if ($pdo) {
     try {
-        $stmt = $pdo->query("SELECT * FROM articles ORDER BY last_edited DESC");
+        // Get total count
+        $totalArticles = $pdo->query("SELECT COUNT(*) FROM articles")->fetchColumn();
+        $totalPages = ceil($totalArticles / $limit);
+
+        $stmt = $pdo->prepare("SELECT * FROM articles ORDER BY $orderBy LIMIT ? OFFSET ?");
+        $stmt->bindValue(1, $limit, PDO::PARAM_INT);
+        $stmt->bindValue(2, $offset, PDO::PARAM_INT);
+        $stmt->execute();
         $articles = $stmt->fetchAll();
     } catch (PDOException $e) {
         $articles = [];
@@ -21,20 +41,30 @@ if ($pdo) {
             <p class="text-emerald-950/40 max-w-2xl mx-auto font-medium italic">Insights, reflections, and knowledge shared by our community.</p>
         </div>
 
-        <!-- Search Bar -->
-        <div class="max-w-xl mx-auto mb-12">
-            <div class="relative">
+        <!-- Search & Sort Bar -->
+        <div class="max-w-4xl mx-auto mb-12 flex flex-col md:flex-row gap-4">
+            <div class="relative flex-1">
                 <i class="fas fa-search absolute left-5 top-1/2 -translate-y-1/2 text-emerald-950/30"></i>
                 <input type="text" id="article-search" 
-                       placeholder="Search articles by title or content..." 
+                       placeholder="Search articles..." 
                        class="w-full pl-12 pr-12 py-4 rounded-2xl border border-emerald-950/10 bg-white text-emerald-950 font-medium placeholder-emerald-950/30 focus:outline-none focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/10 transition-all"
                        autocomplete="off">
                 <button id="search-clear" class="absolute right-4 top-1/2 -translate-y-1/2 text-emerald-950/20 hover:text-emerald-950/60 transition-colors hidden" onclick="clearSearch()">
                     <i class="fas fa-times"></i>
                 </button>
             </div>
-            <p id="search-count" class="text-center text-emerald-950/30 text-xs font-bold uppercase tracking-widest mt-3 hidden"></p>
+            
+            <div class="flex-none">
+                <select onchange="location.href='articles.php?sort=' + this.value" 
+                        class="h-full px-6 py-4 rounded-2xl border border-emerald-950/10 bg-white text-emerald-950 font-bold focus:outline-none focus:border-emerald-500 transition-all appearance-none cursor-pointer">
+                    <option value="newest" <?php echo $sort === 'newest' ? 'selected' : ''; ?>>Newest First</option>
+                    <option value="oldest" <?php echo $sort === 'oldest' ? 'selected' : ''; ?>>Oldest First</option>
+                    <option value="title" <?php echo $sort === 'title' ? 'selected' : ''; ?>>Alphabetical</option>
+                    <option value="reading" <?php echo $sort === 'reading' ? 'selected' : ''; ?>>Shortest Read</option>
+                </select>
+            </div>
         </div>
+        <p id="search-count" class="text-center text-emerald-950/30 text-xs font-bold uppercase tracking-widest -mt-6 mb-12 hidden"></p>
 
         <?php if ($articles): ?>
             <div class="space-y-8">
@@ -85,6 +115,32 @@ if ($pdo) {
                     </a>
                 <?php endforeach; ?>
             </div>
+
+            <!-- Pagination -->
+            <?php if ($totalPages > 1): ?>
+                <div class="mt-16 flex justify-center items-center space-x-2">
+                    <?php if ($page > 1): ?>
+                        <a href="articles.php?page=<?php echo $page - 1; ?>&sort=<?php echo $sort; ?>" 
+                           class="w-12 h-12 rounded-xl border border-emerald-950/10 flex items-center justify-center text-emerald-950 hover:bg-emerald-50 transition-colors">
+                            <i class="fas fa-chevron-left"></i>
+                        </a>
+                    <?php endif; ?>
+
+                    <?php for ($i = 1; $i <= $totalPages; $i++): ?>
+                        <a href="articles.php?page=<?php echo $i; ?>&sort=<?php echo $sort; ?>" 
+                           class="w-12 h-12 rounded-xl border <?php echo $i === $page ? 'bg-emerald-950 text-white border-emerald-950' : 'border-emerald-950/10 text-emerald-950 hover:bg-emerald-50'; ?> flex items-center justify-center font-bold transition-colors">
+                            <?php echo $i; ?>
+                        </a>
+                    <?php endfor; ?>
+
+                    <?php if ($page < $totalPages): ?>
+                        <a href="articles.php?page=<?php echo $page + 1; ?>&sort=<?php echo $sort; ?>" 
+                           class="w-12 h-12 rounded-xl border border-emerald-950/10 flex items-center justify-center text-emerald-950 hover:bg-emerald-50 transition-colors">
+                            <i class="fas fa-chevron-right"></i>
+                        </a>
+                    <?php endif; ?>
+                </div>
+            <?php endif; ?>
         <?php else: ?>
             <div class="col-span-full py-20 text-center border border-dashed border-emerald-950/10 rounded-[40px]">
                 <i class="fas fa-pen-fancy text-4xl text-emerald-950/10 mb-4"></i>

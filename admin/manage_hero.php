@@ -3,11 +3,10 @@ $activeNav = 'hero';
 $pageTitle = 'Hero Carousel';
 require_once 'header.php';
 
-// Ensure table exists (defensive check)
+// Ensure table exists
 try {
     $pdo->query("SELECT 1 FROM hero_slides LIMIT 1");
 } catch (PDOException $e) {
-    // Table might be missing, try to create it
     $pdo->exec("CREATE TABLE IF NOT EXISTS hero_slides (
         id INT AUTO_INCREMENT PRIMARY KEY,
         image_path VARCHAR(255) NOT NULL,
@@ -150,9 +149,12 @@ try {
                         </div>
                     <?php endforeach; ?>
                 </div>
-                <button type="submit" name="update_slides" class="btn btn-secondary" style="width: 100%;">
-                    Save Changes
-                </button>
+                <div style="display: flex; gap: 1rem;">
+                    <button type="submit" name="update_slides" class="btn btn-primary" style="flex: 2;">
+                        Save Changes
+                    </button>
+                    <a href="manage_hero.php" class="btn btn-secondary" style="flex: 1;">Cancel</a>
+                </div>
             </form>
         <?php else: ?>
             <div style="text-align: center; padding: 3rem; color: var(--text-muted);">
