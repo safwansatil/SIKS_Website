@@ -23,9 +23,9 @@ $pastEvents = getEvents(true, null, $selectedCategory);
                 All Events
             </a>
             <?php foreach ($categories as $cat): ?>
-                <a href="events.php?category=<?php echo urlencode($cat['name']); ?>" 
-                   class="px-6 py-2 rounded-full font-bold text-xs uppercase tracking-widest transition-all <?php echo $selectedCategory === $cat['name'] ? 'bg-emerald-950 text-white shadow-lg' : 'bg-emerald-50 text-emerald-950/40 hover:bg-emerald-100'; ?>">
-                    <?php echo htmlspecialchars($cat['name']); ?>
+                <a href="events.php?category=<?php echo urlencode($cat['category']); ?>" 
+                   class="px-6 py-2 rounded-full font-bold text-xs uppercase tracking-widest transition-all <?php echo $selectedCategory === $cat['category'] ? 'bg-emerald-950 text-white shadow-lg' : 'bg-emerald-50 text-emerald-950/40 hover:bg-emerald-100'; ?>">
+                    <?php echo htmlspecialchars($cat['category']); ?>
                 </a>
             <?php endforeach; ?>
         </div>

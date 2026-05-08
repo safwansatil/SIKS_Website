@@ -82,11 +82,11 @@ if (!empty($event['cover_image'])) {
                 <p class="text-emerald-950 font-bold text-xl"><?php echo date('F d, Y', strtotime($event['event_date'])); ?></p>
                 <p class="text-emerald-950/60 font-medium mt-1"><?php echo htmlspecialchars($event['event_time']); ?></p>
             </div>
-            <div class="card-professional p-8 bg-white">
+            <!-- <div class="card-professional p-8 bg-white">
                 <p class="text-[10px] uppercase font-bold text-emerald-950/40 mb-3 tracking-widest">Venue</p>
                 <p class="text-emerald-950 font-bold text-xl"><?php echo htmlspecialchars($event['venue']); ?></p>
                 <p class="text-emerald-950/60 font-medium mt-1">IUT Campus</p>
-            </div>
+            </div> -->
         </div>
 
         <!-- Short Description -->
@@ -186,7 +186,7 @@ if (!empty($event['cover_image'])) {
         <?php endif; ?>
 
         <!-- Get Directions CTA -->
-        <div class="bg-emerald-50/50 border border-emerald-100 rounded-3xl p-8 sm:p-10 flex flex-col sm:flex-row items-center justify-between">
+        <!-- <div class="bg-emerald-50/50 border border-emerald-100 rounded-3xl p-8 sm:p-10 flex flex-col sm:flex-row items-center justify-between">
             <div class="mb-4 sm:mb-0">
                 <p class="text-emerald-950 font-bold text-sm mb-1">Join us for this occasion</p>
                 <p class="text-emerald-950/40 text-xs font-medium"><?php echo htmlspecialchars($event['venue']); ?>, IUT Campus</p>
@@ -197,7 +197,7 @@ if (!empty($event['cover_image'])) {
                 Get Directions
                 <i class="fas fa-arrow-right ml-2 text-[9px] opacity-0 group-hover:opacity-100 group-hover:translate-x-1 transition-all"></i>
             </a>
-        </div>
+        </div> -->
     </div>
 </section>
 

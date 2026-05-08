@@ -65,9 +65,11 @@
                             Us</a></li>
                     <li>
                         <div class="mt-4 pt-4 border-t border-white/5">
-                            <p class="text-white/20 text-[9px] font-bold uppercase tracking-widest leading-relaxed">
-                                <?php echo IUT_ADDRESS; ?>
-                            </p>
+                            <a href="<?php echo MAPS_URL; ?>" target="_blank" class="hover:text-white/50 transition-colors">
+    <p class="text-white/20 text-[9px] font-bold uppercase tracking-widest leading-relaxed">
+        <?php echo IUT_ADDRESS; ?>
+    </p>
+</a>
                         </div>
                     </li>
                 </ul>
