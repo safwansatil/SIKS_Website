@@ -168,7 +168,7 @@ function getEventCategories()
     if (!$pdo) return [];
 
     try {
-        $stmt = $pdo->query("SELECT * FROM event_categories ORDER BY name ASC");
+        $stmt = $pdo->query("SELECT DISTINCT category FROM `events` WHERE 1 order by name asc");
         return $stmt->fetchAll();
     } catch (PDOException $e) {
         return [];

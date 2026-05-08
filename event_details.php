@@ -67,7 +67,6 @@ if (!empty($event['cover_image'])) {
                 <?php if ($event['event_time']): ?>
                     <span><i class="far fa-clock mr-2"></i><?php echo htmlspecialchars($event['event_time']); ?></span>
                 <?php endif; ?>
-                <span><i class="fas fa-location-dot mr-2"></i><?php echo htmlspecialchars($event['venue']); ?></span>
             </div>
         </div>
     </div>

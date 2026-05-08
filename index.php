@@ -42,25 +42,7 @@ $upcomingEvents = getEvents(false, 3); // Get next 3 upcoming events
             <div class="absolute inset-0 bg-gradient-to-b from-black/60 via-black/40 to-black/80 z-10"></div>
         </div>
 
-            <!-- Hero Carousel Navigation Buttons -->
-            <div class="absolute inset-y-0 left-2 md:left-8 z-30 flex items-center">
-                <button onclick="prevSlide()" class="w-10 h-10 md:w-14 md:h-14 rounded-full bg-black/10 hover:bg-black/30 backdrop-blur-md border border-white/10 text-white flex items-center justify-center transition-all group">
-                    <i class="fas fa-chevron-left group-hover:-translate-x-1 transition-transform text-xs md:text-base"></i>
-                </button>
-            </div>
-            <div class="absolute inset-y-0 right-2 md:right-8 z-30 flex items-center">
-                <button onclick="nextSlide()" class="w-10 h-10 md:w-14 md:h-14 rounded-full bg-black/10 hover:bg-black/30 backdrop-blur-md border border-white/10 text-white flex items-center justify-center transition-all group">
-                    <i class="fas fa-chevron-right group-hover:translate-x-1 transition-transform text-xs md:text-base"></i>
-                </button>
-            </div>
-
-            <div class="absolute bottom-12 right-12 z-30 flex flex-col space-y-3">
-                <?php foreach ($heroSlides as $index => $slide): ?>
-                    <button class="carousel-dot-v <?php echo $index === 0 ? 'carousel-dot-v-active' : ''; ?>"
-                            onclick="goToSlide(<?php echo $index; ?>)"
-                            data-dot="<?php echo $index; ?>"></button>
-                <?php endforeach; ?>
-            </div>
+            
     <?php else: ?>
         <!-- Fallback: decorative gradient background if no slides -->
         <div class="absolute inset-0 z-0" style="background: linear-gradient(135deg, #0a0a0a 0%, #1a1a1a 50%, #0a0a0a 100%);">
