@@ -217,7 +217,7 @@ $iconOptions = [
             <select onchange="window.location.href='manage_events.php?cat=' + this.value" style="padding: 0.5rem; border-radius: 0.5rem; border: 1px solid var(--border); font-size: 0.85rem;">
                 <option value="">All Categories</option>
                 <?php 
-                $allCats = getEventCategories();
+                $allCats = getEventCategoriesForAdminEdit();
                 $currentCatFilter = $_GET['cat'] ?? '';
                 foreach ($allCats as $c): ?>
                     <option value="<?php echo htmlspecialchars($c['name']); ?>" <?php echo $currentCatFilter === $c['name'] ? 'selected' : ''; ?>>
@@ -344,7 +344,7 @@ $iconOptions = [
                     <div style="display: flex; gap: 0.5rem;">
                         <select name="category" id="category-select" style="flex: 1;">
                             <?php 
-                            $cats = getEventCategories();
+                            $cats = getEventCategoriesForAdminEdit();
                             $currentCat = $event['category'] ?? 'Community';
                             foreach ($cats as $cat): ?>
                                 <option value="<?php echo htmlspecialchars($cat['name']); ?>" <?php echo $currentCat === $cat['name'] ? 'selected' : ''; ?>>

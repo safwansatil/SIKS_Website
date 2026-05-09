@@ -82,11 +82,11 @@ if (!empty($event['cover_image'])) {
                 <p class="text-emerald-950 font-bold text-xl"><?php echo date('F d, Y', strtotime($event['event_date'])); ?></p>
                 <p class="text-emerald-950/60 font-medium mt-1"><?php echo htmlspecialchars($event['event_time']); ?></p>
             </div>
-            <!-- <div class="card-professional p-8 bg-white">
+            <div class="card-professional p-8 bg-white">
                 <p class="text-[10px] uppercase font-bold text-emerald-950/40 mb-3 tracking-widest">Venue</p>
                 <p class="text-emerald-950 font-bold text-xl"><?php echo htmlspecialchars($event['venue']); ?></p>
-                <p class="text-emerald-950/60 font-medium mt-1">IUT Campus</p>
-            </div> -->
+                <!-- <p class="text-emerald-950/60 font-medium mt-1">IUT Campus</p> -->
+            </div>
         </div>
 
         <!-- Short Description -->

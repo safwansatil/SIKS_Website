@@ -175,6 +175,52 @@ function getEventCategories()
     }
 }
 
+function getEventCategoriesForAdminEdit()
+{
+    global $pdo;
+    if (!$pdo) {
+        // Return fallback categories if no database connection
+        return [
+            ['name' => 'Community'],
+            ['name' => 'Sports'],
+            ['name' => 'Educational'],
+            ['name' => 'Religious'],
+            ['name' => 'Social']
+        ];
+    }
+
+    try {
+        // Query the correct table: event_categories
+        $stmt = $pdo->query("SELECT name FROM event_categories ORDER BY name ASC");
+        $results = $stmt->fetchAll();
+        
+        // If table is empty, insert default categories
+        if (empty($results)) {
+            $defaults = ['Community', 'Sports', 'Educational', 'Religious', 'Social'];
+            $insertStmt = $pdo->prepare("INSERT IGNORE INTO event_categories (name) VALUES (?)");
+            foreach ($defaults as $cat) {
+                $insertStmt->execute([$cat]);
+            }
+            
+            // Refetch after inserting
+            $stmt = $pdo->query("SELECT name FROM event_categories ORDER BY name ASC");
+            $results = $stmt->fetchAll();
+        }
+        
+        return $results;
+    } catch (PDOException $e) {
+        // Log error if needed: error_log($e->getMessage());
+        // Return fallback categories on error
+        return [
+            ['name' => 'Community'],
+            ['name' => 'Sports'],
+            ['name' => 'Educational'],
+            ['name' => 'Religious'],
+            ['name' => 'Social']
+        ];
+    }
+}
+
 /**
  * Get a single event by ID
  */
