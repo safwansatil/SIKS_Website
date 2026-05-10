@@ -8,7 +8,7 @@
         <?php echo SITE_NAME; ?> |
         <?php echo SITE_TAGLINE; ?>
     </title>
-    <link rel="icon" type="image/png" href="assets/images/logo.png?v=2">
+    <link rel="icon" type="image/png" href="assets/images/logofooter.png?v=2">
 
     <!-- Meta Tags for SEO -->
     <meta name="description"
