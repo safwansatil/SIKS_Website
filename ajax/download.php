@@ -13,8 +13,10 @@ try {
     $doc = $stmt->fetch();
 
     if ($doc) {
-        // Increment download count
-        incrementDownloadCount($id);
+        // Increment download count unless skipped
+        if (!isset($_GET['skip_count'])) {
+            incrementDownloadCount($id);
+        }
 
         $filePath = '../' . $doc['file_path'];
         

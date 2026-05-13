@@ -1,6 +1,16 @@
 <?php
 require_once 'includes/config.php';
-require_once 'includes/header.php';
+
+// Check if this is an HTMX request
+$isHtmx = isset($_SERVER['HTTP_HX_REQUEST']);
+
+if (!$isHtmx) {
+    require_once 'includes/header.php';
+} else {
+    // For HTMX requests, we wrap the content in the same main tag structure
+    // so that hx-select="#main-content" still works on the client side.
+    echo '<main id="main-content" class="pt-24 animate-page">';
+}
 
 // Pagination & Sorting Configuration
 $page = isset($_GET['page']) ? (int)$_GET['page'] : 1;
@@ -124,6 +134,7 @@ if ($pdo) {
                             <a href="articles.php?page=<?php echo $page - 1; ?>&sort=<?php echo $sort; ?>" 
                                hx-get="articles.php?page=<?php echo $page - 1; ?>&sort=<?php echo $sort; ?>" 
                                hx-target="#main-content" 
+                               hx-select="#main-content"
                                hx-push-url="true"
                                class="w-12 h-12 rounded-xl border border-emerald-950/10 flex items-center justify-center text-emerald-950 hover:bg-emerald-50 transition-colors">
                                 <i class="fas fa-chevron-left"></i>
@@ -134,6 +145,7 @@ if ($pdo) {
                             <a href="articles.php?page=<?php echo $i; ?>&sort=<?php echo $sort; ?>" 
                                hx-get="articles.php?page=<?php echo $i; ?>&sort=<?php echo $sort; ?>" 
                                hx-target="#main-content" 
+                               hx-select="#main-content"
                                hx-push-url="true"
                                class="w-12 h-12 rounded-xl border <?php echo $i === $page ? 'bg-emerald-950 text-white border-emerald-950' : 'border-emerald-950/10 text-emerald-950 hover:bg-emerald-50'; ?> flex items-center justify-center font-bold transition-colors">
                                 <?php echo $i; ?>
@@ -144,6 +156,7 @@ if ($pdo) {
                             <a href="articles.php?page=<?php echo $page + 1; ?>&sort=<?php echo $sort; ?>" 
                                hx-get="articles.php?page=<?php echo $page + 1; ?>&sort=<?php echo $sort; ?>" 
                                hx-target="#main-content" 
+                               hx-select="#main-content"
                                hx-push-url="true"
                                class="w-12 h-12 rounded-xl border border-emerald-950/10 flex items-center justify-center text-emerald-950 hover:bg-emerald-50 transition-colors">
                                 <i class="fas fa-chevron-right"></i>
@@ -285,4 +298,10 @@ if ($pdo) {
     })();
 </script>
 
-<?php require_once 'includes/footer.php'; ?>
+<?php
+if (!$isHtmx) {
+    require_once 'includes/footer.php';
+} else {
+    echo '</main>';
+}
+?>

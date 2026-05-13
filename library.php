@@ -127,7 +127,8 @@ $categories = $stmt->fetchAll(PDO::FETCH_COLUMN);
                                         <?php echo number_format($doc['downloads']); ?>
                                     </td>
                                     <td class="px-8 py-6 text-right">
-                                        <a href="ajax/download.php?id=<?php echo $doc['id']; ?>" target="_blank" 
+                                        <a href="javascript:void(0)" 
+                                           onclick="trackAndDownload(<?php echo $doc['id']; ?>, 'ajax/download.php?id=<?php echo $doc['id']; ?>&skip_count=1')"
                                            class="inline-flex items-center space-x-2 text-emerald-600 font-bold text-sm hover:text-emerald-800 transition-colors">
                                             <span>Download</span>
                                             <i class="fas fa-download text-xs"></i>
@@ -156,5 +157,33 @@ $categories = $stmt->fetchAll(PDO::FETCH_COLUMN);
         <?php endif; ?>
     </div>
 </section>
+
+<script>
+    async function trackAndDownload(id, downloadUrl) {
+        try {
+            // Increment count via fetch
+            await fetch(`ajax/increment_download.php?id=${id}`);
+            
+            // Trigger actual download
+            const link = document.createElement('a');
+            link.href = downloadUrl;
+            link.target = '_blank';
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            
+            // Optionally update the UI counter (real-time feel)
+            const countCell = event.target.closest('tr').querySelector('td:nth-child(4)');
+            if (countCell) {
+                let current = parseInt(countCell.textContent.replace(/,/g, ''));
+                countCell.textContent = (current + 1).toLocaleString();
+            }
+        } catch (error) {
+            console.error('Download tracking failed:', error);
+            // Fallback: still try to download if tracking fails
+            window.open(downloadUrl, '_blank');
+        }
+    }
+</script>
 
 <?php require_once 'includes/footer.php'; ?>

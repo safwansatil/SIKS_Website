@@ -445,6 +445,20 @@ function updateCountdown() {
             // Scroll to top on page change
             window.scrollTo({ top: 0, behavior: 'smooth' });
         });
+
+        // Global HTMX Error Handling
+        document.body.addEventListener('htmx:responseError', function(evt) {
+            console.error('HTMX Error:', evt.detail.xhr.status, evt.detail.xhr.statusText);
+            // Fallback to normal navigation on severe errors
+            if (evt.detail.xhr.status >= 400) {
+                window.location.href = evt.detail.pathInfo.requestPath;
+            }
+        });
+
+        document.body.addEventListener('htmx:sendError', function(evt) {
+            console.warn('Network error detected. Retrying with standard navigation...');
+            window.location.href = evt.detail.pathInfo.requestPath;
+        });
     </script>
 
     <main id="main-content" class="pt-24 animate-page">
