@@ -66,126 +66,223 @@ if ($pdo) {
         </div>
         <p id="search-count" class="text-center text-emerald-950/30 text-xs font-bold uppercase tracking-widest -mt-6 mb-12 hidden"></p>
 
-        <?php if ($articles): ?>
-            <div class="space-y-8">
-                <?php foreach ($articles as $article): 
-                    $readingTime = $article['reading_time'] ?? calculateReadingTime($article['description'] ?? '');
-                ?>
-                    <a href="article.php?id=<?php echo $article['id']; ?>" class="article-card block card-professional group">
-                        <div class="flex flex-col md:flex-row">
-                            <!-- Cover Image -->
-                            <?php if (!empty($article['cover_image'])): ?>
-                                <div class="md:w-80 flex-none">
-                                    <div class="aspect-[16/10] md:aspect-auto md:h-full overflow-hidden rounded-t-[24px] md:rounded-l-[24px] md:rounded-tr-none">
-                                        <img src="<?php echo htmlspecialchars($article['cover_image']); ?>" 
-                                             alt="<?php echo htmlspecialchars($article['title']); ?>"
-                                             class="article-image w-full h-full object-cover">
+        <div id="articles-container">
+            <?php if ($articles): ?>
+                <div class="space-y-8">
+                    <?php foreach ($articles as $article): 
+                        $readingTime = $article['reading_time'] ?? calculateReadingTime($article['description'] ?? '');
+                    ?>
+                        <a href="article.php?id=<?php echo $article['id']; ?>" class="article-card block card-professional group">
+                            <div class="flex flex-col md:flex-row">
+                                <!-- Cover Image -->
+                                <?php if (!empty($article['cover_image'])): ?>
+                                    <div class="md:w-80 flex-none">
+                                        <div class="aspect-[16/10] md:aspect-auto md:h-full overflow-hidden rounded-t-[24px] md:rounded-l-[24px] md:rounded-tr-none">
+                                            <img src="<?php echo htmlspecialchars($article['cover_image']); ?>" 
+                                                 alt="<?php echo htmlspecialchars($article['title']); ?>"
+                                                 class="article-image w-full h-full object-cover">
+                                        </div>
                                     </div>
-                                </div>
-                            <?php endif; ?>
+                                <?php endif; ?>
 
-                            <!-- Content -->
-                            <div class="flex-1 p-8 md:p-10 flex flex-col justify-center">
-                                <!-- Meta -->
-                                <div class="flex items-center space-x-4 mb-4 text-emerald-950/40 text-[11px] font-bold uppercase tracking-widest">
-                                    <span><?php echo date('F d, Y', strtotime($article['last_edited'])); ?></span>
-                                    <span class="w-1 h-1 rounded-full bg-emerald-950/20"></span>
-                                    <span><?php echo $readingTime; ?> min read</span>
-                                </div>
-
-                                <!-- Title -->
-                                <h3 class="text-2xl md:text-3xl font-display font-bold text-emerald-950 mb-4 leading-tight group-hover:text-emerald-700 transition-colors">
-                                    <?php echo htmlspecialchars($article['title']); ?>
-                                </h3>
-
-                                <!-- Excerpt -->
-                                <p class="text-emerald-950/60 text-sm leading-relaxed line-clamp-3 mb-6 font-medium">
-                                    <?php echo htmlspecialchars(mb_substr(strip_tags($article['description']), 0, 300)); ?>...
-                                </p>
-
-                                <!-- Author -->
-                                    <div class="flex items-center justify-between mt-auto pt-6 border-t border-emerald-950/5">
-                                        <span class="text-sm font-bold text-emerald-950"><?php echo htmlspecialchars($article['writer']); ?></span>
-                                        <span class="text-emerald-600 font-bold text-xs group-hover:translate-x-1 transition-transform flex items-center">
-                                            Read Article <i class="fas fa-arrow-right ml-2"></i>
-                                        </span>
+                                <!-- Content -->
+                                <div class="flex-1 p-8 md:p-10 flex flex-col justify-center">
+                                    <!-- Meta -->
+                                    <div class="flex items-center space-x-4 mb-4 text-emerald-950/40 text-[11px] font-bold uppercase tracking-widest">
+                                        <span><?php echo date('F d, Y', strtotime($article['last_edited'])); ?></span>
+                                        <span class="w-1 h-1 rounded-full bg-emerald-950/20"></span>
+                                        <span><?php echo $readingTime; ?> min read</span>
                                     </div>
+
+                                    <!-- Title -->
+                                    <h3 class="text-2xl md:text-3xl font-display font-bold text-emerald-950 mb-4 leading-tight group-hover:text-emerald-700 transition-colors">
+                                        <?php echo htmlspecialchars($article['title']); ?>
+                                    </h3>
+
+                                    <!-- Excerpt -->
+                                    <p class="text-emerald-950/60 text-sm leading-relaxed line-clamp-3 mb-6 font-medium">
+                                        <?php echo htmlspecialchars(mb_substr(strip_tags($article['description']), 0, 300)); ?>...
+                                    </p>
+
+                                    <!-- Author -->
+                                        <div class="flex items-center justify-between mt-auto pt-6 border-t border-emerald-950/5">
+                                            <span class="text-sm font-bold text-emerald-950"><?php echo htmlspecialchars($article['writer']); ?></span>
+                                            <span class="text-emerald-600 font-bold text-xs group-hover:translate-x-1 transition-transform flex items-center">
+                                                Read Article <i class="fas fa-arrow-right ml-2"></i>
+                                            </span>
+                                        </div>
+                                </div>
                             </div>
-                        </div>
-                    </a>
-                <?php endforeach; ?>
-            </div>
-
-            <!-- Pagination -->
-            <?php if ($totalPages > 1): ?>
-                <div class="mt-16 flex justify-center items-center space-x-2">
-                    <?php if ($page > 1): ?>
-                        <a href="articles.php?page=<?php echo $page - 1; ?>&sort=<?php echo $sort; ?>" 
-                           class="w-12 h-12 rounded-xl border border-emerald-950/10 flex items-center justify-center text-emerald-950 hover:bg-emerald-50 transition-colors">
-                            <i class="fas fa-chevron-left"></i>
                         </a>
-                    <?php endif; ?>
+                    <?php endforeach; ?>
+                </div>
 
-                    <?php for ($i = 1; $i <= $totalPages; $i++): ?>
-                        <a href="articles.php?page=<?php echo $i; ?>&sort=<?php echo $sort; ?>" 
-                           class="w-12 h-12 rounded-xl border <?php echo $i === $page ? 'bg-emerald-950 text-white border-emerald-950' : 'border-emerald-950/10 text-emerald-950 hover:bg-emerald-50'; ?> flex items-center justify-center font-bold transition-colors">
-                            <?php echo $i; ?>
-                        </a>
-                    <?php endfor; ?>
+                <!-- Pagination -->
+                <?php if ($totalPages > 1): ?>
+                    <div id="pagination-container" class="mt-16 flex justify-center items-center space-x-2">
+                        <?php if ($page > 1): ?>
+                            <a href="articles.php?page=<?php echo $page - 1; ?>&sort=<?php echo $sort; ?>" 
+                               hx-get="articles.php?page=<?php echo $page - 1; ?>&sort=<?php echo $sort; ?>" 
+                               hx-target="#main-content" 
+                               hx-push-url="true"
+                               class="w-12 h-12 rounded-xl border border-emerald-950/10 flex items-center justify-center text-emerald-950 hover:bg-emerald-50 transition-colors">
+                                <i class="fas fa-chevron-left"></i>
+                            </a>
+                        <?php endif; ?>
 
-                    <?php if ($page < $totalPages): ?>
-                        <a href="articles.php?page=<?php echo $page + 1; ?>&sort=<?php echo $sort; ?>" 
-                           class="w-12 h-12 rounded-xl border border-emerald-950/10 flex items-center justify-center text-emerald-950 hover:bg-emerald-50 transition-colors">
-                            <i class="fas fa-chevron-right"></i>
-                        </a>
-                    <?php endif; ?>
+                        <?php for ($i = 1; $i <= $totalPages; $i++): ?>
+                            <a href="articles.php?page=<?php echo $i; ?>&sort=<?php echo $sort; ?>" 
+                               hx-get="articles.php?page=<?php echo $i; ?>&sort=<?php echo $sort; ?>" 
+                               hx-target="#main-content" 
+                               hx-push-url="true"
+                               class="w-12 h-12 rounded-xl border <?php echo $i === $page ? 'bg-emerald-950 text-white border-emerald-950' : 'border-emerald-950/10 text-emerald-950 hover:bg-emerald-50'; ?> flex items-center justify-center font-bold transition-colors">
+                                <?php echo $i; ?>
+                            </a>
+                        <?php endfor; ?>
+
+                        <?php if ($page < $totalPages): ?>
+                            <a href="articles.php?page=<?php echo $page + 1; ?>&sort=<?php echo $sort; ?>" 
+                               hx-get="articles.php?page=<?php echo $page + 1; ?>&sort=<?php echo $sort; ?>" 
+                               hx-target="#main-content" 
+                               hx-push-url="true"
+                               class="w-12 h-12 rounded-xl border border-emerald-950/10 flex items-center justify-center text-emerald-950 hover:bg-emerald-50 transition-colors">
+                                <i class="fas fa-chevron-right"></i>
+                            </a>
+                        <?php endif; ?>
+                    </div>
+                <?php endif; ?>
+            <?php else: ?>
+                <div class="col-span-full py-20 text-center border border-dashed border-emerald-950/10 rounded-[40px]">
+                    <i class="fas fa-pen-fancy text-4xl text-emerald-950/10 mb-4"></i>
+                    <p class="text-emerald-950/30 italic">No articles published yet.</p>
                 </div>
             <?php endif; ?>
-        <?php else: ?>
-            <div class="col-span-full py-20 text-center border border-dashed border-emerald-950/10 rounded-[40px]">
-                <i class="fas fa-pen-fancy text-4xl text-emerald-950/10 mb-4"></i>
-                <p class="text-emerald-950/30 italic">No articles published yet.</p>
-            </div>
-        <?php endif; ?>
+        </div>
     </div>
 </section>
 
 <script>
-    const searchInput = document.getElementById('article-search');
-    const searchClear = document.getElementById('search-clear');
-    const searchCount = document.getElementById('search-count');
+    (function() {
+        const searchInput = document.getElementById('article-search');
+        const searchClear = document.getElementById('search-clear');
+        const searchCount = document.getElementById('search-count');
+        const articlesContainer = document.getElementById('articles-container');
+        let debounceTimer;
 
-    if (searchInput) {
-        searchInput.addEventListener('input', function() {
-            const query = this.value.toLowerCase().trim();
-            const cards = document.querySelectorAll('.article-card');
-            let visible = 0;
+        if (searchInput) {
+            searchInput.addEventListener('input', function() {
+                const query = this.value.trim();
+                
+                searchClear.classList.toggle('hidden', query.length === 0);
 
-            searchClear.classList.toggle('hidden', query.length === 0);
-
-            cards.forEach(card => {
-                const title = card.querySelector('h3')?.textContent.toLowerCase() || '';
-                const excerpt = card.querySelector('p.line-clamp-3')?.textContent.toLowerCase() || '';
-                const writer = card.querySelector('.text-sm.font-bold')?.textContent.toLowerCase() || '';
-                const match = title.includes(query) || excerpt.includes(query) || writer.includes(query);
-                card.style.display = match ? '' : 'none';
-                if (match) visible++;
+                clearTimeout(debounceTimer);
+                debounceTimer = setTimeout(() => {
+                    if (query.length > 0) {
+                        performSearch(query);
+                    } else {
+                        resetToPaginated();
+                    }
+                }, 300);
             });
+        }
 
-            if (query.length > 0) {
-                searchCount.classList.remove('hidden');
-                searchCount.textContent = visible + ' article' + (visible !== 1 ? 's' : '') + ' found';
-            } else {
-                searchCount.classList.add('hidden');
+        async function performSearch(query) {
+            try {
+                const response = await fetch(`ajax/search_articles.php?q=${encodeURIComponent(query)}`);
+                const data = await response.json();
+
+                if (data.success) {
+                    renderResults(data.results);
+                    searchCount.classList.remove('hidden');
+                    searchCount.textContent = data.count + ' article' + (data.count !== 1 ? 's' : '') + ' found across all pages';
+                }
+            } catch (error) {
+                console.error('Search failed:', error);
             }
-        });
-    }
+        }
 
-    function clearSearch() {
-        searchInput.value = '';
-        searchInput.dispatchEvent(new Event('input'));
-        searchInput.focus();
-    }
+        function renderResults(articles) {
+            if (articles.length === 0) {
+                articlesContainer.innerHTML = `
+                    <div class="col-span-full py-20 text-center border border-dashed border-emerald-950/10 rounded-[40px]">
+                        <i class="fas fa-search text-4xl text-emerald-950/10 mb-4"></i>
+                        <p class="text-emerald-950/30 italic">No articles match your search.</p>
+                    </div>
+                `;
+                return;
+            }
+
+            let html = '<div class="space-y-8">';
+            articles.forEach(article => {
+                html += `
+                    <a href="article.php?id=${article.id}" 
+                       hx-get="article.php?id=${article.id}" hx-target="#main-content" hx-push-url="true" hx-select="#main-content"
+                       class="article-card block card-professional group">
+                        <div class="flex flex-col md:flex-row">
+                            ${article.cover_image ? `
+                                <div class="md:w-80 flex-none">
+                                    <div class="aspect-[16/10] md:aspect-auto md:h-full overflow-hidden rounded-t-[24px] md:rounded-l-[24px] md:rounded-tr-none">
+                                        <img src="${article.cover_image}" 
+                                             alt="${article.title}"
+                                             class="article-image w-full h-full object-cover">
+                                    </div>
+                                </div>
+                            ` : ''}
+
+                            <div class="flex-1 p-8 md:p-10 flex flex-col justify-center">
+                                <div class="flex items-center space-x-4 mb-4 text-emerald-950/40 text-[11px] font-bold uppercase tracking-widest">
+                                    <span>${article.formatted_date}</span>
+                                    <span class="w-1 h-1 rounded-full bg-emerald-950/20"></span>
+                                    <span>${article.reading_time} min read</span>
+                                </div>
+
+                                <h3 class="text-2xl md:text-3xl font-display font-bold text-emerald-950 mb-4 leading-tight group-hover:text-emerald-700 transition-colors">
+                                    ${article.title}
+                                </h3>
+
+                                <p class="text-emerald-950/60 text-sm leading-relaxed line-clamp-3 mb-6 font-medium">
+                                    ${article.excerpt}
+                                </p>
+
+                                <div class="flex items-center justify-between mt-auto pt-6 border-t border-emerald-950/5">
+                                    <span class="text-sm font-bold text-emerald-950">${article.writer}</span>
+                                    <span class="text-emerald-600 font-bold text-xs group-hover:translate-x-1 transition-transform flex items-center">
+                                        Read Article <i class="fas fa-arrow-right ml-2"></i>
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    </a>
+                `;
+            });
+            html += '</div>';
+            articlesContainer.innerHTML = html;
+            // Re-process HTMX for the new elements
+            htmx.process(articlesContainer);
+        }
+
+        function resetToPaginated() {
+            // Using HTMX to reload the component or just reload page if not easy
+            // But since we want smooth experience, let's just fetch current page again
+            const url = new URL(window.location.href);
+            fetch(url.href)
+                .then(response => response.text())
+                .then(html => {
+                    const parser = new DOMParser();
+                    const doc = parser.parseFromString(html, 'text/html');
+                    const newContent = doc.getElementById('articles-container').innerHTML;
+                    articlesContainer.innerHTML = newContent;
+                    searchCount.classList.add('hidden');
+                });
+        }
+
+        window.clearSearch = function() {
+            searchInput.value = '';
+            searchClear.classList.add('hidden');
+            resetToPaginated();
+            searchInput.focus();
+        };
+    })();
 </script>
 
 <?php require_once 'includes/footer.php'; ?>

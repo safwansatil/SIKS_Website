@@ -23,7 +23,9 @@ $readingTime = $article['reading_time'] ?? calculateReadingTime($article['descri
         
         <div class="relative z-10 w-full">
             <div class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 pb-16 pt-40">
-                <a href="articles.php" class="inline-flex items-center text-white/60 hover:text-white font-bold text-xs uppercase tracking-widest mb-8 transition-colors">
+                <a href="articles.php" 
+                   hx-get="articles.php" hx-target="#main-content" hx-push-url="true" hx-select="#main-content"
+                   class="inline-flex items-center text-white/60 hover:text-white font-bold text-xs uppercase tracking-widest mb-8 transition-colors">
                     <i class="fas fa-arrow-left mr-2"></i>
                     All Articles
                 </a>
@@ -47,7 +49,9 @@ $readingTime = $article['reading_time'] ?? calculateReadingTime($article['descri
     <div class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
         <?php if (empty($article['cover_image'])): ?>
             <!-- No cover image: show title inline -->
-            <a href="articles.php" class="inline-flex items-center text-emerald-950/40 hover:text-emerald-950 font-bold text-xs uppercase tracking-widest mb-8 transition-colors">
+            <a href="articles.php" 
+               hx-get="articles.php" hx-target="#main-content" hx-push-url="true" hx-select="#main-content"
+               class="inline-flex items-center text-emerald-950/40 hover:text-emerald-950 font-bold text-xs uppercase tracking-widest mb-8 transition-colors">
                 <i class="fas fa-arrow-left mr-2"></i>
                 All Articles
             </a>
@@ -73,16 +77,102 @@ $readingTime = $article['reading_time'] ?? calculateReadingTime($article['descri
         <!-- Divider -->
         <div class="my-16 border-t border-emerald-950/10"></div>
 
-        <!-- Author Card -->
-        <div class="p-8 bg-emerald-50/50 border border-emerald-100 rounded-3xl">
-            <p class="text-[10px] font-bold uppercase tracking-widest text-emerald-950/40 mb-1">Written by</p>
-            <p class="text-xl font-bold text-emerald-950"><?php echo htmlspecialchars($article['writer']); ?></p>
-            <p class="text-emerald-950/50 text-sm font-medium">Last updated <?php echo date('F d, Y', strtotime($article['last_edited'])); ?></p>
+        <!-- Gallery Images -->
+        <?php $articleImages = getArticleImages($article['id']); ?>
+        <?php if ($articleImages): ?>
+            <div class="mt-16 mb-24">
+                <h3 class="text-2xl font-display font-bold text-emerald-950 mb-10">Article Gallery</h3>
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                    <?php foreach ($articleImages as $idx => $img): ?>
+                        <div class="group cursor-pointer" onclick="openLightbox(<?php echo $idx; ?>)">
+                            <div class="relative aspect-video rounded-[32px] overflow-hidden border border-emerald-950/5 shadow-sm hover:shadow-xl transition-all duration-500">
+                                <img src="<?php echo htmlspecialchars($img['image_path']); ?>" 
+                                     alt="<?php echo htmlspecialchars($img['caption'] ?: $article['title']); ?>"
+                                     class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700">
+                                <?php if ($img['caption']): ?>
+                                    <div class="absolute inset-x-0 bottom-0 p-6 bg-gradient-to-t from-black/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                                        <p class="text-white text-xs font-medium"><?php echo htmlspecialchars($img['caption']); ?></p>
+                                    </div>
+                                <?php endif; ?>
+                            </div>
+                        </div>
+                    <?php endforeach; ?>
+                </div>
+            </div>
+
+            <script>
+                const galleryImages = <?php echo json_encode(array_map(function($img) { return $img['image_path']; }, $articleImages)); ?>;
+                let currentLightboxIndex = 0;
+                let lightboxEl = null;
+
+                function createLightbox() {
+                    if (lightboxEl) return;
+                    lightboxEl = document.createElement('div');
+                    lightboxEl.id = 'lightbox';
+                    lightboxEl.style.cssText = 'position:fixed;top:0;left:0;width:100%;height:100%;z-index:99999;background:rgba(0,0,0,0.95);display:none;align-items:center;justify-content:center;';
+                    lightboxEl.innerHTML = `
+                        <button onclick="closeLightbox()" style="position:absolute;top:24px;right:24px;width:48px;height:48px;border-radius:50%;background:rgba(255,255,255,0.1);border:none;color:white;font-size:20px;cursor:pointer;display:flex;align-items:center;justify-content:center;z-index:10;"><i class="fas fa-times"></i></button>
+                        <div style="position:absolute;top:28px;left:24px;color:rgba(255,255,255,0.5);font-size:14px;font-weight:bold;z-index:10;" id="lightbox-counter"></div>
+                        <button onclick="navigateLightbox(-1)" style="position:absolute;left:16px;top:50%;transform:translateY(-50%);width:48px;height:48px;border-radius:50%;background:rgba(255,255,255,0.1);border:none;color:white;font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center;z-index:10;"><i class="fas fa-chevron-left"></i></button>
+                        <img id="lightbox-img" src="" alt="Gallery" style="max-width:90vw;max-height:90vh;object-fit:contain;border-radius:8px;">
+                        <button onclick="navigateLightbox(1)" style="position:absolute;right:16px;top:50%;transform:translateY(-50%);width:48px;height:48px;border-radius:50%;background:rgba(255,255,255,0.1);border:none;color:white;font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center;z-index:10;"><i class="fas fa-chevron-right"></i></button>
+                    `;
+                    lightboxEl.addEventListener('click', function(e) {
+                        if (e.target === lightboxEl) closeLightbox();
+                    });
+                    document.body.appendChild(lightboxEl);
+                }
+
+                function openLightbox(index) {
+                    createLightbox();
+                    currentLightboxIndex = index;
+                    document.getElementById('lightbox-img').src = galleryImages[index];
+                    document.getElementById('lightbox-counter').textContent = (index + 1) + ' / ' + galleryImages.length;
+                    lightboxEl.style.display = 'flex';
+                    document.body.style.overflow = 'hidden';
+                }
+
+                function closeLightbox() {
+                    if (lightboxEl) lightboxEl.style.display = 'none';
+                    document.body.style.overflow = '';
+                }
+
+                function navigateLightbox(dir) {
+                    currentLightboxIndex = (currentLightboxIndex + dir + galleryImages.length) % galleryImages.length;
+                    document.getElementById('lightbox-img').src = galleryImages[currentLightboxIndex];
+                    document.getElementById('lightbox-counter').textContent = (currentLightboxIndex + 1) + ' / ' + galleryImages.length;
+                }
+
+                document.addEventListener('keydown', function(e) {
+                    if (!lightboxEl || lightboxEl.style.display === 'none') return;
+                    if (e.key === 'Escape') closeLightbox();
+                    if (e.key === 'ArrowLeft') navigateLightbox(-1);
+                    if (e.key === 'ArrowRight') navigateLightbox(1);
+                });
+            </script>
+        <?php endif; ?>
+
+        <!-- Author Card & Library Link -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+            <div class="md:col-span-2 p-8 bg-emerald-50/50 border border-emerald-100 rounded-3xl">
+                <p class="text-[10px] font-bold uppercase tracking-widest text-emerald-950/40 mb-1">Written by</p>
+                <p class="text-xl font-bold text-emerald-950"><?php echo htmlspecialchars($article['writer']); ?></p>
+                <p class="text-emerald-950/50 text-sm font-medium">Last updated <?php echo date('F d, Y', strtotime($article['last_edited'])); ?></p>
+            </div>
+            <a href="library.php" 
+               hx-get="library.php" hx-target="#main-content" hx-push-url="true" hx-select="#main-content"
+               class="p-8 bg-emerald-950 text-white rounded-3xl flex flex-col justify-center items-center text-center group hover:bg-black transition-colors">
+                <i class="fas fa-book text-2xl mb-3 text-emerald-400 group-hover:scale-110 transition-transform"></i>
+                <p class="font-bold">Explore Library</p>
+                <p class="text-[10px] text-white/40 uppercase tracking-widest mt-1">Free PDFs & Books</p>
+            </a>
         </div>
 
         <!-- Back to Articles -->
         <div class="mt-12 text-center">
-            <a href="articles.php" class="inline-flex items-center px-8 py-4 bg-emerald-950 text-white rounded-2xl text-sm font-bold hover:bg-black transition-colors">
+            <a href="articles.php" 
+               hx-get="articles.php" hx-target="#main-content" hx-push-url="true" hx-select="#main-content"
+               class="inline-flex items-center px-8 py-4 bg-emerald-950 text-white rounded-2xl text-sm font-bold hover:bg-black transition-colors">
                 <i class="fas fa-arrow-left mr-2"></i>
                 Back to All Articles
             </a>

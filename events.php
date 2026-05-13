@@ -19,11 +19,13 @@ $pastEvents = getEvents(true, null, $selectedCategory);
         <!-- Category Filter -->
         <div class="flex flex-wrap items-center justify-center gap-3 mb-16">
             <a href="events.php" 
+               hx-get="events.php" hx-target="#main-content" hx-push-url="true" hx-select="#main-content"
                class="px-6 py-2 rounded-full font-bold text-xs uppercase tracking-widest transition-all <?php echo !$selectedCategory ? 'bg-emerald-950 text-white shadow-lg' : 'bg-emerald-50 text-emerald-950/40 hover:bg-emerald-100'; ?>">
                 All Events
             </a>
             <?php foreach ($categories as $cat): ?>
                 <a href="events.php?category=<?php echo urlencode($cat['category']); ?>" 
+                   hx-get="events.php?category=<?php echo urlencode($cat['category']); ?>" hx-target="#main-content" hx-push-url="true" hx-select="#main-content"
                    class="px-6 py-2 rounded-full font-bold text-xs uppercase tracking-widest transition-all <?php echo $selectedCategory === $cat['category'] ? 'bg-emerald-950 text-white shadow-lg' : 'bg-emerald-50 text-emerald-950/40 hover:bg-emerald-100'; ?>">
                     <?php echo htmlspecialchars($cat['category']); ?>
                 </a>
@@ -44,7 +46,9 @@ $pastEvents = getEvents(true, null, $selectedCategory);
 
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-24">
                 <?php foreach ($upcomingEvents as $event): ?>
-                    <a href="event_details.php?id=<?php echo $event['id']; ?>" class="card-professional group block">
+                    <a href="event_details.php?id=<?php echo $event['id']; ?>" 
+                       hx-get="event_details.php?id=<?php echo $event['id']; ?>" hx-target="#main-content" hx-push-url="true" hx-select="#main-content"
+                       class="card-professional group block">
                         <!-- Event Cover Image -->
                         <div class="relative aspect-[16/10] overflow-hidden">
                             <?php if (!empty($event['cover_image'])): ?>
@@ -120,7 +124,9 @@ $pastEvents = getEvents(true, null, $selectedCategory);
 
                 <div id="past-events-carousel" class="flex overflow-x-auto space-x-6 pb-12 no-scrollbar scroll-smooth">
                     <?php foreach ($pastEvents as $event): ?>
-                        <a href="event_details.php?id=<?php echo $event['id']; ?>" class="flex-none w-[300px] sm:w-[400px] group">
+                        <a href="event_details.php?id=<?php echo $event['id']; ?>" 
+                           hx-get="event_details.php?id=<?php echo $event['id']; ?>" hx-target="#main-content" hx-push-url="true" hx-select="#main-content"
+                           class="flex-none w-[300px] sm:w-[400px] group">
                             <div class="relative aspect-[4/3] rounded-[32px] overflow-hidden mb-6 border border-emerald-950/5">
                                 <div class="absolute inset-0 bg-emerald-950/20 group-hover:bg-transparent transition-colors duration-500 z-10"></div>
                                 <?php if (!empty($event['cover_image'])): ?>

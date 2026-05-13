@@ -55,7 +55,9 @@ $aboutCards = getAboutContent('card');
                 
                 <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
                     <?php foreach ($pastEvents as $event): ?>
-                        <a href="event_details.php?id=<?php echo $event['id']; ?>" class="group block">
+                        <a href="event_details.php?id=<?php echo $event['id']; ?>" 
+                           hx-get="event_details.php?id=<?php echo $event['id']; ?>" hx-target="#main-content" hx-push-url="true" hx-select="#main-content"
+                           class="group block">
                             <div class="relative aspect-video rounded-3xl overflow-hidden mb-6 border border-emerald-950/5">
                                 <?php if (!empty($event['cover_image'])): ?>
                                     <img src="<?php echo htmlspecialchars($event['cover_image']); ?>" 
@@ -78,7 +80,9 @@ $aboutCards = getAboutContent('card');
                 </div>
                 
                 <div class="mt-16 text-center">
-                    <a href="events.php" class="inline-flex items-center px-8 py-4 rounded-2xl bg-emerald-950 text-white font-bold hover:bg-black transition-all shadow-xl shadow-emerald-950/20">
+                    <a href="events.php" 
+                       hx-get="events.php" hx-target="#main-content" hx-push-url="true" hx-select="#main-content"
+                       class="inline-flex items-center px-8 py-4 rounded-2xl bg-emerald-950 text-white font-bold hover:bg-black transition-all shadow-xl shadow-emerald-950/20">
                         View Full Gallery <i class="fas fa-arrow-right ml-3 text-xs"></i>
                     </a>
                 </div>

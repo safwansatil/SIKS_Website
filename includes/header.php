@@ -47,6 +47,9 @@
         }
     </script>
 
+    <!-- HTMX -->
+    <script src="https://unpkg.com/htmx.org@1.9.10"></script>
+
     <!-- Google Fonts (Inter, Outfit + Arabic/Bengali support) -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -172,10 +175,36 @@
             scrollbar-width: none;
             /* Firefox */
         }
+
+        /* HTMX Indicator Styles */
+        .htmx-indicator {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 3px;
+            background: #10b981;
+            z-index: 9999;
+            opacity: 0;
+            transition: opacity 200ms ease-in;
+            pointer-events: none;
+        }
+        .htmx-request .htmx-indicator {
+            opacity: 1;
+            animation: htmx-progress 2s infinite ease-in-out;
+        }
+        @keyframes htmx-progress {
+            0% { width: 0; left: 0; }
+            50% { width: 70%; left: 15%; }
+            100% { width: 100%; left: 100%; }
+        }
     </style>
 </head>
 
 <body class="bg-white text-gray-900 font-sans selection:bg-emerald-950 selection:text-white">
+    <!-- HTMX Loading Indicator -->
+    <div class="htmx-indicator"></div>
+
     <!-- Global Loader -->
     <div id="global-loader"
         class="fixed inset-0 z-[9999] bg-white flex items-center justify-center transition-opacity duration-700 ease-out">
@@ -208,7 +237,7 @@
                 <div class="flex justify-between items-center h-16">
                     <!-- Logo & Brand -->
                     <div class="flex items-center space-x-4 group cursor-pointer"
-                        onclick="window.location.href='index.php'">
+                        hx-get="index.php" hx-target="#main-content" hx-push-url="true" hx-select="#main-content">
                         <div class="relative">
                             <img src="assets/images/logo.png?v=2" alt="Society of Islamic Knowledge Seekers Logo"
                                 class="h-10 w-auto group-hover:scale-110 transition-transform duration-500">
@@ -229,12 +258,18 @@
                             'index.php' => 'Home',
                             'about.php' => 'About',
                             'events.php' => 'Events',
-                            'articles.php' => 'Articles'
+                            'articles.php' => 'Articles',
+                            'library.php' => 'Library'
                         ];
                         foreach ($links as $file => $label):
                             $isActive = ($currentPage == $file || ($currentPage == '' && $file == 'index.php'));
                             ?>
-                            <a href="<?php echo $file; ?>" class="nav-link <?php echo $isActive ? 'active-link' : ''; ?>">
+                            <a href="<?php echo $file; ?>" 
+                               hx-get="<?php echo $file; ?>" 
+                               hx-target="#main-content" 
+                               hx-push-url="true" 
+                               hx-select="#main-content"
+                               class="nav-link <?php echo $isActive ? 'active-link' : ''; ?>">
                                 <?php echo $label; ?>
                             </a>
                         <?php endforeach; ?>
@@ -251,6 +286,10 @@
                                 $isActive = ($currentPage == $file || ($currentPage == '' && $file == 'index.php'));
                                 ?>
                                 <a href="<?php echo $file; ?>"
+                                   hx-get="<?php echo $file; ?>" 
+                                   hx-target="#main-content" 
+                                   hx-push-url="true" 
+                                   hx-select="#main-content"
                                     class="py-3 px-2 text-[11px] font-bold uppercase tracking-[0.15em] transition-all duration-300 border-b-2 text-center flex-1 
                                       <?php echo $isActive ? 'text-emerald-950 border-emerald-950' : 'text-gray-400 border-transparent hover:text-emerald-700'; ?>">
                                     <?php echo $label; ?>
@@ -377,6 +416,36 @@ function updateCountdown() {
 
         setInterval(updateCountdown, 1000);
         updateCountdown();
+
+        // HTMX: Update active link and re-initialize components
+        document.body.addEventListener('htmx:afterSettle', function(evt) {
+            const currentPath = window.location.pathname.split('/').pop() || 'index.php';
+            
+            // Update desktop nav
+            document.querySelectorAll('nav.hidden.md\\:flex .nav-link').forEach(link => {
+                const linkPath = link.getAttribute('href');
+                if (linkPath === currentPath) {
+                    link.classList.add('active-link');
+                } else {
+                    link.classList.remove('active-link');
+                }
+            });
+
+            // Update mobile nav
+            document.querySelectorAll('nav.md\\:hidden a').forEach(link => {
+                const linkPath = link.getAttribute('href');
+                if (linkPath === currentPath) {
+                    link.classList.add('text-emerald-950', 'border-emerald-950');
+                    link.classList.remove('text-gray-400', 'border-transparent');
+                } else {
+                    link.classList.remove('text-emerald-950', 'border-emerald-950');
+                    link.classList.add('text-gray-400', 'border-transparent');
+                }
+            });
+
+            // Scroll to top on page change
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        });
     </script>
 
     <main class="pt-24 animate-page">

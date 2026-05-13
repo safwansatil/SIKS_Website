@@ -159,6 +159,9 @@ require_once 'auth.php';
                 <a href="manage_articles.php" class="nav-item <?php echo $activeNav === 'articles' ? 'active' : ''; ?>">
                     <i class="fas fa-pen-nib"></i> Articles
                 </a>
+                <a href="manage_library.php" class="nav-item <?php echo $activeNav === 'library' ? 'active' : ''; ?>">
+                    <i class="fas fa-book"></i> Library Management
+                </a>
                 <a href="manage_about.php" class="nav-item <?php echo $activeNav === 'about' ? 'active' : ''; ?>">
                     <i class="fas fa-info-circle"></i> About Content
                 </a>
