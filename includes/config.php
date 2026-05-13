@@ -575,3 +575,154 @@ function getRandomHadith($forceRefresh = false)
     return $data;
 }
 
+/**
+ * Get library documents with search, filter, and sort
+ */
+function getLibraryDocuments($category = null, $search = null, $sort = 'name_asc', $limit = null, $offset = 0)
+{
+    global $pdo;
+    if (!$pdo) return [];
+
+    try {
+        $params = [];
+        $sql = "SELECT * FROM library_documents WHERE 1=1";
+
+        if ($category) {
+            $sql .= " AND category = ?";
+            $params[] = $category;
+        }
+
+        if ($search) {
+            $sql .= " AND title LIKE ?";
+            $params[] = "%$search%";
+        }
+
+        // Sorting
+        switch ($sort) {
+            case 'name_desc': $sql .= " ORDER BY title DESC"; break;
+            case 'size_asc':  $sql .= " ORDER BY file_size ASC"; break;
+            case 'size_desc': $sql .= " ORDER BY file_size DESC"; break;
+            case 'newest':    $sql .= " ORDER BY uploaded_at DESC"; break;
+            default:          $sql .= " ORDER BY title ASC"; break;
+        }
+
+        if ($limit) {
+            $sql .= " LIMIT " . (int)$limit . " OFFSET " . (int)$offset;
+        }
+
+        $stmt = $pdo->prepare($sql);
+        $stmt->execute($params);
+        return $stmt->fetchAll();
+    } catch (PDOException $e) {
+        return [];
+    }
+}
+
+/**
+ * Count total library documents for pagination
+ */
+function getLibraryCount($category = null, $search = null)
+{
+    global $pdo;
+    if (!$pdo) return 0;
+
+    try {
+        $params = [];
+        $sql = "SELECT COUNT(*) FROM library_documents WHERE 1=1";
+
+        if ($category) {
+            $sql .= " AND category = ?";
+            $params[] = $category;
+        }
+
+        if ($search) {
+            $sql .= " AND title LIKE ?";
+            $params[] = "%$search%";
+        }
+
+        $stmt = $pdo->prepare($sql);
+        $stmt->execute($params);
+        return (int)$stmt->fetchColumn();
+    } catch (PDOException $e) {
+        return 0;
+    }
+}
+
+/**
+ * Increment download count for a document
+ */
+function incrementDownloadCount($id)
+{
+    global $pdo;
+    if (!$pdo || !$id) return false;
+
+    try {
+        $stmt = $pdo->prepare("UPDATE library_documents SET downloads = downloads + 1 WHERE id = ?");
+        return $stmt->execute([$id]);
+    } catch (PDOException $e) {
+        return false;
+    }
+}
+
+/**
+ * Get images for a specific article
+ */
+function getArticleImages($articleId)
+{
+    global $pdo;
+    if (!$pdo) return [];
+
+    try {
+        $stmt = $pdo->prepare("SELECT * FROM article_images WHERE article_id = ? ORDER BY display_order ASC, id ASC");
+        $stmt->execute([$articleId]);
+        return $stmt->fetchAll();
+    } catch (PDOException $e) {
+        return [];
+    }
+}
+
+/**
+ * Handle PDF upload
+ */
+function handlePDFUpload($file)
+{
+    if (!isset($file['tmp_name']) || empty($file['tmp_name']) || $file['error'] !== UPLOAD_ERR_OK) {
+        return false;
+    }
+
+    // Validate size (25MB)
+    if ($file['size'] > 25 * 1024 * 1024) {
+        return ['error' => 'File size exceeds 25MB limit.'];
+    }
+
+    $uploadDir = UPLOAD_DIR . 'library/';
+    if (!is_dir($uploadDir)) {
+        mkdir($uploadDir, 0755, true);
+    }
+
+    // Validate type
+    $finfo = finfo_open(FILEINFO_MIME_TYPE);
+    $mimeType = finfo_file($finfo, $file['tmp_name']);
+    finfo_close($finfo);
+
+    if ($mimeType !== 'application/pdf') {
+        return ['error' => 'Only PDF files are allowed.'];
+    }
+
+    // Sanitize filename
+    $originalName = $file['name'];
+    $cleanName = preg_replace('/[^a-zA-Z0-9._-]/', '_', $originalName);
+    $filename = time() . '_' . $cleanName;
+    $destPath = $uploadDir . $filename;
+
+    if (move_uploaded_file($file['tmp_name'], $destPath)) {
+        return [
+            'success' => true,
+            'file_path' => UPLOAD_URL . 'library/' . $filename,
+            'filename' => $originalName,
+            'file_size' => $file['size']
+        ];
+    }
+
+    return ['error' => 'Failed to move uploaded file.'];
+}

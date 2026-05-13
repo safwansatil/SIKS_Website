@@ -8,21 +8,52 @@ $messageType = 'success';
 $mode = $_GET['mode'] ?? 'list';
 $edit_id = $_GET['id'] ?? null;
 
-// Handle Delete
+// Handle Delete Article
 if (isset($_GET['delete'])) {
     $id = $_GET['delete'];
     try {
-        // Delete image file first
+        // Delete cover image file
         $stmt = $pdo->prepare("SELECT cover_image FROM articles WHERE id = ?");
         $stmt->execute([$id]);
         $row = $stmt->fetch();
         if ($row && $row['cover_image'] && file_exists(dirname(__DIR__) . '/' . $row['cover_image'])) {
             unlink(dirname(__DIR__) . '/' . $row['cover_image']);
         }
+
+        // Delete gallery images from server
+        $stmt = $pdo->prepare("SELECT image_path FROM article_images WHERE article_id = ?");
+        $stmt->execute([$id]);
+        $imgs = $stmt->fetchAll();
+        foreach ($imgs as $img) {
+            if (file_exists(dirname(__DIR__) . '/' . $img['image_path'])) {
+                unlink(dirname(__DIR__) . '/' . $img['image_path']);
+            }
+        }
         
         $stmt = $pdo->prepare("DELETE FROM articles WHERE id = ?");
         $stmt->execute([$id]);
         $message = "Article deleted successfully.";
+    } catch (PDOException $e) {
+        $message = "Error: " . $e->getMessage();
+        $messageType = 'error';
+    }
+}
+
+// Delete gallery image
+if (isset($_GET['delete_image'])) {
+    $imgId = $_GET['delete_image'];
+    $returnId = $_GET['return_id'] ?? null;
+    try {
+        $stmt = $pdo->prepare("SELECT image_path FROM article_images WHERE id = ?");
+        $stmt->execute([$imgId]);
+        $imgRow = $stmt->fetch();
+        if ($imgRow && $imgRow['image_path'] && file_exists(dirname(__DIR__) . '/' . $imgRow['image_path'])) {
+            unlink(dirname(__DIR__) . '/' . $imgRow['image_path']);
+        }
+        $stmt = $pdo->prepare("DELETE FROM article_images WHERE id = ?");
+        $stmt->execute([$imgId]);
+        $message = "Gallery image deleted.";
+        if ($returnId) { $mode = 'edit'; $edit_id = $returnId; }
     } catch (PDOException $e) {
         $message = "Error: " . $e->getMessage();
         $messageType = 'error';
@@ -49,8 +80,23 @@ if (isset($_GET['remove_cover'])) {
     }
 }
 
-// Handle Add/Edit
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+// Update caption
+if (isset($_POST['update_caption'])) {
+    $imgId = $_POST['image_id'];
+    $caption = $_POST['caption'];
+    try {
+        $stmt = $pdo->prepare("UPDATE article_images SET caption = ? WHERE id = ?");
+        $stmt->execute([$caption, $imgId]);
+        $message = "Caption updated.";
+        $mode = 'edit'; $edit_id = $_POST['article_id'];
+    } catch (PDOException $e) {
+        $message = "Error: " . $e->getMessage();
+        $messageType = 'error';
+    }
+}
+
+// Handle Add/Edit Article
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && !isset($_POST['update_caption'])) {
     $title = $_POST['title'];
     $writer = $_POST['writer'];
     $desc = $_POST['description'];
@@ -63,7 +109,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
     }
 
-    // Auto-calculate reading time if not provided or to ensure accuracy
     $readingTime = calculateReadingTime($desc);
     $slug = generateSlug($title);
 
@@ -71,6 +116,22 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $coverImage = null;
     if (isset($_FILES['cover_image']) && $_FILES['cover_image']['error'] === UPLOAD_ERR_OK) {
         $coverImage = handleFileUpload($_FILES['cover_image'], 'articles');
+    }
+
+    // Handle gallery images
+    $galleryPaths = [];
+    if (isset($_FILES['gallery_images'])) {
+        foreach ($_FILES['gallery_images']['tmp_name'] as $key => $tmp) {
+            if ($_FILES['gallery_images']['error'][$key] === UPLOAD_ERR_OK) {
+                $file = [
+                    'tmp_name' => $_FILES['gallery_images']['tmp_name'][$key],
+                    'name' => $_FILES['gallery_images']['name'][$key],
+                    'error' => $_FILES['gallery_images']['error'][$key]
+                ];
+                $path = handleFileUpload($file, 'articles/gallery');
+                if ($path) $galleryPaths[] = $path;
+            }
+        }
     }
 
     if ($edit_id) {
@@ -96,6 +157,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             
             $stmt = $pdo->prepare($sql);
             $stmt->execute($params);
+
+            // Add gallery images
+            if (!empty($galleryPaths)) {
+                foreach ($galleryPaths as $gpath) {
+                    $stmt = $pdo->prepare("INSERT INTO article_images (article_id, image_path) VALUES (?, ?)");
+                    $stmt->execute([$edit_id, $gpath]);
+                }
+            }
+
             $message = "Article updated successfully.";
             $mode = 'list';
         } catch (PDOException $e) {
@@ -106,6 +176,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         try {
             $stmt = $pdo->prepare("INSERT INTO articles (title, writer, description, reading_time, slug, cover_image) VALUES (?, ?, ?, ?, ?, ?)");
             $stmt->execute([$title, $writer, $desc, $readingTime, $slug, $coverImage]);
+            
+            $newArticleId = $pdo->lastInsertId();
+
+            // Add gallery images
+            if (!empty($galleryPaths)) {
+                foreach ($galleryPaths as $gpath) {
+                    $stmt = $pdo->prepare("INSERT INTO article_images (article_id, image_path) VALUES (?, ?)");
+                    $stmt->execute([$newArticleId, $gpath]);
+                }
+            }
+
             $message = "Article published successfully.";
             $mode = 'list';
         } catch (PDOException $e) {
@@ -117,6 +198,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
 $articles = [];
 $article = [];
+$articleImages = [];
 
 if ($mode === 'list') {
     $stmt = $pdo->query("SELECT * FROM articles ORDER BY last_edited DESC");
@@ -125,6 +207,7 @@ if ($mode === 'list') {
     $stmt = $pdo->prepare("SELECT * FROM articles WHERE id = ?");
     $stmt->execute([$edit_id]);
     $article = $stmt->fetch();
+    $articleImages = getArticleImages($edit_id);
 }
 ?>
 
@@ -203,27 +286,64 @@ if ($mode === 'list') {
                 <div class="form-group">
                     <label>Estimated Reading Time</label>
                     <input type="text" value="<?php echo ($article['reading_time'] ?? 5) . ' min (Auto-calculated)'; ?>" disabled style="background: #f1f5f9;">
-                    <p style="font-size: 0.7rem; color: var(--text-muted); mt: 0.25rem;">This is automatically calculated based on content length.</p>
                 </div>
             </div>
 
-            <div class="form-group">
-                <label>Cover Image</label>
-                <?php if (!empty($article['cover_image'])): ?>
-                    <div style="position: relative; width: 150px; height: 100px; margin-bottom: 0.5rem;">
-                        <img src="../<?php echo htmlspecialchars($article['cover_image']); ?>" style="width: 100%; height: 100%; object-fit: cover; border-radius: 0.5rem; display: block;">
-                        <a href="manage_articles.php?remove_cover=<?php echo $edit_id; ?>" 
-                           style="position: absolute; top: -5px; right: -5px; background: var(--danger); color: white; width: 20px; height: 20px; border-radius: 50%; display: flex; align-items: center; justify-content: center; text-decoration: none; font-size: 0.7rem;" 
-                           title="Remove cover">&times;</a>
+            <div class="grid-2">
+                <div class="form-group">
+                    <label>Cover Image (Hero Display)</label>
+                    <?php if (!empty($article['cover_image'])): ?>
+                        <div style="position: relative; width: 150px; height: 100px; margin-bottom: 0.5rem;">
+                            <img src="../<?php echo htmlspecialchars($article['cover_image']); ?>" style="width: 100%; height: 100%; object-fit: cover; border-radius: 0.5rem; display: block;">
+                            <a href="manage_articles.php?remove_cover=<?php echo $edit_id; ?>" 
+                               style="position: absolute; top: -5px; right: -5px; background: var(--danger); color: white; width: 20px; height: 20px; border-radius: 50%; display: flex; align-items: center; justify-content: center; text-decoration: none; font-size: 0.7rem;" 
+                               title="Remove cover">&times;</a>
+                        </div>
+                    <?php endif; ?>
+                    <input type="file" name="cover_image" accept="image/*" id="article-cover-input">
+                    <div id="article-cover-preview" style="margin-top: 1rem; display: none;">
+                        <img id="preview-img" style="width: 150px; height: 100px; object-fit: cover; border-radius: 0.5rem;">
                     </div>
-                <?php endif; ?>
-                <input type="file" name="cover_image" accept="image/*" id="article-cover-input">
-                <div id="article-cover-preview" style="margin-top: 1rem; display: none;">
-                    <img id="preview-img" style="width: 150px; height: 100px; object-fit: cover; border-radius: 0.5rem;">
+                </div>
+
+                <div class="form-group">
+                    <label>Gallery Images (Multiple Upload)</label>
+                    <input type="file" name="gallery_images[]" accept="image/*" multiple id="gallery-input">
+                    <div id="gallery-preview" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(60px, 1fr)); gap: 0.5rem; margin-top: 1rem;"></div>
                 </div>
             </div>
 
-            <div class="form-group">
+            <?php if ($articleImages): ?>
+                <div class="form-group" style="border: 1px solid var(--border); border-radius: 0.75rem; padding: 1.5rem; margin-top: 2rem;">
+                    <label style="margin-bottom: 1rem;">Current Gallery Images & Captions</label>
+                    <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 1.5rem;">
+                        <?php foreach ($articleImages as $img): ?>
+                            <div style="background: var(--bg); border-radius: 0.75rem; overflow: hidden; border: 1px solid var(--border);">
+                                <div style="position: relative; aspect-ratio: 16/10;">
+                                    <img src="../<?php echo htmlspecialchars($img['image_path']); ?>" style="width: 100%; height: 100%; object-fit: cover;">
+                                    <a href="manage_articles.php?delete_image=<?php echo $img['id']; ?>&return_id=<?php echo $edit_id; ?>" 
+                                       onclick="return confirm('Delete image?')"
+                                       style="position: absolute; top: 8px; right: 8px; background: var(--danger); color: white; width: 24px; height: 24px; border-radius: 50%; display: flex; align-items: center; justify-content: center; text-decoration: none;">
+                                        <i class="fas fa-times" style="font-size: 0.75rem;"></i>
+                                    </a>
+                                </div>
+                                <div style="padding: 0.75rem;">
+                                    <form method="POST" style="display: flex; gap: 0.5rem;">
+                                        <input type="hidden" name="image_id" value="<?php echo $img['id']; ?>">
+                                        <input type="hidden" name="article_id" value="<?php echo $edit_id; ?>">
+                                        <input type="text" name="caption" value="<?php echo htmlspecialchars($img['caption'] ?? ''); ?>" placeholder="Caption..." style="padding: 0.4rem; font-size: 0.8rem; flex: 1;">
+                                        <button type="submit" name="update_caption" class="btn btn-secondary" style="padding: 0.4rem; font-size: 0.8rem;">
+                                            <i class="fas fa-check"></i>
+                                        </button>
+                                    </form>
+                                </div>
+                            </div>
+                        <?php endforeach; ?>
+                    </div>
+                </div>
+            <?php endif; ?>
+
+            <div class="form-group" style="margin-top: 2rem;">
                 <label>Content (Full Article) *</label>
                 <textarea name="description" rows="15" required placeholder="Write your article content here..." data-b64-target><?php echo htmlspecialchars($article['description'] ?? ''); ?></textarea>
             </div>
@@ -252,6 +372,24 @@ if ($mode === 'list') {
                 }
                 reader.readAsDataURL(file);
             }
+        });
+
+        document.getElementById('gallery-input').addEventListener('change', function() {
+            const preview = document.getElementById('gallery-preview');
+            preview.innerHTML = '';
+            Array.from(this.files).forEach(file => {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const div = document.createElement('div');
+                    div.style.aspectRatio = '1';
+                    div.style.borderRadius = '0.5rem';
+                    div.style.overflow = 'hidden';
+                    div.style.border = '1px solid var(--border)';
+                    div.innerHTML = `<img src="${e.target.result}" style="width: 100%; height: 100%; object-fit: cover;">`;
+                    preview.appendChild(div);
+                }
+                reader.readAsDataURL(file);
+            });
         });
     </script>
 <?php endif; ?>
