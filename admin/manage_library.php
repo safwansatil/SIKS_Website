@@ -38,42 +38,55 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         try {
             $stmt = $pdo->prepare("UPDATE library_documents SET title = ?, category = ? WHERE id = ?");
             $stmt->execute([$title, $category, $edit_id]);
-            $message = "Document updated successfully.";
-            $mode = 'list';
+            header("Location: manage_library.php?message=Document updated successfully");
+            exit;
         } catch (PDOException $e) {
             $message = "Error: " . $e->getMessage();
             $messageType = 'error';
         }
     } else {
-        // Handle file upload
-        if (isset($_FILES['pdf_file']) && $_FILES['pdf_file']['error'] === UPLOAD_ERR_OK) {
-            $uploadResult = handlePDFUpload($_FILES['pdf_file']);
-            if (is_array($uploadResult) && isset($uploadResult['success'])) {
-                try {
-                    $stmt = $pdo->prepare("INSERT INTO library_documents (title, filename, file_path, file_size, category) VALUES (?, ?, ?, ?, ?)");
-                    $stmt->execute([
-                        $title, 
-                        $uploadResult['filename'], 
-                        $uploadResult['file_path'], 
-                        $uploadResult['file_size'], 
-                        $category
-                    ]);
-                    $message = "Document uploaded successfully.";
-                    $mode = 'list';
-                } catch (PDOException $e) {
-                    $message = "Database Error: " . $e->getMessage();
+        // Prevent duplicate title uploads
+        $checkStmt = $pdo->prepare("SELECT id FROM library_documents WHERE title = ?");
+        $checkStmt->execute([$title]);
+        if ($checkStmt->fetch()) {
+            $message = "Error: A document with this title already exists.";
+            $messageType = 'error';
+        } else {
+            // Handle file upload
+            if (isset($_FILES['pdf_file']) && $_FILES['pdf_file']['error'] === UPLOAD_ERR_OK) {
+                $uploadResult = handlePDFUpload($_FILES['pdf_file']);
+                if (is_array($uploadResult) && isset($uploadResult['success'])) {
+                    try {
+                        $stmt = $pdo->prepare("INSERT INTO library_documents (title, filename, file_path, file_size, category) VALUES (?, ?, ?, ?, ?)");
+                        $stmt->execute([
+                            $title, 
+                            $uploadResult['filename'], 
+                            $uploadResult['file_path'], 
+                            $uploadResult['file_size'], 
+                            $category
+                        ]);
+                        header("Location: manage_library.php?message=Document uploaded successfully");
+                        exit;
+                    } catch (PDOException $e) {
+                        $message = "Database Error: " . $e->getMessage();
+                        $messageType = 'error';
+                    }
+                } else {
+                    $errorMsg = is_array($uploadResult) ? ($uploadResult['error'] ?? 'Unknown error') : 'Upload failed';
+                    $message = "Upload Error: " . $errorMsg;
                     $messageType = 'error';
                 }
             } else {
-                $errorMsg = is_array($uploadResult) ? ($uploadResult['error'] ?? 'Unknown error') : 'Upload failed';
-                $message = "Upload Error: " . $errorMsg;
+                $message = "Please select a valid PDF file.";
                 $messageType = 'error';
             }
-        } else {
-            $message = "Please select a valid PDF file.";
-            $messageType = 'error';
         }
     }
+}
+
+// Get message from URL if redirected
+if (isset($_GET['message'])) {
+    $message = $_GET['message'];
 }
 
 $documents = [];

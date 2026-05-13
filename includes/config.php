@@ -656,9 +656,26 @@ function incrementDownloadCount($id)
     global $pdo;
     if (!$pdo || !$id) return false;
 
+    // Prevent double counting in the same session
+    if (session_status() === PHP_SESSION_NONE) {
+        session_start();
+    }
+    
+    if (!isset($_SESSION['downloaded_ids'])) {
+        $_SESSION['downloaded_ids'] = [];
+    }
+
+    if (in_array($id, $_SESSION['downloaded_ids'])) {
+        return true; // Already counted this session
+    }
+
     try {
         $stmt = $pdo->prepare("UPDATE library_documents SET downloads = downloads + 1 WHERE id = ?");
-        return $stmt->execute([$id]);
+        if ($stmt->execute([$id])) {
+            $_SESSION['downloaded_ids'][] = $id;
+            return true;
+        }
+        return false;
     } catch (PDOException $e) {
         return false;
     }
