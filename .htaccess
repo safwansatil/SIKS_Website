@@ -1,26 +1,12 @@
-# Prevent directory listing
+# Basic SIKS .htaccess
 Options -Indexes
-
-# Disable MultiViews to prevent extension guessing loops
 Options -MultiViews
 
-# Ensure PHP files are handled correctly
-<FilesMatch "\.php$">
-    Header set Cache-Control "no-store, no-cache, must-revalidate, max-age=0"
-    Header set Pragma "no-cache"
-</FilesMatch>
+# Ensure index.php is the default
+DirectoryIndex index.php
 
-# Increase upload and POST limits
+# Increase limits for uploads
 <IfModule mod_php.c>
-    php_value upload_max_filesize 20M
+    php_value upload_max_filesize 25M
     php_value post_max_size 50M
-    php_value max_execution_time 300
-    php_value max_input_vars 5000
 </IfModule>
-
-# Note: mod_security directives are not allowed in .htaccess on this server.
-# If you experience 403 Forbidden errors, please contact your host 
-# to disable mod_security for this domain.
-
-# UTF-8 encoding
-AddDefaultCharset UTF-8

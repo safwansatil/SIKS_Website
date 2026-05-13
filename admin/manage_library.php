@@ -154,13 +154,36 @@ if ($mode === 'list') {
 
             <div class="form-group">
                 <label>Category *</label>
-                <select name="category" required>
-                    <option value="Book" <?php echo ($document['category'] ?? '') === 'Book' ? 'selected' : ''; ?>>Book</option>
-                    <option value="Research Paper" <?php echo ($document['category'] ?? '') === 'Research Paper' ? 'selected' : ''; ?>>Research Paper</option>
-                    <option value="Lecture Note" <?php echo ($document['category'] ?? '') === 'Lecture Note' ? 'selected' : ''; ?>>Lecture Note</option>
-                    <option value="Other" <?php echo ($document['category'] ?? '') === 'Other' ? 'selected' : ''; ?>>Other</option>
-                </select>
+                <div style="display: flex; gap: 0.5rem;">
+                    <select name="category" id="category-select" style="flex: 1;" required>
+                        <?php 
+                        $stmt = $pdo->query("SELECT DISTINCT category FROM library_documents ORDER BY category ASC");
+                        $existingCats = $stmt->fetchAll(PDO::FETCH_COLUMN);
+                        $currentCat = $document['category'] ?? 'Book';
+                        foreach ($existingCats as $cat): ?>
+                            <option value="<?php echo htmlspecialchars($cat); ?>" <?php echo $currentCat === $cat ? 'selected' : ''; ?>>
+                                <?php echo htmlspecialchars($cat); ?>
+                            </option>
+                        <?php endforeach; ?>
+                        <?php if (!in_array($currentCat, $existingCats)): ?>
+                            <option value="<?php echo htmlspecialchars($currentCat); ?>" selected><?php echo htmlspecialchars($currentCat); ?></option>
+                        <?php endif; ?>
+                    </select>
+                    <input type="text" id="new-category" placeholder="Or type new..." style="flex: 1;" onchange="addNewCategory(this.value)">
+                </div>
             </div>
+
+            <script>
+                function addNewCategory(val) {
+                    if(!val) return;
+                    const select = document.getElementById('category-select');
+                    const opt = document.createElement('option');
+                    opt.value = val;
+                    opt.text = val;
+                    opt.selected = true;
+                    select.add(opt);
+                }
+            </script>
 
             <?php if (!$edit_id): ?>
                 <div class="form-group">

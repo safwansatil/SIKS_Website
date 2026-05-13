@@ -236,8 +236,7 @@
             <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 <div class="flex justify-between items-center h-16">
                     <!-- Logo & Brand -->
-                    <div class="flex items-center space-x-4 group cursor-pointer"
-                        hx-get="index.php" hx-target="#main-content" hx-push-url="true" hx-select="#main-content">
+                    <a href="index.php" class="flex items-center space-x-4 group cursor-pointer">
                         <div class="relative">
                             <img src="assets/images/logo.png?v=2" alt="Society of Islamic Knowledge Seekers Logo"
                                 class="h-10 w-auto group-hover:scale-110 transition-transform duration-500">
@@ -248,7 +247,7 @@
                                 Society of Islamic <br class="md:hidden"> Knowledge Seekers
                             </span>
                         </div>
-                    </div>
+                    </a>
 
                     <!-- Navigation Links - Justified to Right -->
                     <nav class="hidden md:flex items-center space-x-10">
@@ -448,4 +447,4 @@ function updateCountdown() {
         });
     </script>
 
-    <main class="pt-24 animate-page">
+    <main id="main-content" class="pt-24 animate-page">
