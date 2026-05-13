@@ -40,7 +40,9 @@ if (!empty($event['cover_image'])) {
     <div class="relative z-10 w-full">
         <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 pb-16 pt-32">
             <!-- Back Link -->
-            <a href="events.php" class="inline-flex items-center text-white/60 hover:text-white font-bold text-xs uppercase tracking-widest mb-8 transition-colors">
+            <a href="events.php" 
+               hx-get="events.php" hx-target="#main-content" hx-push-url="true" hx-select="#main-content"
+               class="inline-flex items-center text-white/60 hover:text-white font-bold text-xs uppercase tracking-widest mb-8 transition-colors">
                 <i class="fas fa-arrow-left mr-2"></i>
                 Back to Events
             </a>

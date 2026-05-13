@@ -23,7 +23,9 @@ $readingTime = $article['reading_time'] ?? calculateReadingTime($article['descri
         
         <div class="relative z-10 w-full">
             <div class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 pb-16 pt-40">
-                <a href="articles.php" class="inline-flex items-center text-white/60 hover:text-white font-bold text-xs uppercase tracking-widest mb-8 transition-colors">
+                <a href="articles.php" 
+                   hx-get="articles.php" hx-target="#main-content" hx-push-url="true" hx-select="#main-content"
+                   class="inline-flex items-center text-white/60 hover:text-white font-bold text-xs uppercase tracking-widest mb-8 transition-colors">
                     <i class="fas fa-arrow-left mr-2"></i>
                     All Articles
                 </a>
@@ -47,7 +49,9 @@ $readingTime = $article['reading_time'] ?? calculateReadingTime($article['descri
     <div class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
         <?php if (empty($article['cover_image'])): ?>
             <!-- No cover image: show title inline -->
-            <a href="articles.php" class="inline-flex items-center text-emerald-950/40 hover:text-emerald-950 font-bold text-xs uppercase tracking-widest mb-8 transition-colors">
+            <a href="articles.php" 
+               hx-get="articles.php" hx-target="#main-content" hx-push-url="true" hx-select="#main-content"
+               class="inline-flex items-center text-emerald-950/40 hover:text-emerald-950 font-bold text-xs uppercase tracking-widest mb-8 transition-colors">
                 <i class="fas fa-arrow-left mr-2"></i>
                 All Articles
             </a>
@@ -82,7 +86,9 @@ $readingTime = $article['reading_time'] ?? calculateReadingTime($article['descri
 
         <!-- Back to Articles -->
         <div class="mt-12 text-center">
-            <a href="articles.php" class="inline-flex items-center px-8 py-4 bg-emerald-950 text-white rounded-2xl text-sm font-bold hover:bg-black transition-colors">
+            <a href="articles.php" 
+               hx-get="articles.php" hx-target="#main-content" hx-push-url="true" hx-select="#main-content"
+               class="inline-flex items-center px-8 py-4 bg-emerald-950 text-white rounded-2xl text-sm font-bold hover:bg-black transition-colors">
                 <i class="fas fa-arrow-left mr-2"></i>
                 Back to All Articles
             </a>
