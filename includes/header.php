@@ -209,7 +209,7 @@
 
 <body class="bg-white font-sans text-emerald-950 overflow-x-hidden pt-24">
     <!-- Reading Progress Bar -->
-    <div id="reading-progress-bar" class="fixed top-0 left-0 w-0 h-1 bg-emerald-600 z-[100] transition-all duration-150"></div>
+    <div id="reading-progress-bar" class="fixed top-0 left-0 w-0 h-1.5 bg-emerald-600 z-[120] transition-all duration-150 shadow-[0_0_10px_rgba(16,185,129,0.3)]"></div>
 
     <!-- Global Toast Container -->
     <div id="toast-container"></div>
@@ -336,26 +336,32 @@
             </div>
         </header>
 
+        <?php 
+            $isDetailPage = (isset($article) || isset($event)); 
+            $barClasses = $isDetailPage 
+                ? "fixed top-20 right-4 w-auto rounded-full shadow-2xl border border-white/10 px-4 h-9 z-50 animate-fade-in" 
+                : "relative w-full border-b border-white/5 h-8";
+        ?>
         <!-- Pinned Countdown Bar -->
-        <div id="countdown-bar" class="glass-dark border-b border-white/5 opacity-0 animate-page"
+        <div id="countdown-bar" class="glass-dark <?php echo $barClasses; ?> opacity-0 animate-page"
             style="animation-delay: 0.3s;">
-            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                <div class="flex justify-between items-center h-8">
+            <div class="<?php echo $isDetailPage ? '' : 'max-w-7xl mx-auto px-4 sm:px-6 lg:px-8'; ?>">
+                <div class="flex justify-between items-center <?php echo $isDetailPage ? 'h-9 space-x-6' : 'h-8'; ?>">
                     <div class="flex items-center space-x-4">
                         <span class="relative flex h-1.5 w-1.5">
                             <span
                                 class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
                             <span class="relative inline-flex rounded-full h-1.5 w-1.5 bg-emerald-500"></span>
                         </span>
-                        <span class="text-[9px] font-black uppercase tracking-widest text-emerald-100">
-                            Upcoming Jamaat:
+                        <span class="<?php echo $isDetailPage ? 'text-[8px]' : 'text-[9px]'; ?> font-black uppercase tracking-widest text-emerald-100">
+                            <span class="<?php echo $isDetailPage ? 'hidden md:inline' : ''; ?>">Upcoming Jamaat:</span>
                             <span id="header-next-name" class="ml-1 text-white">Loading...</span>
                             <span id="header-next-time" class="ml-2 text-emerald-200"></span>
                         </span>
                     </div>
                     <div class="flex items-center space-x-2">
-                        <i class="fas fa-clock text-[9px] text-emerald-400/50"></i>
-                        <span class="text-[10px] font-mono font-bold text-white tracking-widest"
+                        <i class="fas fa-clock <?php echo $isDetailPage ? 'text-[8px]' : 'text-[9px]'; ?> text-emerald-400/50"></i>
+                        <span class="<?php echo $isDetailPage ? 'text-[9px]' : 'text-[10px]'; ?> font-mono font-bold text-white tracking-widest"
                             id="header-countdown-timer">00:00:00</span>
                     </div>
                 </div>
