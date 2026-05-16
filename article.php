@@ -13,7 +13,11 @@ $id = isset($_GET['id']) ? (int)$_GET['id'] : null;
 $article = getArticleById($id);
 
 if (!$article) {
-    header('Location: /articles');
+    if ($isHtmx) {
+        header('HX-Redirect: /articles');
+    } else {
+        header('Location: /articles');
+    }
     exit;
 }
 

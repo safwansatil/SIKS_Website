@@ -13,7 +13,12 @@ $id = isset($_GET['id']) ? (int)$_GET['id'] : null;
 $event = getEventById($id);
 
 if (!$event) {
-    header('Location: /events');
+    // If not found, redirect to events list
+    if ($isHtmx) {
+        header('HX-Redirect: /events');
+    } else {
+        header('Location: /events');
+    }
     exit;
 }
 

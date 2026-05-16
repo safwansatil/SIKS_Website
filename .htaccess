@@ -1,38 +1,36 @@
-# Basic SIKS .htaccess
-Options -Indexes
-Options -MultiViews
-
-# Ensure index.php is the default
-DirectoryIndex index.php
-
-# Increase limits for uploads
-<IfModule mod_php.c>
-    php_value upload_max_filesize 25M
-    php_value post_max_size 50M
-</IfModule>
+# Disable MultiViews to prevent conflicts with clean URLs
+Options -MultiViews -Indexes
 
 RewriteEngine On
 RewriteBase /
 
-# 1. Force HTTPS
+# 1. Force HTTPS (Robust version for institutional/shared hosting)
 RewriteCond %{HTTPS} off
+RewriteCond %{HTTP:X-Forwarded-Proto} !https
 RewriteRule ^(.*)$ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
 
-# 2. Remove Trailing Slashes (SEO best practice)
+# 2. Exclude Admin & Assets
+RewriteRule ^(admin|assets|uploads|ajax|css|js)(/.*)?$ - [L]
+
+# 3. Remove trailing slash (except for directories)
 RewriteCond %{REQUEST_FILENAME} !-d
-RewriteRule ^(.*)/$ /$1 [L,R=301]
+RewriteCond %{REQUEST_URI} ^/(.+)/$
+RewriteRule ^(.+)/$ /$1 [L,R=301]
 
-# 3. Article Detail Routing: /article/ID/slug
-RewriteRule ^article/([0-9]+)/? article.php?id=$1 [L,QSA]
+# 4. Redirect .php extensions to extensionless (External Redirect)
+RewriteCond %{THE_REQUEST} \s/+(.+)\.php[\s?] [NC]
+RewriteRule ^(.+)\.php$ /$1 [L,R=301]
 
-# 4. Event Detail Routing: /event/ID/slug
-RewriteRule ^event/([0-9]+)/? event_details.php?id=$1 [L,QSA]
+# 5. Article Detail Pretty URLs: /article/ID/slug
+RewriteRule ^article/([0-9]+)/?([^/]*)$ article.php?id=$1 [QSA,L]
 
-# 5. Category Routing: /category/community
-RewriteRule ^category/([^/]+)/? events.php?category=$1 [L,QSA]
+# 6. Event Detail Pretty URLs: /event/ID/slug
+RewriteRule ^event/([0-9]+)/?([^/]*)$ event_details.php?id=$1 [QSA,L]
 
-# 6. Internal Mapping for clean URLs (e.g. /about -> about.php)
-# If the file doesn't exist but the .php version does, serve it internally
+# 7. Category Filter Pretty URLs: /category/Name
+RewriteRule ^category/([^/]+)$ events.php?category=$1 [QSA,L]
+
+# 8. Internal Rewrite for extensionless PHP files
 RewriteCond %{REQUEST_FILENAME} !-d
 RewriteCond %{REQUEST_FILENAME}\.php -f
 RewriteRule ^([^/]+)$ $1.php [L]
