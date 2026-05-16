@@ -28,3 +28,5 @@ php_errors.log
 uploads/
 !uploads/.gitkeep
 includes/db.php
+
+scratch/

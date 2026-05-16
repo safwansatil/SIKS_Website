@@ -1,12 +1,28 @@
-<?php
 require_once 'includes/config.php';
-require_once 'includes/header.php';
 
-$id = $_GET['id'] ?? null;
+// Check if this is an HTMX request
+$isHtmx = isset($_SERVER['HTTP_HX_REQUEST']);
+
+if (!$isHtmx) {
+    require_once 'includes/header.php';
+} else {
+    echo '<main id="main-content" class="pt-24 animate-page">';
+}
+
+$id = isset($_GET['id']) ? (int)$_GET['id'] : null;
 $event = getEventById($id);
 
 if (!$event) {
-    header('Location: events.php');
+    header('Location: /events');
+    exit;
+}
+
+// Canonical URL check: Redirect if accessed via event_details.php?id=X or if slug is missing/wrong
+$canonicalUrl = "/event/" . $event['id'] . "/" . ($event['slug'] ?: generateSlug($event['name']));
+$currentUri = $_SERVER['REQUEST_URI'];
+
+if (!$isHtmx && strpos($currentUri, $canonicalUrl) === false) {
+    header("Location: $canonicalUrl", true, 301);
     exit;
 }
 
@@ -40,8 +56,8 @@ if (!empty($event['cover_image'])) {
     <div class="relative z-10 w-full">
         <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 pb-16 pt-32">
             <!-- Back Link -->
-            <a href="events.php" 
-               hx-get="events.php" hx-target="#main-content" hx-push-url="true" hx-select="#main-content"
+            <a href="events" 
+               hx-get="events" hx-target="#main-content" hx-push-url="true" hx-select="#main-content"
                class="inline-flex items-center text-white/60 hover:text-white font-bold text-xs uppercase tracking-widest mb-8 transition-colors">
                 <i class="fas fa-arrow-left mr-2"></i>
                 Back to Events
@@ -203,4 +219,10 @@ if (!empty($event['cover_image'])) {
     </div>
 </section>
 
-<?php require_once 'includes/footer.php'; ?>
+<?php
+if (!$isHtmx) {
+    require_once 'includes/footer.php';
+} else {
+    echo '</main>';
+}
+?>

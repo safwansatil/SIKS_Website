@@ -1,12 +1,28 @@
-<?php
 require_once 'includes/config.php';
-require_once 'includes/header.php';
 
-$id = $_GET['id'] ?? null;
+// Check if this is an HTMX request
+$isHtmx = isset($_SERVER['HTTP_HX_REQUEST']);
+
+if (!$isHtmx) {
+    require_once 'includes/header.php';
+} else {
+    echo '<main id="main-content" class="pt-24 animate-page">';
+}
+
+$id = isset($_GET['id']) ? (int)$_GET['id'] : null;
 $article = getArticleById($id);
 
 if (!$article) {
-    header('Location: articles.php');
+    header('Location: /articles');
+    exit;
+}
+
+// Canonical URL check: Redirect if accessed via article.php?id=X or if slug is missing/wrong
+$canonicalUrl = "/article/" . $article['id'] . "/" . ($article['slug'] ?: generateSlug($article['title']));
+$currentUri = $_SERVER['REQUEST_URI'];
+
+if (!$isHtmx && strpos($currentUri, $canonicalUrl) === false) {
+    header("Location: $canonicalUrl", true, 301);
     exit;
 }
 
@@ -23,8 +39,8 @@ $readingTime = $article['reading_time'] ?? calculateReadingTime($article['descri
         
         <div class="relative z-10 w-full">
             <div class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 pb-16 pt-40">
-                <a href="articles.php" 
-                   hx-get="articles.php" hx-target="#main-content" hx-push-url="true" hx-select="#main-content"
+                <a href="articles" 
+                   hx-get="articles" hx-target="#main-content" hx-push-url="true" hx-select="#main-content"
                    class="inline-flex items-center text-white/60 hover:text-white font-bold text-xs uppercase tracking-widest mb-8 transition-colors">
                     <i class="fas fa-arrow-left mr-2"></i>
                     All Articles
@@ -49,8 +65,8 @@ $readingTime = $article['reading_time'] ?? calculateReadingTime($article['descri
     <div class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
         <?php if (empty($article['cover_image'])): ?>
             <!-- No cover image: show title inline -->
-            <a href="articles.php" 
-               hx-get="articles.php" hx-target="#main-content" hx-push-url="true" hx-select="#main-content"
+            <a href="articles" 
+               hx-get="articles" hx-target="#main-content" hx-push-url="true" hx-select="#main-content"
                class="inline-flex items-center text-emerald-950/40 hover:text-emerald-950 font-bold text-xs uppercase tracking-widest mb-8 transition-colors">
                 <i class="fas fa-arrow-left mr-2"></i>
                 All Articles
@@ -159,8 +175,8 @@ $readingTime = $article['reading_time'] ?? calculateReadingTime($article['descri
                 <p class="text-xl font-bold text-emerald-950"><?php echo htmlspecialchars($article['writer']); ?></p>
                 <p class="text-emerald-950/50 text-sm font-medium">Last updated <?php echo date('F d, Y', strtotime($article['last_edited'])); ?></p>
             </div>
-            <a href="library.php" 
-               hx-get="library.php" hx-target="#main-content" hx-push-url="true" hx-select="#main-content"
+            <a href="library" 
+               hx-get="library" hx-target="#main-content" hx-push-url="true" hx-select="#main-content"
                class="p-8 bg-emerald-950 text-white rounded-3xl flex flex-col justify-center items-center text-center group hover:bg-black transition-colors">
                 <i class="fas fa-book text-2xl mb-3 text-emerald-400 group-hover:scale-110 transition-transform"></i>
                 <p class="font-bold">Explore Library</p>
@@ -170,8 +186,8 @@ $readingTime = $article['reading_time'] ?? calculateReadingTime($article['descri
 
         <!-- Back to Articles -->
         <div class="mt-12 text-center">
-            <a href="articles.php" 
-               hx-get="articles.php" hx-target="#main-content" hx-push-url="true" hx-select="#main-content"
+            <a href="articles" 
+               hx-get="articles" hx-target="#main-content" hx-push-url="true" hx-select="#main-content"
                class="inline-flex items-center px-8 py-4 bg-emerald-950 text-white rounded-2xl text-sm font-bold hover:bg-black transition-colors">
                 <i class="fas fa-arrow-left mr-2"></i>
                 Back to All Articles
@@ -180,4 +196,10 @@ $readingTime = $article['reading_time'] ?? calculateReadingTime($article['descri
     </div>
 </section>
 
-<?php require_once 'includes/footer.php'; ?>
+<?php
+if (!$isHtmx) {
+    require_once 'includes/footer.php';
+} else {
+    echo '</main>';
+}
+?>
