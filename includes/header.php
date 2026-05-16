@@ -207,7 +207,8 @@
     </style>
 </head>
 
-<body class="bg-white font-sans text-emerald-950 overflow-x-hidden pt-24">
+<body class="bg-white font-sans text-emerald-950 overflow-x-hidden pt-24" 
+      data-page-type="<?php echo (isset($article) || isset($event)) ? 'detail' : 'main'; ?>">
     <!-- Reading Progress Bar -->
     <div id="reading-progress-bar" class="fixed top-0 left-0 w-0 h-1.5 bg-emerald-600 z-[120] transition-all duration-150 shadow-[0_0_10px_rgba(16,185,129,0.3)]"></div>
 
@@ -343,7 +344,7 @@
             : "relative w-full border-b border-white/5 h-8 z-[90]";
     ?>
     <!-- Adaptive Countdown Bar -->
-    <div id="countdown-bar" class="glass-dark <?php echo $barClasses; ?> animate-page"
+    <div id="countdown-bar" class="glass-dark <?php echo $barClasses; ?>"
         style="animation-delay: 0.3s;">
         <div class="<?php echo $isDetailPage ? '' : 'max-w-7xl mx-auto px-4 sm:px-6 lg:px-8'; ?>">
             <div class="flex justify-between items-center <?php echo $isDetailPage ? 'h-9 space-x-6' : 'h-8'; ?>">

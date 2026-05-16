@@ -112,6 +112,19 @@ function initUX() {
         });
     }
 
+    // Modern Padding Fix: Watch the header height and adjust body padding automatically
+    const header = document.getElementById('main-header-container');
+    if (header) {
+        const resizeObserver = new ResizeObserver(entries => {
+            for (let entry of entries) {
+                const height = entry.contentRect.height;
+                // Add a small buffer if the bar is hidden but still in DOM
+                document.body.style.paddingTop = height + 'px';
+            }
+        });
+        resizeObserver.observe(header);
+    }
+
     updateAdaptiveUI();
 }
 
@@ -120,7 +133,7 @@ function handleHeaderScroll() {
     const bar = document.getElementById('countdown-bar');
     if (!navbar) return;
 
-    const isDetail = window.location.pathname.includes('/article/') || window.location.pathname.includes('/event/');
+    const isDetail = document.body.getAttribute('data-page-type') === 'detail';
 
     if (window.scrollY > 20) {
         navbar.classList.add('header-solid');
@@ -137,39 +150,42 @@ function handleHeaderScroll() {
 }
 
 function updateAdaptiveUI() {
-    const header = document.getElementById('main-header-container');
     const bar = document.getElementById('countdown-bar');
-    const labels = bar?.querySelectorAll('.countdown-label');
-    
     if (!bar) return;
 
-    const isDetail = window.location.pathname.includes('/article/') || window.location.pathname.includes('/event/');
+    const labels = bar.querySelectorAll('.countdown-label');
+    const isDetail = document.body.getAttribute('data-page-type') === 'detail';
 
     if (isDetail) {
-        // Bubble mode
-        bar.className = 'glass-dark fixed top-24 right-4 w-auto rounded-full shadow-2xl border border-white/10 px-4 h-9 z-[110] animate-page';
+        // Bubble mode: Use !important to override any other state
+        bar.style.cssText = `
+            position: fixed !important;
+            top: 100px !important;
+            right: 20px !important;
+            width: auto !important;
+            height: 36px !important;
+            border-radius: 99px !important;
+            z-index: 1000 !important;
+            display: flex !important;
+            opacity: 1 !important;
+            transform: none !important;
+            padding: 0 16px !important;
+        `;
         const inner = bar.querySelector('div');
         const content = inner?.querySelector('div');
         if (inner) inner.className = '';
         if (content) content.className = 'flex justify-between items-center h-9 space-x-6';
         labels?.forEach(l => l.classList.add('hidden'));
     } else {
-        // Bar mode
-        bar.className = 'glass-dark relative w-full border-b border-white/5 h-8 z-[90] animate-page';
+        // Bar mode: Reset inline styles to let classes take over
+        bar.style.cssText = '';
+        bar.className = 'glass-dark relative w-full border-b border-white/5 h-8 z-[90]';
         const inner = bar.querySelector('div');
         const content = inner?.querySelector('div');
         if (inner) inner.className = 'max-w-7xl mx-auto px-4 sm:px-6 lg:px-8';
         if (content) content.className = 'flex justify-between items-center h-8';
         labels?.forEach(l => l.classList.remove('hidden'));
     }
-
-    // Dynamic Body Padding Fix
-    setTimeout(() => {
-        if (header) {
-            const height = header.offsetHeight;
-            document.body.style.paddingTop = height + 'px';
-        }
-    }, 100);
 }
 
     // Reset Progress Bar on new page load
@@ -178,6 +194,10 @@ function updateAdaptiveUI() {
         if (title) {
             document.title = `${title} | SIKS`;
         }
+
+        // Update Page Type for Adaptive UI
+        const isDetail = window.location.pathname.includes('/article/') || window.location.pathname.includes('/event/');
+        document.body.setAttribute('data-page-type', isDetail ? 'detail' : 'main');
         
         const progressBar = document.getElementById('reading-progress-bar');
         if (progressBar) progressBar.style.width = '0%';
