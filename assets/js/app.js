@@ -137,10 +137,9 @@ function handleHeaderScroll() {
 }
 
 function updateAdaptiveUI() {
+    const header = document.getElementById('main-header-container');
     const bar = document.getElementById('countdown-bar');
-    const inner = bar?.querySelector('div');
-    const content = inner?.querySelector('div');
-    const labels = bar?.querySelectorAll('.md\\:inline');
+    const labels = bar?.querySelectorAll('.countdown-label');
     
     if (!bar) return;
 
@@ -148,19 +147,29 @@ function updateAdaptiveUI() {
 
     if (isDetail) {
         // Bubble mode
-        bar.className = 'glass-dark fixed top-20 right-4 w-auto rounded-full shadow-2xl border border-white/10 px-4 h-9 z-[110] animate-fade-in opacity-100';
+        bar.className = 'glass-dark fixed top-24 right-4 w-auto rounded-full shadow-2xl border border-white/10 px-4 h-9 z-[110] animate-page';
+        const inner = bar.querySelector('div');
+        const content = inner?.querySelector('div');
         if (inner) inner.className = '';
         if (content) content.className = 'flex justify-between items-center h-9 space-x-6';
         labels?.forEach(l => l.classList.add('hidden'));
-        document.body.classList.add('detail-view');
     } else {
         // Bar mode
-        bar.className = 'glass-dark fixed top-16 left-0 right-0 border-b border-white/5 h-8 z-[90] opacity-100 animate-page';
+        bar.className = 'glass-dark relative w-full border-b border-white/5 h-8 z-[90] animate-page';
+        const inner = bar.querySelector('div');
+        const content = inner?.querySelector('div');
         if (inner) inner.className = 'max-w-7xl mx-auto px-4 sm:px-6 lg:px-8';
         if (content) content.className = 'flex justify-between items-center h-8';
         labels?.forEach(l => l.classList.remove('hidden'));
-        document.body.classList.remove('detail-view');
     }
+
+    // Dynamic Body Padding Fix
+    setTimeout(() => {
+        if (header) {
+            const height = header.offsetHeight;
+            document.body.style.paddingTop = height + 'px';
+        }
+    }, 100);
 }
 
     // Reset Progress Bar on new page load
