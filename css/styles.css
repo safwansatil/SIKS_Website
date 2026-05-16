@@ -391,3 +391,8 @@
 .htmx-request {
     cursor: wait;
 }
+
+/* Adaptive Header Padding */
+body.detail-view {
+    padding-top: 64px !important;
+}

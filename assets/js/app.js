@@ -102,6 +102,7 @@ function initUX() {
     window.addEventListener('scroll', () => {
         updateReadingProgress();
         handleScrollTopButton();
+        handleHeaderScroll();
     });
 
     const backToTop = document.getElementById('back-to-top');
@@ -114,26 +115,51 @@ function initUX() {
     updateAdaptiveUI();
 }
 
+function handleHeaderScroll() {
+    const navbar = document.getElementById('main-navbar');
+    const bar = document.getElementById('countdown-bar');
+    if (!navbar) return;
+
+    const isDetail = window.location.pathname.includes('/article/') || window.location.pathname.includes('/event/');
+
+    if (window.scrollY > 20) {
+        navbar.classList.add('header-solid');
+        // Only hide the bar if it's NOT in bubble mode
+        if (bar && !isDetail) {
+            bar.classList.add('bar-hidden');
+        }
+    } else {
+        navbar.classList.remove('header-solid');
+        if (bar) {
+            bar.classList.remove('bar-hidden');
+        }
+    }
+}
+
 function updateAdaptiveUI() {
     const bar = document.getElementById('countdown-bar');
     const inner = bar?.querySelector('div');
     const content = inner?.querySelector('div');
-    const labels = bar?.querySelectorAll('.md\\:inline'); // "Upcoming Jamaat" label
+    const labels = bar?.querySelectorAll('.md\\:inline');
     
     if (!bar) return;
 
     const isDetail = window.location.pathname.includes('/article/') || window.location.pathname.includes('/event/');
 
     if (isDetail) {
-        bar.className = 'glass-dark fixed top-20 right-4 w-auto rounded-full shadow-2xl border border-white/10 px-4 h-9 z-50 animate-fade-in opacity-100';
+        // Bubble mode
+        bar.className = 'glass-dark fixed top-20 right-4 w-auto rounded-full shadow-2xl border border-white/10 px-4 h-9 z-[110] animate-fade-in opacity-100';
         if (inner) inner.className = '';
         if (content) content.className = 'flex justify-between items-center h-9 space-x-6';
         labels?.forEach(l => l.classList.add('hidden'));
+        document.body.classList.add('detail-view');
     } else {
-        bar.className = 'glass-dark relative w-full border-b border-white/5 h-8 opacity-100 animate-page';
+        // Bar mode
+        bar.className = 'glass-dark fixed top-16 left-0 right-0 border-b border-white/5 h-8 z-[90] opacity-100 animate-page';
         if (inner) inner.className = 'max-w-7xl mx-auto px-4 sm:px-6 lg:px-8';
         if (content) content.className = 'flex justify-between items-center h-8';
         labels?.forEach(l => l.classList.remove('hidden'));
+        document.body.classList.remove('detail-view');
     }
 }
 
