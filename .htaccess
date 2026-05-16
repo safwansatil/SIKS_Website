@@ -22,21 +22,16 @@ RewriteRule ^(.*)$ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
 RewriteCond %{REQUEST_FILENAME} !-d
 RewriteRule ^(.*)/$ /$1 [L,R=301]
 
-# 3. 301 Redirect old .php URLs to clean ones (Prevent duplicate content)
-# Check if the actual request ends in .php (but avoid redirecting actual index.php internally)
-RewriteCond %{THE_REQUEST} ^[A-Z]{3,}\s/+(.+)\.php[\s?] [NC]
-RewriteRule ^(.+)\.php$ /$1 [R=301,L]
-
-# 4. Article Detail Routing: /article/ID/slug
+# 3. Article Detail Routing: /article/ID/slug
 RewriteRule ^article/([0-9]+)/? article.php?id=$1 [L,QSA]
 
-# 5. Event Detail Routing: /event/ID/slug
+# 4. Event Detail Routing: /event/ID/slug
 RewriteRule ^event/([0-9]+)/? event_details.php?id=$1 [L,QSA]
 
-# 6. Category Routing: /category/community
+# 5. Category Routing: /category/community
 RewriteRule ^category/([^/]+)/? events.php?category=$1 [L,QSA]
 
-# 7. Internal Mapping for clean URLs (e.g. /about -> about.php)
+# 6. Internal Mapping for clean URLs (e.g. /about -> about.php)
 # If the file doesn't exist but the .php version does, serve it internally
 RewriteCond %{REQUEST_FILENAME} !-d
 RewriteCond %{REQUEST_FILENAME}\.php -f
