@@ -14,6 +14,9 @@
     <meta name="description"
         content="Official portal of the Society of Islamic Knowledge Seekers (SIKS) at the Islamic University of Technology. View prayer times, upcoming events, and community updates.">
     <meta name="keywords" content="IUT, SIKS, Islamic Society, Prayer Times, IUT Mosque, Islamic Knowledge">
+    
+    <!-- Canonical URL -->
+    <link rel="canonical" href="https://iutsiks.iutoic-dhaka.edu<?php echo explode('?', $_SERVER['REQUEST_URI'])[0]; ?>">
 
     <!-- Tailwind CSS via CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
@@ -236,7 +239,7 @@
             <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 <div class="flex justify-between items-center h-16">
                     <!-- Logo & Brand -->
-                    <a href="index.php" class="flex items-center space-x-4 group cursor-pointer">
+                    <a href="index" class="flex items-center space-x-4 group cursor-pointer">
                         <div class="relative">
                             <img src="assets/images/logo.png?v=2" alt="Society of Islamic Knowledge Seekers Logo"
                                 class="h-10 w-auto group-hover:scale-110 transition-transform duration-500">
@@ -252,19 +255,19 @@
                     <!-- Navigation Links - Justified to Right -->
                     <nav class="hidden md:flex items-center space-x-10">
                         <?php
-                        $currentPage = basename($_SERVER['PHP_SELF']);
+                        $currentPage = basename($_SERVER['PHP_SELF'], '.php');
                         $links = [
-                            'index.php' => 'Home',
-                            'about.php' => 'About',
-                            'events.php' => 'Events',
-                            'articles.php' => 'Articles',
-                            'library.php' => 'Library'
+                            'index' => 'Home',
+                            'about' => 'About',
+                            'events' => 'Events',
+                            'articles' => 'Articles',
+                            'library' => 'Library'
                         ];
-                        foreach ($links as $file => $label):
-                            $isActive = ($currentPage == $file || ($currentPage == '' && $file == 'index.php'));
+                        foreach ($links as $path => $label):
+                            $isActive = ($currentPage == $path || ($currentPage == '' && $path == 'index'));
                             ?>
-                            <a href="<?php echo $file; ?>" 
-                               hx-get="<?php echo $file; ?>" 
+                            <a href="<?php echo $path; ?>" 
+                               hx-get="<?php echo $path; ?>" 
                                hx-target="#main-content" 
                                hx-push-url="true" 
                                hx-select="#main-content"
@@ -281,11 +284,11 @@
                         <?php
                         // Reuse $links if available, otherwise redefine
                         if (isset($links)) {
-                            foreach ($links as $file => $label):
-                                $isActive = ($currentPage == $file || ($currentPage == '' && $file == 'index.php'));
+                            foreach ($links as $path => $label):
+                                $isActive = ($currentPage == $path || ($currentPage == '' && $path == 'index'));
                                 ?>
-                                <a href="<?php echo $file; ?>"
-                                   hx-get="<?php echo $file; ?>" 
+                                <a href="<?php echo $path; ?>"
+                                   hx-get="<?php echo $path; ?>" 
                                    hx-target="#main-content" 
                                    hx-push-url="true" 
                                    hx-select="#main-content"
@@ -418,11 +421,12 @@ function updateCountdown() {
 
         // HTMX: Update active link and re-initialize components
         document.body.addEventListener('htmx:afterSettle', function(evt) {
-            const currentPath = window.location.pathname.split('/').pop() || 'index.php';
+            // Get path without leading slash and extension
+            let currentPath = window.location.pathname.split('/').pop().replace('.php', '') || 'index';
             
             // Update desktop nav
             document.querySelectorAll('nav.hidden.md\\:flex .nav-link').forEach(link => {
-                const linkPath = link.getAttribute('href');
+                const linkPath = link.getAttribute('href').replace('.php', '');
                 if (linkPath === currentPath) {
                     link.classList.add('active-link');
                 } else {
@@ -432,7 +436,7 @@ function updateCountdown() {
 
             // Update mobile nav
             document.querySelectorAll('nav.md\\:hidden a').forEach(link => {
-                const linkPath = link.getAttribute('href');
+                const linkPath = link.getAttribute('href').replace('.php', '');
                 if (linkPath === currentPath) {
                     link.classList.add('text-emerald-950', 'border-emerald-950');
                     link.classList.remove('text-gray-400', 'border-transparent');

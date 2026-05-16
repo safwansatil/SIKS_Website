@@ -82,7 +82,10 @@ if ($pdo) {
                     <?php foreach ($articles as $article): 
                         $readingTime = $article['reading_time'] ?? calculateReadingTime($article['description'] ?? '');
                     ?>
-                        <a href="article.php?id=<?php echo $article['id']; ?>" class="article-card block card-professional group">
+                        <a href="article/<?php echo $article['id']; ?>/<?php echo ($article['slug'] ?: generateSlug($article['title'])); ?>" 
+                           hx-get="article/<?php echo $article['id']; ?>/<?php echo ($article['slug'] ?: generateSlug($article['title'])); ?>"
+                           hx-target="#main-content" hx-push-url="true" hx-select="#main-content"
+                           class="article-card block card-professional group">
                             <div class="flex flex-col md:flex-row">
                                 <!-- Cover Image -->
                                 <?php if (!empty($article['cover_image'])): ?>
@@ -228,8 +231,8 @@ if ($pdo) {
             let html = '<div class="space-y-8">';
             articles.forEach(article => {
                 html += `
-                    <a href="article.php?id=${article.id}" 
-                       hx-get="article.php?id=${article.id}" hx-target="#main-content" hx-push-url="true" hx-select="#main-content"
+                    <a href="article/${article.id}/${article.slug || 'article'}" 
+                       hx-get="article/${article.id}/${article.slug || 'article'}" hx-target="#main-content" hx-push-url="true" hx-select="#main-content"
                        class="article-card block card-professional group">
                         <div class="flex flex-col md:flex-row">
                             ${article.cover_image ? `

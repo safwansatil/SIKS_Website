@@ -31,8 +31,8 @@ $categories = $stmt->fetchAll(PDO::FETCH_COLUMN);
 
         <!-- Controls Bar -->
         <div class="bg-emerald-50/50 border border-emerald-100 rounded-[32px] p-6 mb-8">
-            <form action="library.php" method="GET" class="grid grid-cols-1 md:grid-cols-4 gap-4" id="library-filter-form"
-                  hx-get="library.php" hx-target="#main-content" hx-push-url="true" hx-select="#main-content" hx-trigger="change delay:300ms from:input, change from:select">
+            <form action="library" method="GET" class="grid grid-cols-1 md:grid-cols-4 gap-4" id="library-filter-form"
+                  hx-get="library" hx-target="#main-content" hx-push-url="true" hx-select="#main-content" hx-trigger="change delay:300ms from:input, change from:select">
                 
                 <!-- Search -->
                 <div class="relative">
@@ -146,8 +146,8 @@ $categories = $stmt->fetchAll(PDO::FETCH_COLUMN);
         <?php if ($totalPages > 1): ?>
             <div class="mt-12 flex justify-center items-center space-x-2">
                 <?php for ($i = 1; $i <= $totalPages; $i++): ?>
-                    <a href="library.php?page=<?php echo $i; ?>&limit=<?php echo $limit; ?>&search=<?php echo urlencode($search); ?>&category=<?php echo urlencode($category); ?>&sort=<?php echo $sort; ?>"
-                       hx-get="library.php?page=<?php echo $i; ?>&limit=<?php echo $limit; ?>&search=<?php echo urlencode($search); ?>&category=<?php echo urlencode($category); ?>&sort=<?php echo $sort; ?>"
+                    <a href="library?page=<?php echo $i; ?>&limit=<?php echo $limit; ?>&search=<?php echo urlencode($search); ?>&category=<?php echo urlencode($category); ?>&sort=<?php echo $sort; ?>"
+                       hx-get="library?page=<?php echo $i; ?>&limit=<?php echo $limit; ?>&search=<?php echo urlencode($search); ?>&category=<?php echo urlencode($category); ?>&sort=<?php echo $sort; ?>"
                        hx-target="#main-content" hx-push-url="true" hx-select="#main-content"
                        class="w-10 h-10 flex items-center justify-center rounded-xl font-bold text-sm transition-all <?php echo $page == $i ? 'bg-emerald-950 text-white shadow-lg' : 'bg-white text-emerald-950/40 hover:bg-emerald-50'; ?>">
                         <?php echo $i; ?>
