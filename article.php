@@ -37,15 +37,15 @@ $readingTime = $article['reading_time'] ?? calculateReadingTime($article['descri
 <!-- Article Hero -->
 <section class="relative <?php echo !empty($article['cover_image']) ? '-mt-24 min-h-[50vh]' : ''; ?> flex items-end overflow-hidden">
     <?php if (!empty($article['cover_image'])): ?>
-        <img src="<?php echo htmlspecialchars($article['cover_image']); ?>" 
+        <img src="/<?php echo ltrim(htmlspecialchars($article['cover_image']), '/'); ?>" 
              alt="<?php echo htmlspecialchars($article['title']); ?>"
              class="absolute inset-0 w-full h-full object-cover">
         <div class="absolute inset-0 img-overlay-dark"></div>
         
         <div class="relative z-10 w-full">
             <div class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 pb-16 pt-40">
-                <a href="articles" 
-                   hx-get="articles" hx-target="#main-content" hx-push-url="true" hx-select="#main-content"
+                <a href="/articles" 
+                   hx-get="/articles" hx-target="#main-content" hx-push-url="true" hx-select="#main-content"
                    class="inline-flex items-center text-white/60 hover:text-white font-bold text-xs uppercase tracking-widest mb-8 transition-colors">
                     <i class="fas fa-arrow-left mr-2"></i>
                     All Articles
@@ -70,8 +70,8 @@ $readingTime = $article['reading_time'] ?? calculateReadingTime($article['descri
     <div class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
         <?php if (empty($article['cover_image'])): ?>
             <!-- No cover image: show title inline -->
-            <a href="articles" 
-               hx-get="articles" hx-target="#main-content" hx-push-url="true" hx-select="#main-content"
+            <a href="/articles" 
+               hx-get="/articles" hx-target="#main-content" hx-push-url="true" hx-select="#main-content"
                class="inline-flex items-center text-emerald-950/40 hover:text-emerald-950 font-bold text-xs uppercase tracking-widest mb-8 transition-colors">
                 <i class="fas fa-arrow-left mr-2"></i>
                 All Articles
@@ -107,7 +107,7 @@ $readingTime = $article['reading_time'] ?? calculateReadingTime($article['descri
                     <?php foreach ($articleImages as $idx => $img): ?>
                         <div class="group cursor-pointer" onclick="openLightbox(<?php echo $idx; ?>)">
                             <div class="relative aspect-video rounded-[32px] overflow-hidden border border-emerald-950/5 shadow-sm hover:shadow-xl transition-all duration-500">
-                                <img src="<?php echo htmlspecialchars($img['image_path']); ?>" 
+                                <img src="/<?php echo ltrim(htmlspecialchars($img['image_path']), '/'); ?>" 
                                      alt="<?php echo htmlspecialchars($img['caption'] ?: $article['title']); ?>"
                                      class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700">
                                 <?php if ($img['caption']): ?>
@@ -122,7 +122,7 @@ $readingTime = $article['reading_time'] ?? calculateReadingTime($article['descri
             </div>
 
             <script>
-                const galleryImages = <?php echo json_encode(array_map(function($img) { return $img['image_path']; }, $articleImages)); ?>;
+                const galleryImages = <?php echo json_encode(array_map(function($img) { return '/' . ltrim($img['image_path'], '/'); }, $articleImages)); ?>;
                 let currentLightboxIndex = 0;
                 let lightboxEl = null;
 
@@ -180,8 +180,8 @@ $readingTime = $article['reading_time'] ?? calculateReadingTime($article['descri
                 <p class="text-xl font-bold text-emerald-950"><?php echo htmlspecialchars($article['writer']); ?></p>
                 <p class="text-emerald-950/50 text-sm font-medium">Last updated <?php echo date('F d, Y', strtotime($article['last_edited'])); ?></p>
             </div>
-            <a href="library" 
-               hx-get="library" hx-target="#main-content" hx-push-url="true" hx-select="#main-content"
+            <a href="/library" 
+               hx-get="/library" hx-target="#main-content" hx-push-url="true" hx-select="#main-content"
                class="p-8 bg-emerald-950 text-white rounded-3xl flex flex-col justify-center items-center text-center group hover:bg-black transition-colors">
                 <i class="fas fa-book text-2xl mb-3 text-emerald-400 group-hover:scale-110 transition-transform"></i>
                 <p class="font-bold">Explore Library</p>
@@ -191,8 +191,8 @@ $readingTime = $article['reading_time'] ?? calculateReadingTime($article['descri
 
         <!-- Back to Articles -->
         <div class="mt-12 text-center">
-            <a href="articles" 
-               hx-get="articles" hx-target="#main-content" hx-push-url="true" hx-select="#main-content"
+            <a href="/articles" 
+               hx-get="/articles" hx-target="#main-content" hx-push-url="true" hx-select="#main-content"
                class="inline-flex items-center px-8 py-4 bg-emerald-950 text-white rounded-2xl text-sm font-bold hover:bg-black transition-colors">
                 <i class="fas fa-arrow-left mr-2"></i>
                 Back to All Articles

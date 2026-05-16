@@ -47,7 +47,7 @@ if (!empty($event['cover_image'])) {
 <!-- Event Hero -->
 <section class="relative -mt-24 <?php echo $heroImage ? 'min-h-[60vh]' : 'min-h-[40vh]'; ?> flex items-end overflow-hidden">
     <?php if ($heroImage): ?>
-        <img src="<?php echo htmlspecialchars($heroImage); ?>" 
+        <img src="/<?php echo ltrim(htmlspecialchars($heroImage), '/'); ?>" 
              alt="<?php echo htmlspecialchars($event['name']); ?>"
              class="absolute inset-0 w-full h-full object-cover">
         <div class="absolute inset-0 img-overlay-dark"></div>
@@ -62,8 +62,8 @@ if (!empty($event['cover_image'])) {
     <div class="relative z-10 w-full">
         <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 pb-16 pt-32">
             <!-- Back Link -->
-            <a href="events" 
-               hx-get="events" hx-target="#main-content" hx-push-url="true" hx-select="#main-content"
+            <a href="/events" 
+               hx-get="/events" hx-target="#main-content" hx-push-url="true" hx-select="#main-content"
                class="inline-flex items-center text-white/60 hover:text-white font-bold text-xs uppercase tracking-widest mb-8 transition-colors">
                 <i class="fas fa-arrow-left mr-2"></i>
                 Back to Events
@@ -149,7 +149,7 @@ if (!empty($event['cover_image'])) {
                     <?php foreach ($images as $idx => $img): ?>
                         <div class="rounded-2xl overflow-hidden border border-emerald-950/5 shadow-sm hover:shadow-xl transition-shadow duration-300 cursor-pointer"
                              onclick="openLightbox(<?php echo $idx; ?>)">
-                            <img src="<?php echo htmlspecialchars($img['image_path']); ?>" 
+                            <img src="/<?php echo ltrim(htmlspecialchars($img['image_path']), '/'); ?>" 
                                  alt="Event Photo" 
                                  class="w-full h-auto object-cover hover:scale-105 transition-transform duration-500">
                         </div>
@@ -158,7 +158,7 @@ if (!empty($event['cover_image'])) {
             </div>
 
             <script>
-                const galleryImages = <?php echo json_encode(array_map(function($img) { return $img['image_path']; }, $images)); ?>;
+                const galleryImages = <?php echo json_encode(array_map(function($img) { return '/' . ltrim($img['image_path'], '/'); }, $images)); ?>;
                 let currentLightboxIndex = 0;
                 let lightboxEl = null;
 

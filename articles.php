@@ -65,7 +65,7 @@ if ($pdo) {
             </div>
             
             <div class="flex-none">
-                <select onchange="location.href='articles.php?sort=' + this.value" 
+                <select onchange="location.href='/articles?sort=' + this.value" 
                         class="h-full px-6 py-4 rounded-2xl border border-emerald-950/10 bg-white text-emerald-950 font-bold focus:outline-none focus:border-emerald-500 transition-all appearance-none cursor-pointer">
                     <option value="newest" <?php echo $sort === 'newest' ? 'selected' : ''; ?>>Newest First</option>
                     <option value="oldest" <?php echo $sort === 'oldest' ? 'selected' : ''; ?>>Oldest First</option>
@@ -82,8 +82,8 @@ if ($pdo) {
                     <?php foreach ($articles as $article): 
                         $readingTime = $article['reading_time'] ?? calculateReadingTime($article['description'] ?? '');
                     ?>
-                        <a href="article/<?php echo $article['id']; ?>/<?php echo ($article['slug'] ?: generateSlug($article['title'])); ?>" 
-                           hx-get="article/<?php echo $article['id']; ?>/<?php echo ($article['slug'] ?: generateSlug($article['title'])); ?>"
+                        <a href="/article/<?php echo $article['id']; ?>/<?php echo ($article['slug'] ?: generateSlug($article['title'])); ?>" 
+                           hx-get="/article/<?php echo $article['id']; ?>/<?php echo ($article['slug'] ?: generateSlug($article['title'])); ?>"
                            hx-target="#main-content" hx-push-url="true" hx-select="#main-content"
                            class="article-card block card-professional group">
                             <div class="flex flex-col md:flex-row">
@@ -91,7 +91,7 @@ if ($pdo) {
                                 <?php if (!empty($article['cover_image'])): ?>
                                     <div class="md:w-80 flex-none">
                                         <div class="aspect-[16/10] md:aspect-auto md:h-full overflow-hidden rounded-t-[24px] md:rounded-l-[24px] md:rounded-tr-none">
-                                            <img src="<?php echo htmlspecialchars($article['cover_image']); ?>" 
+                                            <img src="/<?php echo ltrim(htmlspecialchars($article['cover_image']), '/'); ?>" 
                                                  alt="<?php echo htmlspecialchars($article['title']); ?>"
                                                  class="article-image w-full h-full object-cover">
                                         </div>
@@ -134,8 +134,8 @@ if ($pdo) {
                 <?php if ($totalPages > 1): ?>
                     <div id="pagination-container" class="mt-16 flex justify-center items-center space-x-2">
                         <?php if ($page > 1): ?>
-                            <a href="articles.php?page=<?php echo $page - 1; ?>&sort=<?php echo $sort; ?>" 
-                               hx-get="articles.php?page=<?php echo $page - 1; ?>&sort=<?php echo $sort; ?>" 
+                            <a href="/articles?page=<?php echo $page - 1; ?>&sort=<?php echo $sort; ?>" 
+                               hx-get="/articles?page=<?php echo $page - 1; ?>&sort=<?php echo $sort; ?>" 
                                hx-target="#main-content" 
                                hx-select="#main-content"
                                hx-push-url="true"
@@ -145,8 +145,8 @@ if ($pdo) {
                         <?php endif; ?>
 
                         <?php for ($i = 1; $i <= $totalPages; $i++): ?>
-                            <a href="articles.php?page=<?php echo $i; ?>&sort=<?php echo $sort; ?>" 
-                               hx-get="articles.php?page=<?php echo $i; ?>&sort=<?php echo $sort; ?>" 
+                            <a href="/articles?page=<?php echo $i; ?>&sort=<?php echo $sort; ?>" 
+                               hx-get="/articles?page=<?php echo $i; ?>&sort=<?php echo $sort; ?>" 
                                hx-target="#main-content" 
                                hx-select="#main-content"
                                hx-push-url="true"
@@ -156,8 +156,8 @@ if ($pdo) {
                         <?php endfor; ?>
 
                         <?php if ($page < $totalPages): ?>
-                            <a href="articles.php?page=<?php echo $page + 1; ?>&sort=<?php echo $sort; ?>" 
-                               hx-get="articles.php?page=<?php echo $page + 1; ?>&sort=<?php echo $sort; ?>" 
+                            <a href="/articles?page=<?php echo $page + 1; ?>&sort=<?php echo $sort; ?>" 
+                               hx-get="/articles?page=<?php echo $page + 1; ?>&sort=<?php echo $sort; ?>" 
                                hx-target="#main-content" 
                                hx-select="#main-content"
                                hx-push-url="true"
@@ -231,14 +231,14 @@ if ($pdo) {
             let html = '<div class="space-y-8">';
             articles.forEach(article => {
                 html += `
-                    <a href="article/${article.id}/${article.slug || 'article'}" 
-                       hx-get="article/${article.id}/${article.slug || 'article'}" hx-target="#main-content" hx-push-url="true" hx-select="#main-content"
+                    <a href="/article/${article.id}/${article.slug || 'article'}" 
+                       hx-get="/article/${article.id}/${article.slug || 'article'}" hx-target="#main-content" hx-push-url="true" hx-select="#main-content"
                        class="article-card block card-professional group">
                         <div class="flex flex-col md:flex-row">
                             ${article.cover_image ? `
                                 <div class="md:w-80 flex-none">
                                     <div class="aspect-[16/10] md:aspect-auto md:h-full overflow-hidden rounded-t-[24px] md:rounded-l-[24px] md:rounded-tr-none">
-                                        <img src="${article.cover_image}" 
+                                        <img src="/${article.cover_image.replace(/^\//, '')}" 
                                              alt="${article.title}"
                                              class="article-image w-full h-full object-cover">
                                     </div>

@@ -23,7 +23,7 @@ $upcomingEvents = getEvents(false, 3); // Get next 3 upcoming events
             <?php foreach ($heroSlides as $index => $slide): ?>
                 <div class="carousel-slide absolute inset-0 transition-all duration-1000 ease-in-out <?php echo $index === 0 ? 'carousel-slide-active' : 'carousel-slide-hidden'; ?>"
                      data-slide="<?php echo $index; ?>">
-                    <img src="<?php echo htmlspecialchars($slide['image_path']); ?>" 
+                    <img src="/<?php echo ltrim(htmlspecialchars($slide['image_path']), '/'); ?>" 
                          alt="Hero Background"
                          class="w-full h-full object-cover">
                     <!-- Graceful Description Overlay -->
@@ -61,14 +61,14 @@ $upcomingEvents = getEvents(false, 3); // Get next 3 upcoming events
         </p>
 
         <div class="flex flex-col sm:flex-row items-center justify-center space-y-4 sm:space-y-0 sm:space-x-6">
-            <a href="events"
-                hx-get="events" hx-target="#main-content" hx-push-url="true" hx-select="#main-content"
+            <a href="/events"
+                hx-get="/events" hx-target="#main-content" hx-push-url="true" hx-select="#main-content"
                 class="w-full sm:w-56 px-10 py-5 border border-transparent bg-white text-emerald-950 hover:bg-emerald-50 rounded-2xl font-bold transition-all duration-300 shadow-2xl shadow-black/10 flex items-center justify-center group">
                 Explore Events
                 <i class="fas fa-chevron-right ml-3 text-xs transition-transform group-hover:translate-x-1"></i>
             </a>
-            <a href="articles"
-                hx-get="articles" hx-target="#main-content" hx-push-url="true" hx-select="#main-content"
+            <a href="/articles"
+                hx-get="/articles" hx-target="#main-content" hx-push-url="true" hx-select="#main-content"
                 class="w-full sm:w-56 px-10 py-5 bg-white/10 border border-white/20 text-white hover:bg-white/20 backdrop-blur-md rounded-2xl font-bold transition-all duration-300 flex items-center justify-center">
                 Read Articles
             </a>
@@ -316,8 +316,8 @@ function updateSectionCountdown() {
                 </div>
                 <h2 class="text-3xl sm:text-4xl font-display font-bold text-emerald-950 tracking-tight">Upcoming Events</h2>
             </div>
-            <a href="events" 
-               hx-get="events" hx-target="#main-content" hx-push-url="true" hx-select="#main-content"
+            <a href="/events" 
+               hx-get="/events" hx-target="#main-content" hx-push-url="true" hx-select="#main-content"
                class="inline-flex items-center px-6 py-3 rounded-full bg-emerald-950/5 border border-emerald-950/10 text-emerald-950/60 text-sm font-bold hover:bg-emerald-950/10 transition-colors">
                 View All <i class="fas fa-arrow-right ml-2 text-xs"></i>
             </a>
@@ -326,14 +326,14 @@ function updateSectionCountdown() {
         <!-- Responsive Grid - Same as About Page -->
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
             <?php foreach ($upcomingEvents as $evt): ?>
-                <a href="event/<?php echo $evt['id']; ?>/<?php echo ($evt['slug'] ?: generateSlug($evt['name'])); ?>" 
-                   hx-get="event/<?php echo $evt['id']; ?>/<?php echo ($evt['slug'] ?: generateSlug($evt['name'])); ?>" hx-target="#main-content" hx-push-url="true" hx-select="#main-content"
+                <a href="/event/<?php echo $evt['id']; ?>/<?php echo ($evt['slug'] ?: generateSlug($evt['name'])); ?>" 
+                   hx-get="/event/<?php echo $evt['id']; ?>/<?php echo ($evt['slug'] ?: generateSlug($evt['name'])); ?>" hx-target="#main-content" hx-push-url="true" hx-select="#main-content"
                    class="group block transition-all duration-300 hover:-translate-y-2">
                     <div class="rounded-3xl overflow-hidden bg-emerald-950 border border-emerald-950/10 shadow-lg hover:shadow-xl transition-all duration-300 h-full">
                         <!-- Card Image -->
                         <div class="h-52 sm:h-56 overflow-hidden">
                             <?php if (!empty($evt['cover_image'])): ?>
-                                <img src="<?php echo htmlspecialchars($evt['cover_image']); ?>" 
+                                <img src="/<?php echo ltrim(htmlspecialchars($evt['cover_image']), '/'); ?>" 
                                      alt="<?php echo htmlspecialchars($evt['name']); ?>"
                                      class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700">
                             <?php else: ?>

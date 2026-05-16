@@ -8,7 +8,7 @@
         <?php echo SITE_NAME; ?> |
         <?php echo SITE_TAGLINE; ?>
     </title>
-    <link rel="icon" type="image/png" href="assets/images/Logo-green.png?v=2">
+    <link rel="icon" type="image/png" href="/assets/images/Logo-green.png?v=2">
 
     <!-- Meta Tags for SEO -->
     <meta name="description"
@@ -64,7 +64,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
     <!-- Custom Styles -->
-    <link rel="stylesheet" href="css/styles.css">
+    <link rel="stylesheet" href="/css/styles.css">
 
     <style>
         :root {
@@ -212,7 +212,7 @@
     <div id="global-loader"
         class="fixed inset-0 z-[9999] bg-white flex items-center justify-center transition-opacity duration-700 ease-out">
         <div class="relative flex flex-col items-center">
-            <img src="assets/images/loader-logo.png?v=2" alt="Loading..." class="h-24 w-auto animate-pulse">
+            <img src="/assets/images/loader-logo.png?v=2" alt="Loading..." class="h-24 w-auto animate-pulse">
         </div>
     </div>
     <script>
@@ -239,9 +239,9 @@
             <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 <div class="flex justify-between items-center h-16">
                     <!-- Logo & Brand -->
-                    <a href="index" class="flex items-center space-x-4 group cursor-pointer">
+                    <a href="/" hx-get="/" hx-target="#main-content" hx-push-url="true" hx-select="#main-content" class="flex items-center space-x-4 group cursor-pointer">
                         <div class="relative">
-                            <img src="assets/images/logo.png?v=2" alt="Society of Islamic Knowledge Seekers Logo"
+                            <img src="/assets/images/logo.png?v=2" alt="Society of Islamic Knowledge Seekers Logo"
                                 class="h-10 w-auto group-hover:scale-110 transition-transform duration-500">
                         </div>
                         <div class="flex flex-col">
@@ -266,8 +266,8 @@
                         foreach ($links as $path => $label):
                             $isActive = ($currentPage == $path || ($currentPage == '' && $path == 'index'));
                             ?>
-                            <a href="<?php echo $path; ?>" 
-                               hx-get="<?php echo $path; ?>" 
+                            <a href="/<?php echo $path; ?>" 
+                               hx-get="/<?php echo $path; ?>" 
                                hx-target="#main-content" 
                                hx-push-url="true" 
                                hx-select="#main-content"
@@ -287,8 +287,8 @@
                             foreach ($links as $path => $label):
                                 $isActive = ($currentPage == $path || ($currentPage == '' && $path == 'index'));
                                 ?>
-                                <a href="<?php echo $path; ?>"
-                                   hx-get="<?php echo $path; ?>" 
+                                <a href="/<?php echo $path; ?>"
+                                   hx-get="/<?php echo $path; ?>" 
                                    hx-target="#main-content" 
                                    hx-push-url="true" 
                                    hx-select="#main-content"
@@ -421,13 +421,23 @@ function updateCountdown() {
 
         // HTMX: Update active link and re-initialize components
         document.body.addEventListener('htmx:afterSettle', function(evt) {
-            // Get path without leading slash and extension
-            let currentPath = window.location.pathname.split('/').pop().replace('.php', '') || 'index';
+            // Get the first segment of the path (e.g., 'article', 'event', 'about')
+            let segments = window.location.pathname.split('/').filter(s => s !== '');
+            let baseSegment = segments[0] || 'index';
+            if (baseSegment.endsWith('.php')) baseSegment = baseSegment.replace('.php', '');
             
+            // Map detail paths back to their parent list pages
+            let activeMapping = {
+                'article': 'articles',
+                'event': 'events',
+                'category': 'events'
+            };
+            let targetNav = activeMapping[baseSegment] || baseSegment;
+
             // Update desktop nav
             document.querySelectorAll('nav.hidden.md\\:flex .nav-link').forEach(link => {
-                const linkPath = link.getAttribute('href').replace('.php', '');
-                if (linkPath === currentPath) {
+                const linkPath = link.getAttribute('href').replace(/^\//, '').replace('.php', '');
+                if (linkPath === targetNav || (linkPath === 'index' && targetNav === '')) {
                     link.classList.add('active-link');
                 } else {
                     link.classList.remove('active-link');
@@ -436,8 +446,8 @@ function updateCountdown() {
 
             // Update mobile nav
             document.querySelectorAll('nav.md\\:hidden a').forEach(link => {
-                const linkPath = link.getAttribute('href').replace('.php', '');
-                if (linkPath === currentPath) {
+                const linkPath = link.getAttribute('href').replace(/^\//, '').replace('.php', '');
+                if (linkPath === targetNav || (linkPath === 'index' && targetNav === '')) {
                     link.classList.add('text-emerald-950', 'border-emerald-950');
                     link.classList.remove('text-gray-400', 'border-transparent');
                 } else {

@@ -31,7 +31,7 @@ $aboutCards = getAboutContent('card');
                 <div class="<?php echo $spanFull ? 'md:col-span-2' : ''; ?> p-12 <?php echo $isDark ? 'bg-emerald-950 text-white shadow-xl shadow-emerald-950/10' : 'bg-white border border-emerald-950/10 shadow-sm'; ?> rounded-[40px] transition-all duration-300 hover:shadow-2xl">
                     <?php if (isset($card['image_path']) && $card['image_path']): ?>
                         <div class="mb-8 rounded-3xl overflow-hidden aspect-video">
-                            <img src="<?php echo htmlspecialchars($card['image_path']); ?>" alt="<?php echo htmlspecialchars($card['title']); ?>" class="w-full h-full object-cover">
+                            <img src="/<?php echo ltrim(htmlspecialchars($card['image_path']), '/'); ?>" alt="<?php echo htmlspecialchars($card['title']); ?>" class="w-full h-full object-cover">
                         </div>
                     <?php endif; ?>
                     <h3 class="text-3xl font-display font-bold mb-6 <?php echo $isDark ? 'text-white' : 'text-emerald-950'; ?>">
@@ -55,12 +55,12 @@ $aboutCards = getAboutContent('card');
                 
                 <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
                     <?php foreach ($pastEvents as $event): ?>
-                        <a href="event/<?php echo $event['id']; ?>/<?php echo ($event['slug'] ?: generateSlug($event['name'])); ?>" 
-                           hx-get="event/<?php echo $event['id']; ?>/<?php echo ($event['slug'] ?: generateSlug($event['name'])); ?>" hx-target="#main-content" hx-push-url="true" hx-select="#main-content"
+                        <a href="/event/<?php echo $event['id']; ?>/<?php echo ($event['slug'] ?: generateSlug($event['name'])); ?>" 
+                           hx-get="/event/<?php echo $event['id']; ?>/<?php echo ($event['slug'] ?: generateSlug($event['name'])); ?>" hx-target="#main-content" hx-push-url="true" hx-select="#main-content"
                            class="group block">
                             <div class="relative aspect-video rounded-3xl overflow-hidden mb-6 border border-emerald-950/5">
                                 <?php if (!empty($event['cover_image'])): ?>
-                                    <img src="<?php echo htmlspecialchars($event['cover_image']); ?>" 
+                                    <img src="/<?php echo ltrim(htmlspecialchars($event['cover_image']), '/'); ?>" 
                                          alt="<?php echo htmlspecialchars($event['name']); ?>"
                                          class="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-500 group-hover:scale-105">
                                 <?php else: ?>
@@ -80,8 +80,8 @@ $aboutCards = getAboutContent('card');
                 </div>
                 
                 <div class="mt-16 text-center">
-                    <a href="events" 
-                       hx-get="events" hx-target="#main-content" hx-push-url="true" hx-select="#main-content"
+                    <a href="/events" 
+                       hx-get="/events" hx-target="#main-content" hx-push-url="true" hx-select="#main-content"
                        class="inline-flex items-center px-8 py-4 rounded-2xl bg-emerald-950 text-white font-bold hover:bg-black transition-all shadow-xl shadow-emerald-950/20">
                         View Full Gallery <i class="fas fa-arrow-right ml-3 text-xs"></i>
                     </a>

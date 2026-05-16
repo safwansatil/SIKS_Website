@@ -31,8 +31,8 @@ $categories = $stmt->fetchAll(PDO::FETCH_COLUMN);
 
         <!-- Controls Bar -->
         <div class="bg-emerald-50/50 border border-emerald-100 rounded-[32px] p-6 mb-8">
-            <form action="library" method="GET" class="grid grid-cols-1 md:grid-cols-4 gap-4" id="library-filter-form"
-                  hx-get="library" hx-target="#main-content" hx-push-url="true" hx-select="#main-content" hx-trigger="change delay:300ms from:input, change from:select">
+            <form action="/library" method="GET" class="grid grid-cols-1 md:grid-cols-4 gap-4" id="library-filter-form"
+                  hx-get="/library" hx-target="#main-content" hx-push-url="true" hx-select="#main-content" hx-trigger="change delay:300ms from:input, change from:select">
                 
                 <!-- Search -->
                 <div class="relative">
@@ -127,8 +127,9 @@ $categories = $stmt->fetchAll(PDO::FETCH_COLUMN);
                                         <?php echo number_format($doc['downloads']); ?>
                                     </td>
                                     <td class="px-8 py-6 text-right">
-                                        <a href="javascript:void(0)" 
-                                           onclick="trackAndDownload(<?php echo $doc['id']; ?>, 'ajax/download.php?id=<?php echo $doc['id']; ?>&skip_count=1')"
+                                        <a href="/<?php echo ltrim(htmlspecialchars($doc['file_path']), '/'); ?>" 
+                                           target="_blank"
+                                           onclick="trackDownload(<?php echo $doc['id']; ?>)"
                                            class="inline-flex items-center space-x-2 text-emerald-600 font-bold text-sm hover:text-emerald-800 transition-colors">
                                             <span>Download</span>
                                             <i class="fas fa-download text-xs"></i>
@@ -146,10 +147,10 @@ $categories = $stmt->fetchAll(PDO::FETCH_COLUMN);
         <?php if ($totalPages > 1): ?>
             <div class="mt-12 flex justify-center items-center space-x-2">
                 <?php for ($i = 1; $i <= $totalPages; $i++): ?>
-                    <a href="library?page=<?php echo $i; ?>&limit=<?php echo $limit; ?>&search=<?php echo urlencode($search); ?>&category=<?php echo urlencode($category); ?>&sort=<?php echo $sort; ?>"
-                       hx-get="library?page=<?php echo $i; ?>&limit=<?php echo $limit; ?>&search=<?php echo urlencode($search); ?>&category=<?php echo urlencode($category); ?>&sort=<?php echo $sort; ?>"
+                    <a href="/library?page=<?php echo $i; ?>&search=<?php echo urlencode($search); ?>&category=<?php echo urlencode($category); ?>&sort=<?php echo $sort; ?>&limit=<?php echo $limit; ?>"
+                       hx-get="/library?page=<?php echo $i; ?>&search=<?php echo urlencode($search); ?>&category=<?php echo urlencode($category); ?>&sort=<?php echo $sort; ?>&limit=<?php echo $limit; ?>"
                        hx-target="#main-content" hx-push-url="true" hx-select="#main-content"
-                       class="w-10 h-10 flex items-center justify-center rounded-xl font-bold text-sm transition-all <?php echo $page == $i ? 'bg-emerald-950 text-white shadow-lg' : 'bg-white text-emerald-950/40 hover:bg-emerald-50'; ?>">
+                       class="w-10 h-10 rounded-xl flex items-center justify-center font-bold text-sm transition-all <?php echo $i == $page ? 'bg-emerald-950 text-white' : 'text-emerald-950/40 hover:bg-emerald-50'; ?>">
                         <?php echo $i; ?>
                     </a>
                 <?php endfor; ?>
@@ -159,31 +160,10 @@ $categories = $stmt->fetchAll(PDO::FETCH_COLUMN);
 </section>
 
 <script>
-    async function trackAndDownload(id, downloadUrl) {
-        try {
-            // Increment count via fetch
-            await fetch(`ajax/increment_download.php?id=${id}`);
-            
-            // Trigger actual download
-            const link = document.createElement('a');
-            link.href = downloadUrl;
-            link.target = '_blank';
-            document.body.appendChild(link);
-            link.click();
-            document.body.removeChild(link);
-            
-            // Optionally update the UI counter (real-time feel)
-            const countCell = event.target.closest('tr').querySelector('td:nth-child(4)');
-            if (countCell) {
-                let current = parseInt(countCell.textContent.replace(/,/g, ''));
-                countCell.textContent = (current + 1).toLocaleString();
-            }
-        } catch (error) {
-            console.error('Download tracking failed:', error);
-            // Fallback: still try to download if tracking fails
-            window.open(downloadUrl, '_blank');
-        }
-    }
+function trackDownload(id) {
+    fetch(`ajax/download.php?id=${id}`)
+        .catch(err => console.error('Tracking failed', err));
+}
 </script>
 
 <?php require_once 'includes/footer.php'; ?>
