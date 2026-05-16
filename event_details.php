@@ -91,7 +91,18 @@ if (!empty($event['cover_image'])) {
                 <?php if ($event['event_time']): ?>
                     <span><i class="far fa-clock mr-2"></i><?php echo htmlspecialchars($event['event_time']); ?></span>
                 <?php endif; ?>
+                <button onclick="copyToClipboard()" 
+                        class="inline-flex items-center gap-2 text-white/60 hover:text-white transition-all hover:scale-105">
+                    <i class="fas fa-share-alt"></i>
+                    <span class="font-bold">Share</span>
+                </button>
             </div>
+
+            <?php if (!empty($event['updated_at'])): ?>
+                <div class="mt-4 text-white/40 text-[10px] uppercase tracking-widest font-bold italic">
+                    Last updated: <?php echo date('F d, Y', strtotime($event['updated_at'])); ?>
+                </div>
+            <?php endif; ?>
         </div>
     </div>
 </section>

@@ -58,36 +58,61 @@ $readingTime = $article['reading_time'] ?? calculateReadingTime($article['descri
                     <span class="w-1 h-1 rounded-full bg-white/30"></span>
                     <span><?php echo date('F d, Y', strtotime($article['last_edited'])); ?></span>
                     <span class="w-1 h-1 rounded-full bg-white/30"></span>
-                    <span><?php echo $readingTime; ?> min read</span>
+                    <span class="flex items-center">
+                        <i class="far fa-clock mr-1.5 opacity-60"></i>
+                        <?php echo $readingTime; ?> min read
+                    </span>
+                    <span class="w-1 h-1 rounded-full bg-white/30"></span>
+                    <button onclick="copyToClipboard()" 
+                            class="inline-flex items-center gap-2 text-white/60 hover:text-white transition-all hover:scale-105">
+                        <i class="fas fa-share-alt"></i>
+                        <span class="font-bold">Share</span>
+                    </button>
+                </div>
+                <?php if (!empty($article['updated_at'])): ?>
+                    <div class="mt-4 text-white/40 text-[10px] uppercase tracking-widest font-bold italic">
+                        Last updated: <?php echo date('F d, Y', strtotime($article['updated_at'])); ?>
+                    </div>
+                <?php endif; ?>
+            </div>
+        </div>
+    <?php else: ?>
+        <!-- Minimal Hero (No Image) -->
+        <div class="w-full pt-40 pb-16">
+            <div class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
+                <a href="/articles" 
+                   hx-get="/articles" hx-target="#main-content" hx-push-url="true" hx-select="#main-content"
+                   class="inline-flex items-center text-emerald-950/40 hover:text-emerald-950 font-bold text-xs uppercase tracking-widest mb-8 transition-colors">
+                    <i class="fas fa-arrow-left mr-2"></i>
+                    All Articles
+                </a>
+                <h1 class="text-4xl md:text-5xl font-display font-bold text-emerald-950 mb-6 tracking-tight leading-tight">
+                    <?php echo htmlspecialchars($article['title']); ?>
+                </h1>
+                <div class="flex flex-wrap items-center gap-4 text-emerald-950/40 text-sm font-medium">
+                    <span class="font-bold text-emerald-950"><?php echo htmlspecialchars($article['writer']); ?></span>
+                    <span class="w-1 h-1 rounded-full bg-emerald-950/10"></span>
+                    <span><?php echo date('F d, Y', strtotime($article['last_edited'])); ?></span>
+                    <span class="w-1 h-1 rounded-full bg-emerald-950/10"></span>
+                    <span class="flex items-center">
+                        <i class="far fa-clock mr-1.5 opacity-60"></i>
+                        <?php echo $readingTime; ?> min read
+                    </span>
+                    <span class="w-1 h-1 rounded-full bg-emerald-950/10"></span>
+                    <button onclick="copyToClipboard()" 
+                            class="inline-flex items-center gap-2 hover:text-emerald-950 transition-all hover:scale-105">
+                        <i class="fas fa-share-alt"></i>
+                        <span class="font-bold">Share</span>
+                    </button>
                 </div>
             </div>
         </div>
-    <?php endif; ?>
+<?php endif; ?>
 </section>
 
 <!-- Article Content -->
 <section class="py-16 bg-white">
     <div class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
-        <?php if (empty($article['cover_image'])): ?>
-            <!-- No cover image: show title inline -->
-            <a href="/articles" 
-               hx-get="/articles" hx-target="#main-content" hx-push-url="true" hx-select="#main-content"
-               class="inline-flex items-center text-emerald-950/40 hover:text-emerald-950 font-bold text-xs uppercase tracking-widest mb-8 transition-colors">
-                <i class="fas fa-arrow-left mr-2"></i>
-                All Articles
-            </a>
-            <h1 class="text-4xl md:text-5xl font-display font-bold text-emerald-950 mb-6 tracking-tight leading-tight">
-                <?php echo htmlspecialchars($article['title']); ?>
-            </h1>
-            <div class="flex items-center space-x-4 text-emerald-950/40 text-sm font-medium mb-12">
-                <span class="font-bold text-emerald-950"><?php echo htmlspecialchars($article['writer']); ?></span>
-                <span class="w-1 h-1 rounded-full bg-emerald-950/20"></span>
-                <span><?php echo date('F d, Y', strtotime($article['last_edited'])); ?></span>
-                <span class="w-1 h-1 rounded-full bg-emerald-950/20"></span>
-                <span><?php echo $readingTime; ?> min read</span>
-            </div>
-        <?php endif; ?>
-
         <!-- Article Body -->
         <article class="prose prose-lg prose-emerald max-w-none">
             <div class="text-emerald-950/80 text-lg leading-[1.9] font-medium whitespace-pre-wrap" style="font-family: 'Inter', 'Noto Sans Bengali', 'Noto Naskh Arabic', sans-serif;">

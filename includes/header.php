@@ -65,6 +65,9 @@
 
     <!-- Custom Styles -->
     <link rel="stylesheet" href="/css/styles.css">
+    
+    <!-- Modern UX Logic -->
+    <script src="/assets/js/app.js" defer></script>
 
     <style>
         :root {
@@ -204,9 +207,37 @@
     </style>
 </head>
 
-<body class="bg-white text-gray-900 font-sans selection:bg-emerald-950 selection:text-white">
-    <!-- HTMX Loading Indicator -->
-    <div class="htmx-indicator"></div>
+<body class="bg-white font-sans text-emerald-950 overflow-x-hidden pt-24">
+    <!-- Reading Progress Bar -->
+    <div id="reading-progress-bar" class="fixed top-0 left-0 w-0 h-1 bg-emerald-600 z-[100] transition-all duration-150"></div>
+
+    <!-- Global Toast Container -->
+    <div id="toast-container"></div>
+
+    <!-- Back to Top Button -->
+    <button id="back-to-top" 
+            class="fixed bottom-8 right-8 bg-emerald-950 text-white w-12 h-12 rounded-full shadow-2xl opacity-0 invisible translate-y-10 transition-all duration-500 hover:bg-emerald-800 z-50 flex items-center justify-center">
+        <i class="fas fa-arrow-up"></i>
+    </button>
+    <!-- HTMX Loading Indicator (Modern Skeleton) -->
+    <div class="htmx-indicator fixed inset-0 z-[60] pointer-events-none">
+        <!-- Top Loading Bar -->
+        <div class="absolute top-0 left-0 h-1 bg-emerald-600 w-full">
+            <div class="h-full bg-emerald-400 skeleton w-full"></div>
+        </div>
+        <!-- Content Shimmer Overlay -->
+        <div class="absolute inset-0 bg-white/50 backdrop-blur-[2px] flex items-center justify-center">
+            <div class="w-full max-w-3xl px-8 space-y-8 animate-pulse">
+                <div class="h-12 bg-emerald-950/5 rounded-2xl w-3/4"></div>
+                <div class="h-64 bg-emerald-950/5 rounded-[32px] w-full"></div>
+                <div class="space-y-4">
+                    <div class="h-4 bg-emerald-950/5 rounded w-full"></div>
+                    <div class="h-4 bg-emerald-950/5 rounded w-5/6"></div>
+                    <div class="h-4 bg-emerald-950/5 rounded w-4/6"></div>
+                </div>
+            </div>
+        </div>
+    </div>
 
     <!-- Global Loader -->
     <div id="global-loader"

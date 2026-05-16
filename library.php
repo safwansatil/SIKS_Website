@@ -127,13 +127,20 @@ $categories = $stmt->fetchAll(PDO::FETCH_COLUMN);
                                         <?php echo number_format($doc['downloads']); ?>
                                     </td>
                                     <td class="px-8 py-6 text-right">
-                                        <a href="/<?php echo ltrim(htmlspecialchars($doc['file_path']), '/'); ?>" 
-                                           target="_blank"
-                                           onclick="trackDownload(<?php echo $doc['id']; ?>)"
-                                           class="inline-flex items-center space-x-2 text-emerald-600 font-bold text-sm hover:text-emerald-800 transition-colors">
-                                            <span>Download</span>
-                                            <i class="fas fa-download text-xs"></i>
-                                        </a>
+                                        <div class="flex items-center justify-end space-x-4">
+                                            <button onclick="copyToClipboard('<?php echo (isset($_SERVER['HTTPS']) ? 'https' : 'http') . '://' . $_SERVER['HTTP_HOST'] . '/' . ltrim($doc['file_path'], '/'); ?>', 'PDF link copied!')" 
+                                                    class="p-2 text-emerald-950/20 hover:text-emerald-600 transition-colors"
+                                                    title="Share PDF Link">
+                                                <i class="fas fa-share-alt"></i>
+                                            </button>
+                                            <a href="/<?php echo ltrim(htmlspecialchars($doc['file_path']), '/'); ?>" 
+                                               target="_blank"
+                                               onclick="trackDownload(<?php echo $doc['id']; ?>)"
+                                               class="inline-flex items-center space-x-2 text-emerald-600 font-bold text-sm hover:text-emerald-800 transition-colors">
+                                                <span>Download</span>
+                                                <i class="fas fa-download text-xs"></i>
+                                            </a>
+                                        </div>
                                     </td>
                                 </tr>
                             <?php endforeach; ?>
