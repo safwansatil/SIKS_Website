@@ -44,6 +44,7 @@ function copyToClipboard(text, message = 'Link copied to clipboard!') {
     }
 }
 
+// Fallback copy function
 function fallbackCopy(url, message) {
     const textArea = document.createElement("textarea");
     textArea.value = url;
@@ -97,44 +98,10 @@ function handleScrollTopButton() {
     }
 }
 
-// Initialize Global Listeners
-function initUX() {
-    window.addEventListener('scroll', () => {
-        updateReadingProgress();
-        handleScrollTopButton();
-        handleHeaderScroll();
-    });
-
-    const backToTop = document.getElementById('back-to-top');
-    if (backToTop) {
-        backToTop.addEventListener('click', () => {
-            window.scrollTo({ top: 0, behavior: 'smooth' });
-        });
-    }
-
-    // Modern Padding Fix: Watch the header height and adjust body padding automatically
-    const header = document.getElementById('main-header-container');
-    if (header) {
-        const resizeObserver = new ResizeObserver(entries => {
-            for (let entry of entries) {
-                const height = entry.contentRect.height;
-                // Add a small buffer if the bar is hidden but still in DOM
-                document.body.style.paddingTop = height + 'px';
-            }
-        });
-        resizeObserver.observe(header);
-    }
-
-    updateAdaptiveUI();
-    handleHeaderScroll();
-}
-
+// Sticky/Solid Header Scroll logic
 function handleHeaderScroll() {
     const navbar = document.getElementById('main-navbar');
-    const bar = document.getElementById('countdown-bar');
     if (!navbar) return;
-
-    const isDetail = document.body.getAttribute('data-page-type') === 'detail';
 
     if (window.scrollY > 20) {
         navbar.classList.add('header-solid');
@@ -143,6 +110,7 @@ function handleHeaderScroll() {
     }
 }
 
+// Adaptive Countdown Bar layout logic
 function updateAdaptiveUI() {
     const bar = document.getElementById('countdown-bar');
     if (!bar) return;
@@ -182,48 +150,82 @@ function updateAdaptiveUI() {
     }
 }
 
-    // Reset Progress Bar on new page load
-    document.body.addEventListener('htmx:afterSettle', (evt) => {
-        const title = evt.detail.target.querySelector('h1')?.innerText;
-        if (title) {
-            document.title = `${title} | SIKS`;
-        }
-
-        // Update Page Type for Adaptive UI
-        const isDetail = window.location.pathname.includes('/article/') || window.location.pathname.includes('/event/');
-        document.body.setAttribute('data-page-type', isDetail ? 'detail' : 'main');
-        
-        const progressBar = document.getElementById('reading-progress-bar');
-        if (progressBar) progressBar.style.width = '0%';
-        
-        window.scrollTo({ top: 0, behavior: 'instant' });
-        updateAdaptiveUI();
+// Initialize Global Listeners
+function initUX() {
+    window.addEventListener('scroll', () => {
+        updateReadingProgress();
+        handleScrollTopButton();
+        handleHeaderScroll();
     });
 
-    // Search Focus Shortcut (/)
-    document.addEventListener('keydown', (e) => {
-        if (e.key === '/' && document.activeElement.tagName !== 'INPUT' && document.activeElement.tagName !== 'TEXTAREA') {
-            e.preventDefault();
-            const searchInput = document.querySelector('input[name="search"]');
-            if (searchInput) {
-                searchInput.focus();
-                showToast('Search focused', 'success');
+    const backToTop = document.getElementById('back-to-top');
+    if (backToTop) {
+        backToTop.addEventListener('click', () => {
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        });
+    }
+
+    // Modern Padding Fix: Watch the header height and adjust body padding automatically
+    const header = document.getElementById('main-header-container');
+    if (header) {
+        const resizeObserver = new ResizeObserver(entries => {
+            for (let entry of entries) {
+                const height = entry.contentRect.height;
+                document.body.style.paddingTop = height + 'px';
             }
-        }
-    });
+        });
+        resizeObserver.observe(header);
+    }
 
-    // Smooth scroll for internal links
-    document.addEventListener('click', (e) => {
-        const anchor = e.target.closest('a');
-        if (anchor && anchor.hash && anchor.origin === window.location.origin) {
-            const target = document.querySelector(anchor.hash);
-            if (target) {
-                e.preventDefault();
-                target.scrollIntoView({ behavior: 'smooth' });
-            }
-        }
-    });
+    // Setup initial state based on current page
+    const isDetail = window.location.pathname.includes('/article/') || window.location.pathname.includes('/event/') || document.body.classList.contains('single-post');
+    document.body.setAttribute('data-page-type', isDetail ? 'detail' : 'main');
+
+    updateAdaptiveUI();
+    handleHeaderScroll();
 }
+
+// HTMX Ajax Page Transitions Compatibility
+document.body.addEventListener('htmx:afterSettle', (evt) => {
+    const title = evt.detail.target.querySelector('h1')?.innerText;
+    if (title) {
+        document.title = `${title} | SIKS`;
+    }
+
+    // Update Page Type dynamically for Adaptive UI
+    const isDetail = window.location.pathname.includes('/article/') || window.location.pathname.includes('/event/');
+    document.body.setAttribute('data-page-type', isDetail ? 'detail' : 'main');
+    
+    const progressBar = document.getElementById('reading-progress-bar');
+    if (progressBar) progressBar.style.width = '0%';
+    
+    window.scrollTo({ top: 0, behavior: 'instant' });
+    updateAdaptiveUI();
+});
+
+// Search Focus Shortcut (/)
+document.addEventListener('keydown', (e) => {
+    if (e.key === '/' && document.activeElement.tagName !== 'INPUT' && document.activeElement.tagName !== 'TEXTAREA') {
+        e.preventDefault();
+        const searchInput = document.querySelector('input[name="search"]');
+        if (searchInput) {
+            searchInput.focus();
+            showToast('Search focused', 'success');
+        }
+    }
+});
+
+// Smooth scroll for internal links
+document.addEventListener('click', (e) => {
+    const anchor = e.target.closest('a');
+    if (anchor && anchor.hash && anchor.origin === window.location.origin) {
+        const target = document.querySelector(anchor.hash);
+        if (target) {
+            e.preventDefault();
+            target.scrollIntoView({ behavior: 'smooth' });
+        }
+    }
+});
 
 // Run on initial load
 document.addEventListener('DOMContentLoaded', initUX);

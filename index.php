@@ -237,11 +237,20 @@ function updateSectionCountdown() {
     });
 
     if (nextPrayer) {
-        document.getElementById('section-next-name').innerText = nextPrayer.name;
+        const nameEl = document.getElementById('section-next-name');
+        const timerEl = document.getElementById('section-countdown-timer');
+        
+        if (nameEl) {
+            nameEl.innerText = nextPrayer.name;
+        }
+        
         const h = Math.floor(minDiff / 3600000);
         const m = Math.floor((minDiff % 3600000) / 60000);
         const s = Math.floor((minDiff % 60000) / 1000);
-        document.getElementById('section-countdown-timer').innerText = `${h.toString().padStart(2, '0')}:${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
+        
+        if (timerEl) {
+            timerEl.innerText = `${h.toString().padStart(2, '0')}:${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
+        }
     }
 }
 
