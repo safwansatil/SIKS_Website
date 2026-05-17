@@ -214,14 +214,14 @@
 <body class="bg-white font-sans text-emerald-950 overflow-x-hidden" 
       data-page-type="<?php echo $isDetailPage ? 'detail' : 'main'; ?>">
     <!-- Reading Progress Bar -->
-    <div id="reading-progress-bar" class="fixed top-0 left-0 w-0 h-1.5 bg-emerald-600 z-[120] transition-all duration-150 shadow-[0_0_10px_rgba(16,185,129,0.3)]"></div>
+    <div id="reading-progress-bar" class="fixed top-[64px] left-0 w-0 h-1.5 bg-emerald-600 z-[120] transition-all duration-150 shadow-[0_0_10px_rgba(16,185,129,0.3)]"></div>
 
     <!-- Global Toast Container -->
     <div id="toast-container"></div>
 
     <!-- Back to Top Button -->
     <button id="back-to-top" 
-            class="fixed bottom-8 right-8 bg-emerald-950 text-white w-12 h-12 rounded-full shadow-2xl opacity-0 invisible translate-y-10 transition-all duration-500 hover:bg-emerald-800 z-50 flex items-center justify-center">
+            class="fixed bottom-8 right-8 bg-emerald-950 text-white w-12 h-12 rounded-full shadow-2xl opacity-0 invisible translate-y-10 transition-all duration-500 hover:bg-emerald-800 z-[150] flex items-center justify-center">
         <i class="fas fa-arrow-up"></i>
     </button>
     <!-- HTMX Loading Indicator (Modern Skeleton) -->

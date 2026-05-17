@@ -64,6 +64,15 @@ function updateReadingProgress() {
     const progressBar = document.getElementById('reading-progress-bar');
     if (!progressBar) return;
 
+    const isDetail = document.body.getAttribute('data-page-type') === 'detail';
+    if (!isDetail) {
+        progressBar.style.width = '0%';
+        progressBar.style.display = 'none';
+        return;
+    } else {
+        progressBar.style.display = 'block';
+    }
+
     const winScroll = document.documentElement.scrollTop;
     const height = document.documentElement.scrollHeight - document.documentElement.clientHeight;
     if (height <= 0) {
@@ -132,12 +141,23 @@ function updateAdaptiveUI() {
             opacity: 1 !important;
             transform: none !important;
             padding: 0 16px !important;
+            background: rgba(255, 255, 255, 0.85) !important;
+            backdrop-filter: blur(8px) !important;
+            -webkit-backdrop-filter: blur(8px) !important;
+            border: 1px solid rgba(0, 0, 0, 0.05) !important;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1) !important;
         `;
         const inner = bar.querySelector('div');
         const content = inner?.querySelector('div');
         if (inner) inner.className = '';
         if (content) content.className = 'flex justify-between items-center h-9 space-x-6';
         labels?.forEach(l => l.classList.add('hidden'));
+
+        // Color inner elements dark green for readability in light mode
+        const textElements = bar.querySelectorAll('span, i');
+        textElements.forEach(el => {
+            el.style.setProperty('color', '#022c22', 'important');
+        });
     } else {
         // Bar mode: Reset inline styles to let classes take over
         bar.style.cssText = '';
@@ -147,6 +167,12 @@ function updateAdaptiveUI() {
         if (inner) inner.className = 'max-w-7xl mx-auto px-4 sm:px-6 lg:px-8';
         if (content) content.className = 'flex justify-between items-center h-8';
         labels?.forEach(l => l.classList.remove('hidden'));
+
+        // Reset child colors
+        const textElements = bar.querySelectorAll('span, i');
+        textElements.forEach(el => {
+            el.style.color = '';
+        });
     }
 }
 
