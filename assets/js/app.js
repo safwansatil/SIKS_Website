@@ -126,6 +126,7 @@ function initUX() {
     }
 
     updateAdaptiveUI();
+    handleHeaderScroll();
 }
 
 function handleHeaderScroll() {
@@ -137,15 +138,8 @@ function handleHeaderScroll() {
 
     if (window.scrollY > 20) {
         navbar.classList.add('header-solid');
-        // Only hide the bar if it's NOT in bubble mode
-        if (bar && !isDetail) {
-            bar.classList.add('bar-hidden');
-        }
     } else {
         navbar.classList.remove('header-solid');
-        if (bar) {
-            bar.classList.remove('bar-hidden');
-        }
     }
 }
 

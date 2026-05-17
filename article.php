@@ -7,7 +7,7 @@ $isHtmx = isset($_SERVER['HTTP_HX_REQUEST']);
 if (!$isHtmx) {
     require_once 'includes/header.php';
 } else {
-    echo '<main id="main-content" class="pt-24 animate-page">';
+    echo '<main id="main-content" class="animate-page">';
 }
 
 $id = isset($_GET['id']) ? (int)$_GET['id'] : null;

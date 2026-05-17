@@ -9,7 +9,7 @@ if (!$isHtmx) {
 } else {
     // For HTMX requests, we wrap the content in the same main tag structure
     // so that hx-select="#main-content" still works on the client side.
-    echo '<main id="main-content" class="pt-24 animate-page">';
+    echo '<main id="main-content" class="animate-page">';
 }
 
 // Pagination & Sorting Configuration

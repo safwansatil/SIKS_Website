@@ -207,8 +207,12 @@
     </style>
 </head>
 
-<body class="bg-white font-sans text-emerald-950 overflow-x-hidden pt-24" 
-      data-page-type="<?php echo (isset($article) || isset($event)) ? 'detail' : 'main'; ?>">
+<?php 
+    $currentScript = basename($_SERVER['SCRIPT_NAME']);
+    $isDetailPage = in_array($currentScript, ['article.php', 'event_details.php']);
+?>
+<body class="bg-white font-sans text-emerald-950 overflow-x-hidden" 
+      data-page-type="<?php echo $isDetailPage ? 'detail' : 'main'; ?>">
     <!-- Reading Progress Bar -->
     <div id="reading-progress-bar" class="fixed top-0 left-0 w-0 h-1.5 bg-emerald-600 z-[120] transition-all duration-150 shadow-[0_0_10px_rgba(16,185,129,0.3)]"></div>
 
@@ -338,7 +342,6 @@
         </header>
 
     <?php 
-        $isDetailPage = (isset($article) || isset($event)); 
         $barClasses = $isDetailPage 
             ? "fixed top-24 right-4 w-auto rounded-full shadow-2xl border border-white/10 px-4 h-9 z-[110]" 
             : "relative w-full border-b border-white/5 h-8 z-[90]";
@@ -502,4 +505,4 @@ function updateCountdown() {
         });
     </script>
 
-    <main id="main-content" class="pt-24 animate-page">
+    <main id="main-content" class="animate-page">
