@@ -1,6 +1,21 @@
 <?php
 require_once 'includes/config.php';
 
+// Fetch article data early so header.php can use it for OG meta tags
+$id = isset($_GET['id']) ? (int)$_GET['id'] : null;
+$article = getArticleById($id);
+
+// Set OG meta variables for header.php
+if ($article) {
+    $ogTitle = htmlspecialchars($article['title']) . ' | ' . SITE_NAME;
+    $ogDescription = mb_substr(strip_tags($article['description'] ?? ''), 0, 200);
+    if (!empty($article['cover_image'])) {
+        $ogImage = 'https://iutsiks.iutoic-dhaka.edu/' . ltrim($article['cover_image'], '/');
+    }
+    $ogUrl = 'https://iutsiks.iutoic-dhaka.edu/article/' . $article['id'] . '/' . ($article['slug'] ?: generateSlug($article['title']));
+    $ogType = 'article';
+}
+
 // Check if this is an HTMX request
 $isHtmx = isset($_SERVER['HTTP_HX_REQUEST']);
 
@@ -9,9 +24,6 @@ if (!$isHtmx) {
 } else {
     echo '<main id="main-content" class="animate-page">';
 }
-
-$id = isset($_GET['id']) ? (int)$_GET['id'] : null;
-$article = getArticleById($id);
 
 if (!$article) {
     if ($isHtmx) {

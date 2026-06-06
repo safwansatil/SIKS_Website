@@ -1,6 +1,21 @@
 <?php
 require_once 'includes/config.php';
 
+// Fetch event data early so header.php can use it for OG meta tags
+$id = isset($_GET['id']) ? (int)$_GET['id'] : null;
+$event = getEventById($id);
+
+// Set OG meta variables for header.php
+if ($event) {
+    $ogTitle = htmlspecialchars($event['name']) . ' | ' . SITE_NAME;
+    $ogDescription = mb_substr(strip_tags($event['short_description'] ?? $event['description'] ?? ''), 0, 200);
+    if (!empty($event['cover_image'])) {
+        $ogImage = 'https://iutsiks.iutoic-dhaka.edu/' . ltrim($event['cover_image'], '/');
+    }
+    $ogUrl = 'https://iutsiks.iutoic-dhaka.edu/event/' . $event['id'] . '/' . ($event['slug'] ?: generateSlug($event['name']));
+    $ogType = 'article';
+}
+
 // Check if this is an HTMX request
 $isHtmx = isset($_SERVER['HTTP_HX_REQUEST']);
 
@@ -9,9 +24,6 @@ if (!$isHtmx) {
 } else {
     echo '<main id="main-content" class="animate-page">';
 }
-
-$id = isset($_GET['id']) ? (int)$_GET['id'] : null;
-$event = getEventById($id);
 
 if (!$event) {
     // If not found, redirect to events list

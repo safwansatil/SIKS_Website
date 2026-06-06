@@ -5,18 +5,33 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>
-        <?php echo SITE_NAME; ?> |
-        <?php echo SITE_TAGLINE; ?>
+        <?php echo isset($ogTitle) ? $ogTitle : SITE_NAME . ' | ' . SITE_TAGLINE; ?>
     </title>
     <link rel="icon" type="image/png" href="/assets/images/Logo-green.png?v=2">
 
     <!-- Meta Tags for SEO -->
     <meta name="description"
-        content="Official portal of the Society of Islamic Knowledge Seekers (SIKS) at the Islamic University of Technology. View prayer times, upcoming events, and community updates.">
+        content="<?php echo isset($ogDescription) ? htmlspecialchars($ogDescription) : 'Official portal of the Society of Islamic Knowledge Seekers (SIKS) at the Islamic University of Technology. View prayer times, upcoming events, and community updates.'; ?>">
     <meta name="keywords" content="IUT, SIKS, Islamic Society, Prayer Times, IUT Mosque, Islamic Knowledge">
     
     <!-- Canonical URL -->
-    <link rel="canonical" href="https://iutsiks.iutoic-dhaka.edu<?php echo explode('?', $_SERVER['REQUEST_URI'])[0]; ?>">
+    <link rel="canonical" href="<?php echo isset($ogUrl) ? $ogUrl : 'https://iutsiks.iutoic-dhaka.edu' . explode('?', $_SERVER['REQUEST_URI'])[0]; ?>">
+
+    <!-- Open Graph Meta Tags (Facebook, WhatsApp, LinkedIn, etc.) -->
+    <meta property="og:type" content="<?php echo isset($ogType) ? $ogType : 'website'; ?>">
+    <meta property="og:title" content="<?php echo isset($ogTitle) ? $ogTitle : SITE_NAME . ' | ' . SITE_TAGLINE; ?>">
+    <meta property="og:description" content="<?php echo isset($ogDescription) ? htmlspecialchars($ogDescription) : 'Official portal of the Society of Islamic Knowledge Seekers (SIKS) at the Islamic University of Technology.'; ?>">
+    <meta property="og:url" content="<?php echo isset($ogUrl) ? $ogUrl : 'https://iutsiks.iutoic-dhaka.edu' . explode('?', $_SERVER['REQUEST_URI'])[0]; ?>">
+    <meta property="og:image" content="<?php echo isset($ogImage) ? $ogImage : 'https://iutsiks.iutoic-dhaka.edu/assets/images/Logo-green.png'; ?>">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="630">
+    <meta property="og:site_name" content="<?php echo SITE_NAME; ?>">
+
+    <!-- Twitter Card Meta Tags -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="<?php echo isset($ogTitle) ? $ogTitle : SITE_NAME . ' | ' . SITE_TAGLINE; ?>">
+    <meta name="twitter:description" content="<?php echo isset($ogDescription) ? htmlspecialchars($ogDescription) : 'Official portal of the Society of Islamic Knowledge Seekers (SIKS) at the Islamic University of Technology.'; ?>">
+    <meta name="twitter:image" content="<?php echo isset($ogImage) ? $ogImage : 'https://iutsiks.iutoic-dhaka.edu/assets/images/Logo-green.png'; ?>">
 
     <!-- Tailwind CSS via CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
