@@ -85,8 +85,68 @@ $categories = $stmt->fetchAll(PDO::FETCH_COLUMN);
             </form>
         </div>
 
-        <!-- Table Container -->
-        <div class="bg-white border border-emerald-950/5 rounded-[40px] overflow-hidden shadow-sm">
+        <!-- Mobile Card View (visible on small screens only) -->
+        <div class="md:hidden space-y-3">
+            <?php if (empty($documents)): ?>
+                <div class="bg-white border border-emerald-950/5 rounded-3xl p-8 text-center">
+                    <i class="fas fa-folder-open text-5xl text-emerald-950/10 mb-4"></i>
+                    <p class="text-emerald-950/40 font-medium">No documents found matching your criteria.</p>
+                </div>
+            <?php else: ?>
+                <?php foreach ($documents as $doc): ?>
+                    <div class="bg-white border border-emerald-950/5 rounded-2xl p-4 hover:border-emerald-200 transition-all">
+                        <!-- Top row: icon + title -->
+                        <div class="flex items-start space-x-3 mb-3">
+                            <div class="w-10 h-10 rounded-xl bg-red-50 text-red-600 flex items-center justify-center flex-none">
+                                <i class="fas fa-file-pdf"></i>
+                            </div>
+                            <div class="min-w-0 flex-1">
+                                <a href="/<?php echo ltrim(htmlspecialchars($doc['file_path']), '/'); ?>"
+                                    target="_blank"
+                                    class="text-emerald-950 font-bold text-sm hover:text-emerald-700 transition-colors hover:underline line-clamp-2 block">
+                                    <?php echo htmlspecialchars($doc['title']); ?>
+                                </a>
+                                <p class="text-[10px] text-emerald-950/30 font-bold uppercase tracking-wider mt-0.5 truncate">
+                                    <?php echo htmlspecialchars($doc['filename']); ?>
+                                </p>
+                            </div>
+                        </div>
+                        <!-- Meta row: category, size, downloads -->
+                        <div class="flex items-center flex-wrap gap-2 mb-3 pl-[52px]">
+                            <span class="px-2.5 py-0.5 bg-emerald-100 text-emerald-800 text-[10px] font-bold rounded-full uppercase tracking-wider">
+                                <?php echo htmlspecialchars($doc['category']); ?>
+                            </span>
+                            <span class="text-xs font-medium text-emerald-950/40">
+                                <?php echo round($doc['file_size'] / 1024 / 1024, 2); ?> MB
+                            </span>
+                            <span class="text-xs text-emerald-950/30">•</span>
+                            <span class="text-xs font-medium text-emerald-950/40">
+                                <i class="fas fa-download text-[10px] mr-1"></i><?php echo number_format($doc['downloads']); ?>
+                            </span>
+                        </div>
+                        <!-- Action row -->
+                        <div class="flex items-center justify-end space-x-3 pl-[52px]">
+                            <button
+                                onclick="copyToClipboard('<?php echo (isset($_SERVER['HTTPS']) ? 'https' : 'http') . '://' . $_SERVER['HTTP_HOST'] . '/' . ltrim($doc['file_path'], '/'); ?>', 'PDF link copied!')"
+                                class="p-2 text-emerald-950/20 hover:text-emerald-600 transition-colors"
+                                title="Share PDF Link">
+                                <i class="fas fa-share-alt"></i>
+                            </button>
+                            <a href="/<?php echo ltrim(htmlspecialchars($doc['file_path']), '/'); ?>"
+                                target="_blank" download="<?php echo htmlspecialchars($doc['filename']); ?>"
+                                onclick="trackDownload(<?php echo $doc['id']; ?>)"
+                                class="inline-flex items-center space-x-2 bg-emerald-950 text-white text-xs font-bold px-4 py-2 rounded-xl hover:bg-emerald-800 transition-colors">
+                                <span>Download</span>
+                                <i class="fas fa-download text-[10px]"></i>
+                            </a>
+                        </div>
+                    </div>
+                <?php endforeach; ?>
+            <?php endif; ?>
+        </div>
+
+        <!-- Desktop Table View (hidden on small screens) -->
+        <div class="hidden md:block bg-white border border-emerald-950/5 rounded-[40px] overflow-hidden shadow-sm">
             <div class="overflow-x-auto no-scrollbar">
                 <table class="w-full text-left border-collapse">
                     <thead>
