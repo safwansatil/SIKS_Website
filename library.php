@@ -95,10 +95,13 @@ $categories = $stmt->fetchAll(PDO::FETCH_COLUMN);
             <?php else: ?>
                 <?php foreach ($documents as $doc): ?>
                     <div class="bg-white border border-emerald-950/5 rounded-2xl p-4 hover:border-emerald-200 transition-all">
-                        <!-- Top row: icon + title -->
+                        <!-- Top row: cover + title -->
                         <div class="flex items-start space-x-3 mb-3">
-                            <div class="w-10 h-10 rounded-xl bg-red-50 text-red-600 flex items-center justify-center flex-none">
-                                <i class="fas fa-file-pdf"></i>
+                            <div class="w-12 h-16 rounded-lg bg-emerald-50 flex items-center justify-center flex-none overflow-hidden border border-emerald-950/5">
+                                <img src="/ajax/thumbnail.php?id=<?php echo $doc['id']; ?>"
+                                     alt="Cover" loading="lazy"
+                                     class="w-full h-full object-cover"
+                                     onerror="this.parentElement.innerHTML='<i class=\'fas fa-file-pdf text-red-500\'></i>';this.parentElement.classList.add('bg-red-50');this.parentElement.classList.remove('bg-emerald-50');">
                             </div>
                             <div class="min-w-0 flex-1">
                                 <a href="/<?php echo ltrim(htmlspecialchars($doc['file_path']), '/'); ?>"
@@ -112,7 +115,7 @@ $categories = $stmt->fetchAll(PDO::FETCH_COLUMN);
                             </div>
                         </div>
                         <!-- Meta row: category, size, downloads -->
-                        <div class="flex items-center flex-wrap gap-2 mb-3 pl-[52px]">
+                        <div class="flex items-center flex-wrap gap-2 mb-3 pl-[60px]">
                             <span class="px-2.5 py-0.5 bg-emerald-100 text-emerald-800 text-[10px] font-bold rounded-full uppercase tracking-wider">
                                 <?php echo htmlspecialchars($doc['category']); ?>
                             </span>
@@ -125,7 +128,7 @@ $categories = $stmt->fetchAll(PDO::FETCH_COLUMN);
                             </span>
                         </div>
                         <!-- Action row -->
-                        <div class="flex items-center justify-end space-x-3 pl-[52px]">
+                        <div class="flex items-center justify-end space-x-3 pl-[60px]">
                             <button
                                 onclick="copyToClipboard('<?php echo (isset($_SERVER['HTTPS']) ? 'https' : 'http') . '://' . $_SERVER['HTTP_HOST'] . '/' . ltrim($doc['file_path'], '/'); ?>', 'PDF link copied!')"
                                 class="p-2 text-emerald-950/20 hover:text-emerald-600 transition-colors"
@@ -175,8 +178,11 @@ $categories = $stmt->fetchAll(PDO::FETCH_COLUMN);
                                     <td class="px-8 py-6">
                                         <div class="flex items-center space-x-4">
                                             <div
-                                                class="w-10 h-10 rounded-xl bg-red-50 text-red-600 flex items-center justify-center flex-none">
-                                                <i class="fas fa-file-pdf"></i>
+                                                class="w-10 h-14 rounded-lg bg-emerald-50 flex items-center justify-center flex-none overflow-hidden border border-emerald-950/5">
+                                                <img src="/ajax/thumbnail.php?id=<?php echo $doc['id']; ?>"
+                                                     alt="Cover" loading="lazy"
+                                                     class="w-full h-full object-cover"
+                                                     onerror="this.parentElement.innerHTML='<i class=\'fas fa-file-pdf text-red-500\'></i>';this.parentElement.classList.add('bg-red-50');this.parentElement.classList.remove('bg-emerald-50');">
                                             </div>
                                             <div>
                                                 <a href="/<?php echo ltrim(htmlspecialchars($doc['file_path']), '/'); ?>"
