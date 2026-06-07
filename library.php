@@ -25,17 +25,8 @@ $categories = $stmt->fetchAll(PDO::FETCH_COLUMN);
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <!-- Header -->
         <div class="mb-16 text-center">
-<<<<<<< HEAD
-            <h1 class="text-4xl md:text-6xl font-display font-bold text-emerald-950 mb-6 tracking-tight">Digital Library
-            </h1>
-            <p class="text-emerald-950/60 text-lg max-w-2xl mx-auto">Explore our collection of Islamic literature,
-                research papers, educational resources, magazines, and carefully selected public-domain and
-                copyright-free books.</p>
-=======
             <h1 class="text-4xl md:text-6xl font-display font-bold text-emerald-950 mb-6 tracking-tight">Digital Library</h1>
-            <p class="text-emerald-950/60 text-lg max-w-2xl mx-auto">Explore our collection of Islamic literature, research papers, educational resources, magazines, and carefully selected public-domain and copyright-free books.
-</p>
->>>>>>> b7d45ccb7de41e85d99582aa2462dfeed5c2ec72
+            <p class="text-emerald-950/60 text-lg max-w-2xl mx-auto">Explore our collection of Islamic literature, research papers, educational resources, magazines, and carefully selected public-domain and copyright-free books.</p>
         </div>
 
         <!-- Controls Bar -->
