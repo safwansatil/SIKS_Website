@@ -119,62 +119,6 @@ function handleHeaderScroll() {
     }
 }
 
-// Adaptive Countdown Bar layout logic
-function updateAdaptiveUI() {
-    const bar = document.getElementById('countdown-bar');
-    if (!bar) return;
-
-    const labels = bar.querySelectorAll('.countdown-label');
-    const isDetail = document.body.getAttribute('data-page-type') === 'detail';
-
-    if (isDetail) {
-        // Bubble mode: Use !important to override any other state
-        bar.style.cssText = `
-            position: fixed !important;
-            top: 100px !important;
-            right: 20px !important;
-            width: auto !important;
-            height: 36px !important;
-            border-radius: 99px !important;
-            z-index: 1000 !important;
-            display: flex !important;
-            opacity: 1 !important;
-            transform: none !important;
-            padding: 0 16px !important;
-            background: rgba(255, 255, 255, 0.85) !important;
-            backdrop-filter: blur(8px) !important;
-            -webkit-backdrop-filter: blur(8px) !important;
-            border: 1px solid rgba(0, 0, 0, 0.05) !important;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1) !important;
-        `;
-        const inner = bar.querySelector('div');
-        const content = inner?.querySelector('div');
-        if (inner) inner.className = '';
-        if (content) content.className = 'flex justify-between items-center h-9 space-x-6';
-        labels?.forEach(l => l.classList.add('hidden'));
-
-        // Color inner elements dark green for readability in light mode
-        const textElements = bar.querySelectorAll('span, i');
-        textElements.forEach(el => {
-            el.style.setProperty('color', '#022c22', 'important');
-        });
-    } else {
-        // Bar mode: Reset inline styles to let classes take over
-        bar.style.cssText = '';
-        bar.className = 'glass-dark relative w-full border-b border-white/5 h-8 z-[90]';
-        const inner = bar.querySelector('div');
-        const content = inner?.querySelector('div');
-        if (inner) inner.className = 'max-w-7xl mx-auto px-4 sm:px-6 lg:px-8';
-        if (content) content.className = 'flex justify-between items-center h-8';
-        labels?.forEach(l => l.classList.remove('hidden'));
-
-        // Reset child colors
-        const textElements = bar.querySelectorAll('span, i');
-        textElements.forEach(el => {
-            el.style.color = '';
-        });
-    }
-}
 
 // Initialize Global Listeners
 function initUX() {
@@ -207,7 +151,7 @@ function initUX() {
     const isDetail = window.location.pathname.includes('/article/') || window.location.pathname.includes('/event/') || document.body.classList.contains('single-post');
     document.body.setAttribute('data-page-type', isDetail ? 'detail' : 'main');
 
-    updateAdaptiveUI();
+
     handleHeaderScroll();
 }
 
@@ -226,7 +170,7 @@ document.body.addEventListener('htmx:afterSettle', (evt) => {
     if (progressBar) progressBar.style.width = '0%';
     
     window.scrollTo({ top: 0, behavior: 'instant' });
-    updateAdaptiveUI();
+
 });
 
 // Search Focus Shortcut (/)

@@ -356,31 +356,26 @@
             </div>
         </header>
 
-    <?php 
-        $barClasses = $isDetailPage 
-            ? "fixed top-24 right-4 w-auto rounded-full shadow-2xl border border-white/10 px-4 h-9 z-[110]" 
-            : "relative w-full border-b border-white/5 h-8 z-[90]";
-    ?>
-    <!-- Adaptive Countdown Bar -->
-    <div id="countdown-bar" class="glass-dark <?php echo $barClasses; ?>"
+    <!-- Countdown Bar -->
+    <div id="countdown-bar" class="glass-dark relative w-full border-b border-white/5 h-8 z-[90]"
         style="animation-delay: 0.3s;">
-        <div class="<?php echo $isDetailPage ? '' : 'max-w-7xl mx-auto px-4 sm:px-6 lg:px-8'; ?>">
-            <div class="flex justify-between items-center <?php echo $isDetailPage ? 'h-9 space-x-6' : 'h-8'; ?>">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-8">
                 <div class="flex items-center space-x-4">
                     <span class="relative flex h-1.5 w-1.5">
                         <span
                             class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
                         <span class="relative inline-flex rounded-full h-1.5 w-1.5 bg-emerald-500"></span>
                     </span>
-                    <span class="<?php echo $isDetailPage ? 'text-[8px]' : 'text-[9px]'; ?> font-black uppercase tracking-widest text-emerald-100">
-                        <span class="countdown-label <?php echo $isDetailPage ? 'hidden md:inline' : ''; ?>">Upcoming Jamaat:</span>
+                    <span class="text-[9px] font-black uppercase tracking-widest text-emerald-100">
+                        <span class="countdown-label">Upcoming Jamaat:</span>
                         <span id="header-next-name" class="ml-1 text-white">Loading...</span>
                         <span id="header-next-time" class="ml-2 text-emerald-200"></span>
                     </span>
                 </div>
                 <div class="flex items-center space-x-2">
-                    <i class="fas fa-clock <?php echo $isDetailPage ? 'text-[8px]' : 'text-[9px]'; ?> text-emerald-400/50"></i>
-                    <span class="<?php echo $isDetailPage ? 'text-[9px]' : 'text-[10px]'; ?> font-mono font-bold text-white tracking-widest"
+                    <i class="fas fa-clock text-[9px] text-emerald-400/50"></i>
+                    <span class="text-[10px] font-mono font-bold text-white tracking-widest"
                         id="header-countdown-timer">00:00:00</span>
                 </div>
             </div>
