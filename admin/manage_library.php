@@ -1,4 +1,5 @@
 <?php
+ob_start();
 $activeNav = 'library';
 $pageTitle = 'Manage Library';
 require_once 'header.php';
