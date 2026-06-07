@@ -72,15 +72,27 @@ try {
     $imagick = new Imagick();
     $imagick->setResolution(150, 150); // DPI - good balance of quality vs size
     $imagick->readImage($pdfPath . '[0]'); // [0] = first page only
+    
+    // Fix color space: convert CMYK → sRGB to prevent color shifts
+    if ($imagick->getImageColorspace() === Imagick::COLORSPACE_CMYK) {
+        $imagick->transformImageColorspace(Imagick::COLORSPACE_SRGB);
+    }
+    // Ensure sRGB colorspace for consistent colors
+    $imagick->setImageColorspace(Imagick::COLORSPACE_SRGB);
+    
+    // Flatten first (remove alpha/transparency from PDF)
+    $imagick->setImageBackgroundColor('white');
+    $imagick = $imagick->flattenImages();
+    
+    // Set output format and quality
     $imagick->setImageFormat('jpeg');
     $imagick->setImageCompressionQuality(85);
     
+    // Strip any embedded color profiles that may cause issues
+    $imagick->stripImage();
+    
     // Resize to a reasonable thumbnail size (maintain aspect ratio)
     $imagick->thumbnailImage(400, 0); // 400px wide, auto height
-    
-    // Flatten (remove alpha/transparency from PDF)
-    $imagick->setImageBackgroundColor('white');
-    $imagick = $imagick->flattenImages();
     
     // Save to cache
     $imagick->writeImage($cachePath);
