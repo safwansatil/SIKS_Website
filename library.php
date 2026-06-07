@@ -130,9 +130,9 @@ $categories = $stmt->fetchAll(PDO::FETCH_COLUMN);
                         <!-- Action row -->
                         <div class="flex items-center justify-end space-x-3 pl-[60px]">
                             <button
-                                onclick="copyToClipboard('<?php echo (isset($_SERVER['HTTPS']) ? 'https' : 'http') . '://' . $_SERVER['HTTP_HOST'] . '/' . ltrim($doc['file_path'], '/'); ?>', 'PDF link copied!')"
+                                onclick="copyToClipboard('<?php echo (isset($_SERVER['HTTPS']) ? 'https' : 'http') . '://' . $_SERVER['HTTP_HOST'] . '/document?id=' . $doc['id']; ?>', 'Link copied!')"
                                 class="p-2 text-emerald-950/20 hover:text-emerald-600 transition-colors"
-                                title="Share PDF Link">
+                                title="Share Document Link">
                                 <i class="fas fa-share-alt"></i>
                             </button>
                             <a href="/<?php echo ltrim(htmlspecialchars($doc['file_path']), '/'); ?>"
@@ -211,9 +211,9 @@ $categories = $stmt->fetchAll(PDO::FETCH_COLUMN);
                                     <td class="px-8 py-6 text-right">
                                         <div class="flex items-center justify-end space-x-4">
                                             <button
-                                                onclick="copyToClipboard('<?php echo (isset($_SERVER['HTTPS']) ? 'https' : 'http') . '://' . $_SERVER['HTTP_HOST'] . '/' . ltrim($doc['file_path'], '/'); ?>', 'PDF link copied!')"
+                                                onclick="copyToClipboard('<?php echo (isset($_SERVER['HTTPS']) ? 'https' : 'http') . '://' . $_SERVER['HTTP_HOST'] . '/document?id=' . $doc['id']; ?>', 'Link copied!')"
                                                 class="p-2 text-emerald-950/20 hover:text-emerald-600 transition-colors"
-                                                title="Share PDF Link">
+                                                title="Share Document Link">
                                                 <i class="fas fa-share-alt"></i>
                                             </button>
                                             <a href="/<?php echo ltrim(htmlspecialchars($doc['file_path']), '/'); ?>"

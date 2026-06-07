@@ -30,6 +30,9 @@ RewriteRule ^event/([0-9]+)/?([^/]*)$ event_details.php?id=$1 [QSA,L]
 # 7. Category Filter Pretty URLs: /category/Name
 RewriteRule ^category/([^/]+)$ events.php?category=$1 [QSA,L]
 
+# 7b. Document Detail Pretty URLs: /document/ID
+RewriteRule ^document/([0-9]+)$ document.php?id=$1 [QSA,L]
+
 # 8. Internal Rewrite for extensionless PHP files
 RewriteCond %{REQUEST_FILENAME} !-d
 RewriteCond %{REQUEST_FILENAME}\.php -f
