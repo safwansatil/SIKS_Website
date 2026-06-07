@@ -3,7 +3,7 @@
     "description": "SIKS Web project",
     "type": "project",
     "require": {
-        "php": ">=8.0"
+        "php": ">=7.3"
     },
     "autoload": {
         "psr-4": {
