@@ -99,7 +99,7 @@ require_once 'includes/header.php';
                         <span>Download PDF</span>
                         <i class="fas fa-download"></i>
                     </a>
-                    <a href="/view?id=<?php echo $doc['id']; ?>"
+                    <a href="/<?php echo ltrim(htmlspecialchars($doc['file_path']), '/'); ?>"
                        target="_blank"
                        class="inline-flex items-center space-x-3 border border-emerald-950/10 text-emerald-950 font-bold text-sm px-6 py-3 rounded-2xl hover:bg-emerald-50 transition-colors">
                         <span>View PDF</span>

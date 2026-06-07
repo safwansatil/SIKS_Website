@@ -104,7 +104,7 @@ $categories = $stmt->fetchAll(PDO::FETCH_COLUMN);
                                      onerror="this.parentElement.innerHTML='<i class=\'fas fa-file-pdf text-red-500\'></i>';this.parentElement.classList.add('bg-red-50');this.parentElement.classList.remove('bg-emerald-50');">
                             </div>
                             <div class="min-w-0 flex-1">
-                                <a href="/view?id=<?php echo $doc['id']; ?>"
+                                <a href="/<?php echo ltrim(htmlspecialchars($doc['file_path']), '/'); ?>"
                                     target="_blank"
                                     class="text-emerald-950 font-bold text-sm hover:text-emerald-700 transition-colors hover:underline line-clamp-2 block">
                                     <?php echo htmlspecialchars($doc['title']); ?>
@@ -185,7 +185,7 @@ $categories = $stmt->fetchAll(PDO::FETCH_COLUMN);
                                                      onerror="this.parentElement.innerHTML='<i class=\'fas fa-file-pdf text-red-500\'></i>';this.parentElement.classList.add('bg-red-50');this.parentElement.classList.remove('bg-emerald-50');">
                                             </div>
                                             <div>
-                                                <a href="/view?id=<?php echo $doc['id']; ?>"
+                                                <a href="/<?php echo ltrim(htmlspecialchars($doc['file_path']), '/'); ?>"
                                                     target="_blank"
                                                     class="text-emerald-950 font-bold group-hover:text-emerald-700 transition-colors hover:underline">
                                                     <?php echo htmlspecialchars($doc['title']); ?>
