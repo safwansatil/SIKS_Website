@@ -32,7 +32,7 @@ if (!$doc) {
 }
 
 // Build URLs
-$baseUrl = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? 'https' : 'http') . '://' . $_SERVER['HTTP_HOST'];
+$baseUrl = 'https://' . $_SERVER['HTTP_HOST'];
 $pdfUrl = $baseUrl . '/' . ltrim($doc['file_path'], '/');
 $thumbnailUrl = $baseUrl . '/ajax/thumbnail.php?id=' . $doc['id'];
 $pageUrl = $baseUrl . '/document?id=' . $doc['id'];
