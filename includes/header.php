@@ -14,6 +14,9 @@
         content="<?php echo isset($ogDescription) ? htmlspecialchars($ogDescription) : 'Official portal of the Society of Islamic Knowledge Seekers (SIKS) at the Islamic University of Technology. View prayer times, upcoming events, and community updates.'; ?>">
     <meta name="keywords" content="IUT, SIKS, Islamic Society, Prayer Times, IUT Mosque, Islamic Knowledge">
     
+    <!-- Google Search Console Verification -->
+    <meta name="google-site-verification" content="oqP7o6QtvXrvmnK5Jai2A0T_7HM-Wwk2wPowrzv2Sc8" />
+    
     <!-- Canonical URL -->
     <link rel="canonical" href="<?php echo isset($ogUrl) ? $ogUrl : 'https://iutsiks.iutoic-dhaka.edu' . explode('?', $_SERVER['REQUEST_URI'])[0]; ?>">
 
