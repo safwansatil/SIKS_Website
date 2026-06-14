@@ -24,7 +24,7 @@ $upcomingEvents = getEvents(false, 3); // Get next 3 upcoming events
                 <div class="carousel-slide absolute inset-0 transition-all duration-1000 ease-in-out <?php echo $index === 0 ? 'carousel-slide-active' : 'carousel-slide-hidden'; ?>"
                      data-slide="<?php echo $index; ?>">
                     <img src="/<?php echo ltrim(htmlspecialchars($slide['image_path']), '/'); ?>" 
-                         alt="Hero Background"
+                         alt="<?php echo htmlspecialchars(!empty($slide['subtitle']) ? $slide['subtitle'] : 'IUT SIKS - Society of Islamic Knowledge Seekers'); ?>"
                          class="w-full h-full object-cover">
                     <!-- Graceful Description Overlay -->
                     <?php if (!empty($slide['subtitle'])): ?>

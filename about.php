@@ -1,5 +1,10 @@
 <?php
 require_once 'includes/config.php';
+
+// SEO: Unique title and description for this page
+$ogTitle = 'About SIKS | ' . SITE_NAME;
+$ogDescription = 'Learn about the Society of Islamic Knowledge Seekers (SIKS) at IUT — our motivation, aims, and journey of fostering spiritual growth and academic excellence.';
+
 require_once 'includes/header.php';
 
 $aboutTitle = getAboutContent('title');
@@ -11,9 +16,9 @@ $aboutCards = getAboutContent('card');
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <?php if ($aboutTitle): ?>
             <div class="max-w-4xl mx-auto text-center mb-20">
-                <h2 class="text-5xl font-display font-bold text-emerald-950 mb-8 tracking-tight">
+                <h1 class="text-5xl font-display font-bold text-emerald-950 mb-8 tracking-tight">
                     <?php echo htmlspecialchars($aboutTitle[0]['title']); ?>
-                </h2>
+                </h1>
                 <p class="text-xl text-emerald-950/60 leading-relaxed font-medium">
                     <?php echo nl2br(htmlspecialchars($aboutTitle[0]['description'])); ?>
                 </p>

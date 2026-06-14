@@ -1,0 +1,9 @@
+User-agent: *
+Allow: /
+Disallow: /admin/
+Disallow: /ajax/
+Disallow: /includes/
+Disallow: /cache/
+Disallow: /vendor/
+
+Sitemap: https://iutsiks.iutoic-dhaka.edu/sitemap.xml

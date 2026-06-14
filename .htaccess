@@ -9,7 +9,10 @@ RewriteCond %{HTTPS} off
 RewriteCond %{HTTP:X-Forwarded-Proto} !https
 RewriteRule ^(.*)$ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
 
-# 2. Exclude Admin & Assets
+# 2. Sitemap & Robots
+RewriteRule ^sitemap\.xml$ sitemap.php [L]
+
+# 3. Exclude Admin & Assets
 RewriteRule ^(admin|assets|uploads|ajax|css|js)(/.*)?$ - [L]
 
 # 3. Remove trailing slash (except for directories)

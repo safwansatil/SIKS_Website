@@ -1,5 +1,10 @@
 <?php
 require_once 'includes/config.php';
+
+// SEO: Unique title and description for this page
+$ogTitle = 'Digital Library | ' . SITE_NAME;
+$ogDescription = 'Explore the SIKS digital library — a collection of Islamic literature, research papers, educational resources, magazines, and public-domain books.';
+
 require_once 'includes/header.php';
 
 // Pagination settings

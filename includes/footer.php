@@ -19,11 +19,11 @@
                     since its inception.
                 </p>
                 <div class="flex space-x-3">
-                    <a href="<?php echo YOUTUBE_URL; ?>" target="_blank"
+                    <a href="<?php echo YOUTUBE_URL; ?>" target="_blank" rel="noopener noreferrer"
                         class="w-9 h-9 rounded-full bg-white/5 border border-white/10 flex items-center justify-center text-white/50 hover:bg-white hover:text-emerald-950 hover:border-white transition-all duration-500">
                         <i class="fab fa-youtube text-xs"></i>
                     </a>
-                    <a href="<?php echo FACEBOOK_URL; ?>" target="_blank"
+                    <a href="<?php echo FACEBOOK_URL; ?>" target="_blank" rel="noopener noreferrer"
                         class="w-9 h-9 rounded-full bg-white/5 border border-white/10 flex items-center justify-center text-white/50 hover:bg-white hover:text-emerald-950 hover:border-white transition-all duration-500">
                         <i class="fab fa-facebook-f text-xs"></i>
                     </a>
@@ -34,7 +34,7 @@
             <div class="space-y-6">
                 <h3 class="text-white/30 font-black text-[9px] uppercase tracking-[0.2em]">Society</h3>
                 <ul class="space-y-4">
-                    <li><a href="about.php"
+                    <li><a href="/about"
                             class="text-white/60 hover:text-white text-[11px] font-bold transition-all duration-300">About
                             SIKS</a></li>
                 </ul>
@@ -44,10 +44,10 @@
             <div class="space-y-6">
                 <h3 class="text-white/30 font-black text-[9px] uppercase tracking-[0.2em]">Resources</h3>
                 <ul class="space-y-4">
-                    <li><a href="index.php#reminders"
+                    <li><a href="/#reminders"
                             class="text-white/60 hover:text-white text-[11px] font-bold transition-all duration-300">Daily
                             Reminders</a></li>
-                    <li><a href="index.php#upcoming"
+                    <li><a href="/#upcoming"
                             class="text-white/60 hover:text-white text-[11px] font-bold transition-all duration-300">Jamaat
                             Times</a></li>
                 </ul>
@@ -57,7 +57,7 @@
             <div class="space-y-6">
                 <h3 class="text-white/30 font-black text-[9px] uppercase tracking-[0.2em]">Connect</h3>
                 <ul class="space-y-4">
-                    <li><a href="events.php"
+                    <li><a href="/events"
                             class="text-white/60 hover:text-white text-[11px] font-bold transition-all duration-300">Upcoming
                             Events</a></li>
                     <li><a href="mailto:siks@iut-dhaka.edu"
@@ -65,7 +65,7 @@
                             Us</a></li>
                     <li>
                         <div class="mt-4 pt-4 border-t border-white/5">
-                            <a href="<?php echo MAPS_URL; ?>" target="_blank" class="hover:text-white/50 transition-colors">
+                            <a href="<?php echo MAPS_URL; ?>" target="_blank" rel="noopener noreferrer" class="hover:text-white/50 transition-colors">
     <p class="text-white/20 text-[9px] font-bold uppercase tracking-widest leading-relaxed">
         <?php echo IUT_ADDRESS; ?>
     </p>
@@ -83,10 +83,10 @@
     </p>
     <div class="flex items-center space-x-1">
         <span class="text-white/10 text-[8px] font-black uppercase tracking-[0.2em]">Any suggestions?</span>
-        <a href="https://github.com/Tajwarbot" target="_blank"
+        <a href="https://github.com/Tajwarbot" target="_blank" rel="noopener noreferrer"
             class="text-white/20 hover:text-white text-[8px] font-black uppercase tracking-[0.2em] transition-colors">Tajwar</a>
         <span class="text-white/10 text-[8px]">&</span>
-        <a href="https://github.com/safwansatil" target="_blank"
+        <a href="https://github.com/safwansatil" target="_blank" rel="noopener noreferrer"
             class="text-white/20 hover:text-white text-[8px] font-black uppercase tracking-[0.2em] transition-colors">Safwan</a>
     </div>
 </div>

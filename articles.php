@@ -1,6 +1,10 @@
 <?php
 require_once 'includes/config.php';
 
+// SEO: Unique title and description for this page
+$ogTitle = 'Society Articles | ' . SITE_NAME;
+$ogDescription = 'Read insights, reflections, and knowledge shared by the SIKS community at the Islamic University of Technology.';
+
 // Check if this is an HTMX request
 $isHtmx = isset($_SERVER['HTTP_HX_REQUEST']);
 
@@ -47,7 +51,7 @@ if ($pdo) {
 <section class="py-24">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="text-center mb-16">
-            <h2 class="text-4xl font-display font-bold text-emerald-950 mb-4 tracking-tight">Society Articles</h2>
+            <h1 class="text-4xl font-display font-bold text-emerald-950 mb-4 tracking-tight">Society Articles</h1>
             <p class="text-emerald-950/40 max-w-2xl mx-auto font-medium italic">Insights, reflections, and knowledge shared by our community.</p>
         </div>
 

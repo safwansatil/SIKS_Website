@@ -173,7 +173,7 @@ if (!empty($event['cover_image'])) {
                         <div class="rounded-2xl overflow-hidden border border-emerald-950/5 shadow-sm hover:shadow-xl transition-shadow duration-300 cursor-pointer"
                              onclick="openLightbox(<?php echo $idx; ?>)">
                             <img src="/<?php echo ltrim(htmlspecialchars($img['image_path']), '/'); ?>" 
-                                 alt="Event Photo" 
+                                 alt="<?php echo htmlspecialchars($event['name']); ?> - Gallery Photo" 
                                  class="w-full h-auto object-cover hover:scale-105 transition-transform duration-500">
                         </div>
                     <?php endforeach; ?>

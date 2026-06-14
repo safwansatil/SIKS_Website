@@ -1,5 +1,10 @@
 <?php
 require_once 'includes/config.php';
+
+// SEO: Unique title and description for this page
+$ogTitle = 'Society Events | ' . SITE_NAME;
+$ogDescription = 'Stay updated with upcoming and past events from the Society of Islamic Knowledge Seekers (SIKS) at IUT — workshops, programs, and community activities.';
+
 require_once 'includes/header.php';
 
 $selectedCategory = $_GET['category'] ?? null;
@@ -12,7 +17,7 @@ $pastEvents = getEvents(true, null, $selectedCategory);
 <section class="py-24">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="text-center mb-16">
-            <h2 class="text-4xl font-display font-bold text-emerald-950 mb-4 tracking-tight">Society Events</h2>
+            <h1 class="text-4xl font-display font-bold text-emerald-950 mb-4 tracking-tight">Society Events</h1>
             <p class="text-emerald-950/40 max-w-2xl mx-auto font-medium italic">Stay updated with our upcoming programs, workshops, and activities.</p>
         </div>
 
