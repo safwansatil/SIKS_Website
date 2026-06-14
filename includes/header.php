@@ -230,7 +230,8 @@
     $isDetailPage = in_array($currentScript, ['article.php', 'event_details.php']);
 ?>
 <body class="bg-white font-sans text-emerald-950 overflow-x-hidden" 
-      data-page-type="<?php echo $isDetailPage ? 'detail' : 'main'; ?>">
+      data-page-type="<?php echo $isDetailPage ? 'detail' : 'main'; ?>"
+      hx-indicator=".htmx-indicator">
     <!-- Reading Progress Bar -->
     <div id="reading-progress-bar" class="fixed top-[64px] left-0 w-0 h-1.5 bg-emerald-600 z-[120] transition-all duration-150 shadow-[0_0_10px_rgba(16,185,129,0.3)]"></div>
 
