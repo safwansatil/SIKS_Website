@@ -29,7 +29,7 @@ if (!$isHtmx && strpos($currentUri, $canonicalUrl) === false) {
 
 // Set OG meta variables for header.php
 $ogTitle = htmlspecialchars($event['name']) . ' | ' . SITE_NAME;
-$ogDescription = mb_substr(strip_tags($event['short_description'] ?? $event['description'] ?? ''), 0, 200);
+$ogDescription = trim(preg_replace('/\s+/', ' ', mb_substr(strip_tags($event['short_description'] ?? $event['description'] ?? ''), 0, 200)));
 if (!empty($event['cover_image'])) {
     $ogImage = 'https://iutsiks.iutoic-dhaka.edu/' . ltrim($event['cover_image'], '/');
 }
