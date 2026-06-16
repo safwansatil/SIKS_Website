@@ -22,19 +22,34 @@
 
     <!-- Open Graph Meta Tags (Facebook, WhatsApp, LinkedIn, etc.) -->
     <meta property="og:type" content="<?php echo isset($ogType) ? $ogType : 'website'; ?>">
-    <meta property="og:title" content="<?php echo isset($ogTitle) ? $ogTitle : SITE_NAME . ' | ' . SITE_TAGLINE; ?>">
+    <meta property="og:title" content="<?php echo isset($ogTitle) ? htmlspecialchars($ogTitle) : SITE_NAME . ' | ' . SITE_TAGLINE; ?>">
     <meta property="og:description" content="<?php echo isset($ogDescription) ? htmlspecialchars($ogDescription) : 'Official portal of the Society of Islamic Knowledge Seekers (SIKS) at the Islamic University of Technology.'; ?>">
     <meta property="og:url" content="<?php echo isset($ogUrl) ? $ogUrl : 'https://iutsiks.iutoic-dhaka.edu' . explode('?', $_SERVER['REQUEST_URI'])[0]; ?>">
     <meta property="og:image" content="<?php echo isset($ogImage) ? $ogImage : 'https://iutsiks.iutoic-dhaka.edu/assets/images/Logo-green.png'; ?>">
-    <meta property="og:image:width" content="1200">
-    <meta property="og:image:height" content="630">
+    <?php
+    // Determine og:image MIME type from the image URL
+    $ogImageUrl = isset($ogImage) ? $ogImage : 'https://iutsiks.iutoic-dhaka.edu/assets/images/Logo-green.png';
+    $ogImageExt = strtolower(pathinfo(parse_url($ogImageUrl, PHP_URL_PATH), PATHINFO_EXTENSION));
+    $ogImageMimeMap = ['jpg' => 'image/jpeg', 'jpeg' => 'image/jpeg', 'png' => 'image/png', 'webp' => 'image/webp', 'gif' => 'image/gif'];
+    $ogImageMime = $ogImageMimeMap[$ogImageExt] ?? 'image/png';
+    ?>
+    <meta property="og:image:type" content="<?php echo $ogImageMime; ?>">
+    <meta property="og:image:alt" content="<?php echo isset($ogTitle) ? htmlspecialchars($ogTitle) : SITE_NAME; ?>">
+    <?php if (isset($ogImage)): ?>
+    <meta property="og:image:width" content="<?php echo isset($ogImageWidth) ? $ogImageWidth : '1200'; ?>">
+    <meta property="og:image:height" content="<?php echo isset($ogImageHeight) ? $ogImageHeight : '630'; ?>">
+    <?php else: ?>
+    <meta property="og:image:width" content="1024">
+    <meta property="og:image:height" content="1024">
+    <?php endif; ?>
     <meta property="og:site_name" content="<?php echo SITE_NAME; ?>">
 
     <!-- Twitter Card Meta Tags -->
-    <meta name="twitter:card" content="summary_large_image">
-    <meta name="twitter:title" content="<?php echo isset($ogTitle) ? $ogTitle : SITE_NAME . ' | ' . SITE_TAGLINE; ?>">
+    <meta name="twitter:card" content="<?php echo isset($ogImage) ? 'summary_large_image' : 'summary'; ?>">
+    <meta name="twitter:title" content="<?php echo isset($ogTitle) ? htmlspecialchars($ogTitle) : SITE_NAME . ' | ' . SITE_TAGLINE; ?>">
     <meta name="twitter:description" content="<?php echo isset($ogDescription) ? htmlspecialchars($ogDescription) : 'Official portal of the Society of Islamic Knowledge Seekers (SIKS) at the Islamic University of Technology.'; ?>">
     <meta name="twitter:image" content="<?php echo isset($ogImage) ? $ogImage : 'https://iutsiks.iutoic-dhaka.edu/assets/images/Logo-green.png'; ?>">
+    <meta name="twitter:image:alt" content="<?php echo isset($ogTitle) ? htmlspecialchars($ogTitle) : SITE_NAME; ?>">
 
     <!-- Tailwind CSS via CDN -->
     <script src="https://cdn.tailwindcss.com"></script>

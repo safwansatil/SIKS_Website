@@ -7,7 +7,7 @@
             <!-- Brand Area -->
             <div class="col-span-2 lg:col-span-2 space-y-8">
                 <div class="flex items-center space-x-4 group cursor-pointer" onclick="window.location.href='index.php'">
-                    <img src="assets/images/logofooter.png?v=2" alt="Society of Islamic Knowledge Seekers Logo" class="h-12 w-auto group-hover:scale-110 transition-transform duration-500">
+                    <img src="/assets/images/logofooter.png?v=2" alt="Society of Islamic Knowledge Seekers Logo" class="h-12 w-auto group-hover:scale-110 transition-transform duration-500">
                     <div class="flex flex-col">
                         <span class="text-xs font-black tracking-widest text-white uppercase leading-tight">
                             Society of Islamic <br> Knowledge Seekers
