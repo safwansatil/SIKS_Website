@@ -36,8 +36,8 @@
     <meta property="og:image:type" content="<?php echo $ogImageMime; ?>">
     <meta property="og:image:alt" content="<?php echo isset($ogTitle) ? htmlspecialchars($ogTitle) : SITE_NAME; ?>">
     <?php if (isset($ogImage)): ?>
-    <meta property="og:image:width" content="<?php echo isset($ogImageWidth) ? $ogImageWidth : '1200'; ?>">
-    <meta property="og:image:height" content="<?php echo isset($ogImageHeight) ? $ogImageHeight : '630'; ?>">
+        <?php if (isset($ogImageWidth)): ?><meta property="og:image:width" content="<?php echo $ogImageWidth; ?>"><?php endif; ?>
+        <?php if (isset($ogImageHeight)): ?><meta property="og:image:height" content="<?php echo $ogImageHeight; ?>"><?php endif; ?>
     <?php else: ?>
     <meta property="og:image:width" content="1024">
     <meta property="og:image:height" content="1024">
