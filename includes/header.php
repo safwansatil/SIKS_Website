@@ -11,7 +11,7 @@
 
     <!-- Meta Tags for SEO -->
     <meta name="description"
-        content="<?php echo isset($ogDescription) ? htmlspecialchars($ogDescription) : 'Official portal of the Society of Islamic Knowledge Seekers (SIKS) at the Islamic University of Technology. View prayer times, upcoming events, and community updates.'; ?>">
+        content="<?php echo isset($ogDescription) ? htmlspecialchars(trim(preg_replace('/\s+/', ' ', $ogDescription))) : 'Official portal of the Society of Islamic Knowledge Seekers (SIKS) at the Islamic University of Technology. View prayer times, upcoming events, and community updates.'; ?>">
     <meta name="keywords" content="IUT, SIKS, Islamic Society, Prayer Times, IUT Mosque, Islamic Knowledge">
     
     <!-- Google Search Console Verification -->
@@ -23,7 +23,7 @@
     <!-- Open Graph Meta Tags (Facebook, WhatsApp, LinkedIn, etc.) -->
     <meta property="og:type" content="<?php echo isset($ogType) ? $ogType : 'website'; ?>">
     <meta property="og:title" content="<?php echo isset($ogTitle) ? htmlspecialchars($ogTitle) : SITE_NAME . ' | ' . SITE_TAGLINE; ?>">
-    <meta property="og:description" content="<?php echo isset($ogDescription) ? htmlspecialchars($ogDescription) : 'Official portal of the Society of Islamic Knowledge Seekers (SIKS) at the Islamic University of Technology.'; ?>">
+    <meta property="og:description" content="<?php echo isset($ogDescription) ? htmlspecialchars(trim(preg_replace('/\s+/', ' ', $ogDescription))) : 'Official portal of the Society of Islamic Knowledge Seekers (SIKS) at the Islamic University of Technology.'; ?>">
     <meta property="og:url" content="<?php echo isset($ogUrl) ? $ogUrl : 'https://iutsiks.iutoic-dhaka.edu' . explode('?', $_SERVER['REQUEST_URI'])[0]; ?>">
     <meta property="og:image" content="<?php echo isset($ogImage) ? $ogImage : 'https://iutsiks.iutoic-dhaka.edu/assets/images/Logo-green.png'; ?>">
     <?php
@@ -47,7 +47,7 @@
     <!-- Twitter Card Meta Tags -->
     <meta name="twitter:card" content="<?php echo isset($ogImage) ? 'summary_large_image' : 'summary'; ?>">
     <meta name="twitter:title" content="<?php echo isset($ogTitle) ? htmlspecialchars($ogTitle) : SITE_NAME . ' | ' . SITE_TAGLINE; ?>">
-    <meta name="twitter:description" content="<?php echo isset($ogDescription) ? htmlspecialchars($ogDescription) : 'Official portal of the Society of Islamic Knowledge Seekers (SIKS) at the Islamic University of Technology.'; ?>">
+    <meta name="twitter:description" content="<?php echo isset($ogDescription) ? htmlspecialchars(trim(preg_replace('/\s+/', ' ', $ogDescription))) : 'Official portal of the Society of Islamic Knowledge Seekers (SIKS) at the Islamic University of Technology.'; ?>">
     <meta name="twitter:image" content="<?php echo isset($ogImage) ? $ogImage : 'https://iutsiks.iutoic-dhaka.edu/assets/images/Logo-green.png'; ?>">
     <meta name="twitter:image:alt" content="<?php echo isset($ogTitle) ? htmlspecialchars($ogTitle) : SITE_NAME; ?>">
 
