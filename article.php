@@ -5,26 +5,10 @@ require_once 'includes/config.php';
 $id = isset($_GET['id']) ? (int)$_GET['id'] : null;
 $article = getArticleById($id);
 
-// Set OG meta variables for header.php
-if ($article) {
-    $ogTitle = htmlspecialchars($article['title']) . ' | ' . SITE_NAME;
-    $ogDescription = mb_substr(strip_tags($article['description'] ?? ''), 0, 200);
-    if (!empty($article['cover_image'])) {
-        $ogImage = 'https://iutsiks.iutoic-dhaka.edu/' . ltrim($article['cover_image'], '/');
-    }
-    $ogUrl = 'https://iutsiks.iutoic-dhaka.edu/article/' . $article['id'] . '/' . ($article['slug'] ?: generateSlug($article['title']));
-    $ogType = 'article';
-}
-
 // Check if this is an HTMX request
 $isHtmx = isset($_SERVER['HTTP_HX_REQUEST']);
 
-if (!$isHtmx) {
-    require_once 'includes/header.php';
-} else {
-    echo '<main id="main-content" class="animate-page">';
-}
-
+// Redirect if article not found (before any output)
 if (!$article) {
     if ($isHtmx) {
         header('HX-Redirect: /articles');
@@ -34,13 +18,28 @@ if (!$article) {
     exit;
 }
 
-// Canonical URL check: Redirect if accessed via article.php?id=X or if slug is missing/wrong
+// Canonical URL check: Redirect if accessed via article.php?id=X or if slug is missing/wrong (before any output)
 $canonicalUrl = "/article/" . $article['id'] . "/" . ($article['slug'] ?: generateSlug($article['title']));
 $currentUri = $_SERVER['REQUEST_URI'];
 
 if (!$isHtmx && strpos($currentUri, $canonicalUrl) === false) {
     header("Location: $canonicalUrl", true, 301);
     exit;
+}
+
+// Set OG meta variables for header.php
+$ogTitle = htmlspecialchars($article['title']) . ' | ' . SITE_NAME;
+$ogDescription = mb_substr(strip_tags($article['description'] ?? ''), 0, 200);
+if (!empty($article['cover_image'])) {
+    $ogImage = 'https://iutsiks.iutoic-dhaka.edu/' . ltrim($article['cover_image'], '/');
+}
+$ogUrl = 'https://iutsiks.iutoic-dhaka.edu/article/' . $article['id'] . '/' . ($article['slug'] ?: generateSlug($article['title']));
+$ogType = 'article';
+
+if (!$isHtmx) {
+    require_once 'includes/header.php';
+} else {
+    echo '<main id="main-content" class="animate-page">';
 }
 
 $readingTime = $article['reading_time'] ?? calculateReadingTime($article['description'] ?? '');

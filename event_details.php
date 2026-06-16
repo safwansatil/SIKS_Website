@@ -5,28 +5,11 @@ require_once 'includes/config.php';
 $id = isset($_GET['id']) ? (int)$_GET['id'] : null;
 $event = getEventById($id);
 
-// Set OG meta variables for header.php
-if ($event) {
-    $ogTitle = htmlspecialchars($event['name']) . ' | ' . SITE_NAME;
-    $ogDescription = mb_substr(strip_tags($event['short_description'] ?? $event['description'] ?? ''), 0, 200);
-    if (!empty($event['cover_image'])) {
-        $ogImage = 'https://iutsiks.iutoic-dhaka.edu/' . ltrim($event['cover_image'], '/');
-    }
-    $ogUrl = 'https://iutsiks.iutoic-dhaka.edu/event/' . $event['id'] . '/' . ($event['slug'] ?: generateSlug($event['name']));
-    $ogType = 'article';
-}
-
 // Check if this is an HTMX request
 $isHtmx = isset($_SERVER['HTTP_HX_REQUEST']);
 
-if (!$isHtmx) {
-    require_once 'includes/header.php';
-} else {
-    echo '<main id="main-content" class="animate-page">';
-}
-
+// Redirect if event not found (before any output)
 if (!$event) {
-    // If not found, redirect to events list
     if ($isHtmx) {
         header('HX-Redirect: /events');
     } else {
@@ -35,13 +18,28 @@ if (!$event) {
     exit;
 }
 
-// Canonical URL check: Redirect if accessed via event_details.php?id=X or if slug is missing/wrong
+// Canonical URL check: Redirect if accessed via event_details.php?id=X or if slug is missing/wrong (before any output)
 $canonicalUrl = "/event/" . $event['id'] . "/" . ($event['slug'] ?: generateSlug($event['name']));
 $currentUri = $_SERVER['REQUEST_URI'];
 
 if (!$isHtmx && strpos($currentUri, $canonicalUrl) === false) {
     header("Location: $canonicalUrl", true, 301);
     exit;
+}
+
+// Set OG meta variables for header.php
+$ogTitle = htmlspecialchars($event['name']) . ' | ' . SITE_NAME;
+$ogDescription = mb_substr(strip_tags($event['short_description'] ?? $event['description'] ?? ''), 0, 200);
+if (!empty($event['cover_image'])) {
+    $ogImage = 'https://iutsiks.iutoic-dhaka.edu/' . ltrim($event['cover_image'], '/');
+}
+$ogUrl = 'https://iutsiks.iutoic-dhaka.edu/event/' . $event['id'] . '/' . ($event['slug'] ?: generateSlug($event['name']));
+$ogType = 'article';
+
+if (!$isHtmx) {
+    require_once 'includes/header.php';
+} else {
+    echo '<main id="main-content" class="animate-page">';
 }
 
 $images = getEventImages($event['id']);
