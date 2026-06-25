@@ -147,14 +147,35 @@ if (!empty($event['cover_image'])) {
         <?php if (!empty($event['description'])): ?>
             <div class="mb-16">
                 <h3 class="text-2xl font-display font-bold text-emerald-950 mb-6">About This Event</h3>
-                <div class="prose prose-lg max-w-none text-emerald-950/70 leading-relaxed font-medium">
                 <?php 
                     $eventDesc = $event['description'];
                     // If content has HTML tags (from rich text editor), render as HTML
                     // Otherwise fallback to nl2br + auto-linkify for old plain-text events
                     if ($eventDesc !== strip_tags($eventDesc)) {
-                        echo $eventDesc;
-                    } else {
+                ?>
+                <style>
+                    .rich-event-content { font-family: 'Inter', 'Noto Sans Bengali', 'Noto Naskh Arabic', sans-serif; color: rgba(5, 46, 31, 0.7); font-size: 1.0625rem; line-height: 1.8; }
+                    .rich-event-content h1 { font-size: 2rem; font-weight: 800; color: #042f2e; margin: 2rem 0 0.75rem; line-height: 1.3; }
+                    .rich-event-content h2 { font-size: 1.5rem; font-weight: 700; color: #042f2e; margin: 1.75rem 0 0.5rem; line-height: 1.35; }
+                    .rich-event-content h3 { font-size: 1.25rem; font-weight: 700; color: #042f2e; margin: 1.5rem 0 0.5rem; line-height: 1.4; }
+                    .rich-event-content h4, .rich-event-content h5, .rich-event-content h6 { font-size: 1.0625rem; font-weight: 700; color: #042f2e; margin: 1.25rem 0 0.5rem; }
+                    .rich-event-content p { margin-bottom: 1rem; }
+                    .rich-event-content strong, .rich-event-content b { font-weight: 700; color: #042f2e; }
+                    .rich-event-content em, .rich-event-content i { font-style: italic; }
+                    .rich-event-content u { text-decoration: underline; text-underline-offset: 3px; }
+                    .rich-event-content ul { list-style-type: disc; padding-left: 1.75rem; margin-bottom: 1rem; }
+                    .rich-event-content ol { list-style-type: decimal; padding-left: 1.75rem; margin-bottom: 1rem; }
+                    .rich-event-content li { margin-bottom: 0.25rem; }
+                    .rich-event-content blockquote { border-left: 4px solid #059669; padding: 0.75rem 1.25rem; margin: 1.25rem 0; background: #ecfdf5; border-radius: 0 0.5rem 0.5rem 0; font-style: italic; color: #065f46; }
+                    .rich-event-content a { color: #059669; text-decoration: underline; text-underline-offset: 2px; transition: color 0.2s; }
+                    .rich-event-content a:hover { color: #047857; }
+                </style>
+                <div class="rich-event-content">
+                    <?php echo $eventDesc; ?>
+                </div>
+                <?php } else { ?>
+                <div class="text-emerald-950/70 leading-relaxed font-medium">
+                <?php
                         $safeDesc = htmlspecialchars($eventDesc);
                         // Auto-linkify URLs
                         $safeDesc = preg_replace(
@@ -163,8 +184,9 @@ if (!empty($event['cover_image'])) {
                             $safeDesc
                         );
                         echo '<div style="white-space: pre-wrap;">' . nl2br($safeDesc) . '</div>';
-                    }
                 ?>
+                </div>
+                <?php } ?>
                 </div>
             </div>
         <?php endif; ?>

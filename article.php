@@ -126,18 +126,43 @@ $readingTime = $article['reading_time'] ?? calculateReadingTime($article['descri
     <div class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
         <!-- Article Body -->
         <article class="prose prose-lg prose-emerald max-w-none">
-            <div class="article-content text-emerald-950/80 text-lg leading-[1.9] font-medium" style="font-family: 'Inter', 'Noto Sans Bengali', 'Noto Naskh Arabic', sans-serif;">
 <?php 
     $desc = $article['description'] ?? '';
-    // If content has HTML tags (from rich text editor), render as HTML
+    // If content has HTML tags (from rich text editor), render as HTML with rich styles
     // Otherwise fallback to nl2br for old plain-text articles
     if ($desc !== strip_tags($desc)) {
-        echo $desc;
-    } else {
-        echo '<div style="white-space: pre-wrap;">' . nl2br(htmlspecialchars($desc)) . '</div>';
-    }
 ?>
+            <style>
+                .rich-article-content { font-family: 'Inter', 'Noto Sans Bengali', 'Noto Naskh Arabic', sans-serif; color: rgba(5, 46, 31, 0.8); font-size: 1.125rem; line-height: 1.9; }
+                .rich-article-content h1 { font-size: 2.25rem; font-weight: 800; color: #042f2e; margin: 2.5rem 0 1rem; line-height: 1.3; }
+                .rich-article-content h2 { font-size: 1.75rem; font-weight: 700; color: #042f2e; margin: 2rem 0 0.75rem; line-height: 1.35; }
+                .rich-article-content h3 { font-size: 1.375rem; font-weight: 700; color: #042f2e; margin: 1.75rem 0 0.5rem; line-height: 1.4; }
+                .rich-article-content h4 { font-size: 1.125rem; font-weight: 700; color: #042f2e; margin: 1.5rem 0 0.5rem; }
+                .rich-article-content h5, .rich-article-content h6 { font-size: 1rem; font-weight: 700; color: #042f2e; margin: 1.25rem 0 0.5rem; }
+                .rich-article-content p { margin-bottom: 1.25rem; }
+                .rich-article-content strong, .rich-article-content b { font-weight: 700; color: #042f2e; }
+                .rich-article-content em, .rich-article-content i { font-style: italic; }
+                .rich-article-content u { text-decoration: underline; text-underline-offset: 3px; }
+                .rich-article-content ul { list-style-type: disc; padding-left: 1.75rem; margin-bottom: 1.25rem; }
+                .rich-article-content ol { list-style-type: decimal; padding-left: 1.75rem; margin-bottom: 1.25rem; }
+                .rich-article-content li { margin-bottom: 0.35rem; }
+                .rich-article-content blockquote { border-left: 4px solid #059669; padding: 0.75rem 1.25rem; margin: 1.5rem 0; background: #ecfdf5; border-radius: 0 0.5rem 0.5rem 0; font-style: italic; color: #065f46; }
+                .rich-article-content a { color: #059669; text-decoration: underline; text-underline-offset: 2px; transition: color 0.2s; }
+                .rich-article-content a:hover { color: #047857; }
+                .rich-article-content hr { border: none; border-top: 1px solid rgba(5, 46, 31, 0.1); margin: 2rem 0; }
+                .rich-article-content pre, .rich-article-content code { font-family: 'Fira Code', monospace; background: #f1f5f9; border-radius: 0.375rem; font-size: 0.875em; }
+                .rich-article-content code { padding: 0.15rem 0.4rem; }
+                .rich-article-content pre { padding: 1rem 1.25rem; overflow-x: auto; margin-bottom: 1.25rem; }
+                .rich-article-content pre code { padding: 0; background: none; }
+            </style>
+            <div class="rich-article-content">
+                <?php echo $desc; ?>
             </div>
+<?php } else { ?>
+            <div class="text-emerald-950/80 text-lg leading-[1.9] font-medium" style="font-family: 'Inter', 'Noto Sans Bengali', 'Noto Naskh Arabic', sans-serif;">
+                <div style="white-space: pre-wrap;"><?php echo nl2br(htmlspecialchars($desc)); ?></div>
+            </div>
+<?php } ?>
         </article>
 
         <!-- Divider -->
