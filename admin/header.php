@@ -100,7 +100,7 @@ require_once 'auth.php';
             .sidebar { display: block !important; }
         }
     </style>
-    <script src="https://cdn.tiny.cloud/1/no-api-key/tinymce/6/tinymce.min.js" referrerpolicy="origin"></script>
+    <script src="https://cdn.jsdelivr.net/npm/tinymce@6/tinymce.min.js" referrerpolicy="origin"></script>
     <script>
         /**
          * Robust UTF-8 aware Base64 encoding
