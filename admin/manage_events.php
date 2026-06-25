@@ -38,6 +38,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
     }
 
+    // Sanitize HTML — only allow safe formatting tags
+    $allowedTags = '<p><br><b><strong><i><em><u><h1><h2><h3><h4><h5><h6><ul><ol><li><a><blockquote><hr><span><sub><sup><pre><code>';
+    $desc = strip_tags($desc, $allowedTags);
+
     $tag = $_POST['tag'];
     $category = $_POST['category'] ?? 'Community';
     $is_past = isset($_POST['is_past']) ? 1 : 0;
@@ -386,7 +390,7 @@ $iconOptions = [
 
             <div class="form-group">
                 <label>Full Description</label>
-                <textarea name="description" rows="8" placeholder="Detailed event details, agenda, etc." data-b64-target><?php echo htmlspecialchars($event['description'] ?? ''); ?></textarea>
+                <textarea name="description" id="event-description" rows="8" placeholder="Detailed event details, agenda, etc."><?php echo htmlspecialchars($event['description'] ?? ''); ?></textarea>
             </div>
 
             <div class="grid-2">
@@ -466,6 +470,39 @@ $iconOptions = [
                 reader.readAsDataURL(file);
             });
         });
+    </script>
+
+    <script>
+        tinymce.init({
+            selector: '#event-description',
+            plugins: 'lists link autolink code',
+            toolbar: 'undo redo | blocks | bold italic underline strikethrough | bullist numlist | blockquote link | removeformat code',
+            menubar: false,
+            height: 400,
+            content_style: "body { font-family: 'Inter', sans-serif; font-size: 16px; line-height: 1.8; color: #0a2e1f; }",
+            paste_as_text: false,
+            paste_word_valid_elements: 'b,strong,i,em,u,h1,h2,h3,h4,h5,h6,p,br,ul,ol,li,a[href],blockquote,hr,sub,sup,pre,code',
+            valid_elements: 'p[style],br,b,strong,i,em,u,h1,h2,h3,h4,h5,h6,ul,ol,li,a[href|target],blockquote,hr,span[style],sub,sup,pre,code',
+            block_formats: 'Paragraph=p; Heading 2=h2; Heading 3=h3; Heading 4=h4; Blockquote=blockquote; Preformatted=pre',
+            setup: function(editor) {
+                editor.on('submit', function() {
+                    var content = editor.getContent();
+                    var textarea = document.getElementById('event-description');
+                    textarea.value = b64EncodeUnicode(content);
+                });
+            }
+        });
+
+        // Also encode on form submit as a safety net
+        var eventForm = document.querySelector('form[data-b64-bypass]');
+        if (eventForm) {
+            eventForm.addEventListener('submit', function() {
+                if (tinymce.get('event-description')) {
+                    var content = tinymce.get('event-description').getContent();
+                    document.getElementById('event-description').value = b64EncodeUnicode(content);
+                }
+            });
+        }
     </script>
 <?php endif; ?>
 

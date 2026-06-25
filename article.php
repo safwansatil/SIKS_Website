@@ -126,8 +126,17 @@ $readingTime = $article['reading_time'] ?? calculateReadingTime($article['descri
     <div class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
         <!-- Article Body -->
         <article class="prose prose-lg prose-emerald max-w-none">
-            <div class="text-emerald-950/80 text-lg leading-[1.9] font-medium whitespace-pre-wrap" style="font-family: 'Inter', 'Noto Sans Bengali', 'Noto Naskh Arabic', sans-serif;">
-<?php echo nl2br(htmlspecialchars($article['description'])); ?>
+            <div class="article-content text-emerald-950/80 text-lg leading-[1.9] font-medium" style="font-family: 'Inter', 'Noto Sans Bengali', 'Noto Naskh Arabic', sans-serif;">
+<?php 
+    $desc = $article['description'] ?? '';
+    // If content has HTML tags (from rich text editor), render as HTML
+    // Otherwise fallback to nl2br for old plain-text articles
+    if ($desc !== strip_tags($desc)) {
+        echo $desc;
+    } else {
+        echo '<div style="white-space: pre-wrap;">' . nl2br(htmlspecialchars($desc)) . '</div>';
+    }
+?>
             </div>
         </article>
 

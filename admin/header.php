@@ -100,6 +100,7 @@ require_once 'auth.php';
             .sidebar { display: block !important; }
         }
     </style>
+    <script src="https://cdn.tiny.cloud/1/no-api-key/tinymce/6/tinymce.min.js" referrerpolicy="origin"></script>
     <script>
         /**
          * Robust UTF-8 aware Base64 encoding
@@ -117,12 +118,17 @@ require_once 'auth.php';
         }
 
         // Auto-apply base64 to designated textareas on form submit
+        // Skips textareas managed by TinyMCE (they sync their own content)
         document.addEventListener('submit', function(e) {
             const forms = document.querySelectorAll('form[data-b64-bypass]');
             forms.forEach(form => {
                 if (e.target === form) {
                     const targets = form.querySelectorAll('[data-b64-target]');
                     targets.forEach(t => {
+                        // Skip if TinyMCE is managing this textarea
+                        if (typeof tinymce !== 'undefined' && tinymce.get(t.id)) {
+                            return;
+                        }
                         if (t.value) {
                             t.value = b64EncodeUnicode(t.value);
                         }

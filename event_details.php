@@ -149,14 +149,21 @@ if (!empty($event['cover_image'])) {
                 <h3 class="text-2xl font-display font-bold text-emerald-950 mb-6">About This Event</h3>
                 <div class="prose prose-lg max-w-none text-emerald-950/70 leading-relaxed font-medium">
                 <?php 
-                    $safeDesc = htmlspecialchars($event['description']);
-                    // Auto-linkify URLs
-                    $safeDesc = preg_replace(
-                        '/(https?:\/\/[^\s<]+)/i', 
-                        '<a href="$1" target="_blank" class="text-emerald-600 underline underline-offset-2 hover:text-emerald-800 transition-colors break-all">$1</a>', 
-                        $safeDesc
-                    );
-                    echo nl2br($safeDesc); 
+                    $eventDesc = $event['description'];
+                    // If content has HTML tags (from rich text editor), render as HTML
+                    // Otherwise fallback to nl2br + auto-linkify for old plain-text events
+                    if ($eventDesc !== strip_tags($eventDesc)) {
+                        echo $eventDesc;
+                    } else {
+                        $safeDesc = htmlspecialchars($eventDesc);
+                        // Auto-linkify URLs
+                        $safeDesc = preg_replace(
+                            '/(https?:\/\/[^\s<]+)/i', 
+                            '<a href="$1" target="_blank" class="text-emerald-600 underline underline-offset-2 hover:text-emerald-800 transition-colors break-all">$1</a>', 
+                            $safeDesc
+                        );
+                        echo '<div style="white-space: pre-wrap;">' . nl2br($safeDesc) . '</div>';
+                    }
                 ?>
                 </div>
             </div>

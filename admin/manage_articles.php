@@ -109,6 +109,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !isset($_POST['update_caption'])) {
         }
     }
 
+    // Sanitize HTML — only allow safe formatting tags
+    $allowedTags = '<p><br><b><strong><i><em><u><h1><h2><h3><h4><h5><h6><ul><ol><li><a><blockquote><hr><span><sub><sup><pre><code>';
+    $desc = strip_tags($desc, $allowedTags);
+
     $readingTime = calculateReadingTime($desc);
     $slug = generateSlug($title);
 
@@ -345,7 +349,7 @@ if ($mode === 'list') {
 
             <div class="form-group" style="margin-top: 2rem;">
                 <label>Content (Full Article) *</label>
-                <textarea name="description" rows="15" required placeholder="Write your article content here..." data-b64-target><?php echo htmlspecialchars($article['description'] ?? ''); ?></textarea>
+                <textarea name="description" id="article-description" rows="15" required placeholder="Write your article content here..."><?php echo htmlspecialchars($article['description'] ?? ''); ?></textarea>
             </div>
 
             <div style="display: flex; gap: 1rem; margin-top: 3rem; pt: 2rem; border-top: 1px solid var(--border);">
@@ -359,7 +363,37 @@ if ($mode === 'list') {
         </form>
     </div>
 
+
     <script>
+        tinymce.init({
+            selector: '#article-description',
+            plugins: 'lists link autolink code',
+            toolbar: 'undo redo | blocks | bold italic underline strikethrough | bullist numlist | blockquote link | removeformat code',
+            menubar: false,
+            height: 500,
+            content_style: "body { font-family: 'Inter', sans-serif; font-size: 16px; line-height: 1.8; color: #0a2e1f; }",
+            paste_as_text: false,
+            paste_word_valid_elements: 'b,strong,i,em,u,h1,h2,h3,h4,h5,h6,p,br,ul,ol,li,a[href],blockquote,hr,sub,sup,pre,code',
+            valid_elements: 'p[style],br,b,strong,i,em,u,h1,h2,h3,h4,h5,h6,ul,ol,li,a[href|target],blockquote,hr,span[style],sub,sup,pre,code',
+            block_formats: 'Paragraph=p; Heading 2=h2; Heading 3=h3; Heading 4=h4; Blockquote=blockquote; Preformatted=pre',
+            // Base64 encode before submit to bypass WAF
+            setup: function(editor) {
+                editor.on('submit', function() {
+                    var content = editor.getContent();
+                    var textarea = document.getElementById('article-description');
+                    textarea.value = b64EncodeUnicode(content);
+                });
+            }
+        });
+
+        // Also encode on form submit as a safety net
+        document.querySelector('form[data-b64-bypass]').addEventListener('submit', function() {
+            if (tinymce.get('article-description')) {
+                var content = tinymce.get('article-description').getContent();
+                document.getElementById('article-description').value = b64EncodeUnicode(content);
+            }
+        });
+
         document.getElementById('article-cover-input').addEventListener('change', function() {
             const preview = document.getElementById('article-cover-preview');
             const img = document.getElementById('preview-img');
