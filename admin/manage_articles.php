@@ -376,21 +376,22 @@ if ($mode === 'list') {
             paste_word_valid_elements: 'b,strong,i,em,u,h1,h2,h3,h4,h5,h6,p,br,ul,ol,li,a[href],blockquote,hr,sub,sup,pre,code',
             valid_elements: 'p[style],br,b,strong,i,em,u,h1,h2,h3,h4,h5,h6,ul,ol,li,a[href|target],blockquote,hr,span[style],sub,sup,pre,code',
             block_formats: 'Paragraph=p; Heading 2=h2; Heading 3=h3; Heading 4=h4; Blockquote=blockquote; Preformatted=pre',
-            // Base64 encode before submit to bypass WAF
             setup: function(editor) {
-                editor.on('submit', function() {
-                    var content = editor.getContent();
-                    var textarea = document.getElementById('article-description');
-                    textarea.value = b64EncodeUnicode(content);
+                // Intercept form submit to base64-encode content before sending (WAF bypass)
+                editor.on('init', function() {
+                    var form = editor.getElement().closest('form');
+                    if (form) {
+                        form.addEventListener('submit', function(e) {
+                            // Sync TinyMCE content to textarea
+                            editor.save();
+                            // Base64 encode to bypass WAF blocking HTML in POST
+                            var textarea = document.getElementById('article-description');
+                            if (textarea.value) {
+                                textarea.value = b64EncodeUnicode(textarea.value);
+                            }
+                        });
+                    }
                 });
-            }
-        });
-
-        // Also encode on form submit as a safety net
-        document.querySelector('form[data-b64-bypass]').addEventListener('submit', function() {
-            if (tinymce.get('article-description')) {
-                var content = tinymce.get('article-description').getContent();
-                document.getElementById('article-description').value = b64EncodeUnicode(content);
             }
         });
 

@@ -485,24 +485,23 @@ $iconOptions = [
             valid_elements: 'p[style],br,b,strong,i,em,u,h1,h2,h3,h4,h5,h6,ul,ol,li,a[href|target],blockquote,hr,span[style],sub,sup,pre,code',
             block_formats: 'Paragraph=p; Heading 2=h2; Heading 3=h3; Heading 4=h4; Blockquote=blockquote; Preformatted=pre',
             setup: function(editor) {
-                editor.on('submit', function() {
-                    var content = editor.getContent();
-                    var textarea = document.getElementById('event-description');
-                    textarea.value = b64EncodeUnicode(content);
+                // Intercept form submit to base64-encode content before sending (WAF bypass)
+                editor.on('init', function() {
+                    var form = editor.getElement().closest('form');
+                    if (form) {
+                        form.addEventListener('submit', function(e) {
+                            // Sync TinyMCE content to textarea
+                            editor.save();
+                            // Base64 encode to bypass WAF blocking HTML in POST
+                            var textarea = document.getElementById('event-description');
+                            if (textarea.value) {
+                                textarea.value = b64EncodeUnicode(textarea.value);
+                            }
+                        });
+                    }
                 });
             }
         });
-
-        // Also encode on form submit as a safety net
-        var eventForm = document.querySelector('form[data-b64-bypass]');
-        if (eventForm) {
-            eventForm.addEventListener('submit', function() {
-                if (tinymce.get('event-description')) {
-                    var content = tinymce.get('event-description').getContent();
-                    document.getElementById('event-description').value = b64EncodeUnicode(content);
-                }
-            });
-        }
     </script>
 <?php endif; ?>
 
