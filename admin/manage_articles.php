@@ -349,7 +349,7 @@ if ($mode === 'list') {
 
             <div class="form-group" style="margin-top: 2rem;">
                 <label>Content (Full Article) *</label>
-                <textarea name="description" id="article-description" rows="15" required placeholder="Write your article content here..."><?php echo htmlspecialchars($article['description'] ?? ''); ?></textarea>
+                <textarea name="description" id="article-description" rows="15" placeholder="Write your article content here..."><?php echo htmlspecialchars($article['description'] ?? ''); ?></textarea>
             </div>
 
             <div style="display: flex; gap: 1rem; margin-top: 3rem; pt: 2rem; border-top: 1px solid var(--border);">
