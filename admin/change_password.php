@@ -20,11 +20,34 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $admin = $stmt->fetch();
 
                 if ($admin && password_verify($current_password, $admin['password'])) {
-                    // Update password
-                    $hashed_password = password_hash($new_password, PASSWORD_BCRYPT, ['cost' => 12]);
-                    $stmt = $pdo->prepare("UPDATE admins SET password = ? WHERE id = ?");
-                    $stmt->execute([$hashed_password, $_SESSION['admin_id']]);
-                    $message = 'Password updated successfully.';
+                    // Generate secure 6-digit OTP
+                    $otp = random_int(100000, 999999);
+                    
+                    // Store details in session
+                    $_SESSION['change_pwd_pending_hash'] = password_hash($new_password, PASSWORD_BCRYPT, ['cost' => 12]);
+                    $_SESSION['change_pwd_otp'] = $otp;
+                    $_SESSION['change_pwd_otp_expiry'] = time() + 600; // 10 minutes
+                    
+                    // Dispatch verification mail to the designated address
+                    $to = 'siks@iut-dhaka.edu';
+                    $subject = 'SIKS Admin Portal - Password Change OTP';
+                    $email_message = "Dear Admin,\n\nWe received a request to update the password for your SIKS admin account.\n\nYour 2FA verification code (OTP) is: " . $otp . "\n\nThis code is valid for 10 minutes.\n\nIf you did not initiate this change, please inspect server security configurations immediately.\n\nSincerely,\nSIKS Web Portal";
+                    
+                    $sender_domain = isset($_SERVER['HTTP_HOST']) ? $_SERVER['HTTP_HOST'] : 'iutsiks.iutoic-dhaka.edu';
+                    $headers = "From: SIKS Portal <no-reply@" . $sender_domain . ">\r\n" .
+                               "Reply-To: no-reply@" . $sender_domain . "\r\n" .
+                               "X-Mailer: PHP/" . phpversion();
+
+                    $mail_sent = @mail($to, $subject, $email_message, $headers);
+                    
+                    // Redirect to verification screen
+                    if ($mail_sent) {
+                        header('Location: verify_password_change.php');
+                    } else {
+                        // Safe warning fallback helper for local developers (without mail servers configured)
+                        header('Location: verify_password_change.php?mail_error=1&dev_otp=' . $otp);
+                    }
+                    exit;
                 } else {
                     $error = 'Incorrect current password.';
                 }

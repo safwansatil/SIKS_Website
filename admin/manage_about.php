@@ -68,6 +68,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $message = "Card added.";
         } catch (PDOException $e) { $message = "Error: " . $e->getMessage(); $messageType = 'error'; }
     } elseif (isset($_POST['update_content'])) {
+        $id = $_POST['id'] ?? null;
         $title = $_POST['title'];
         $desc = $_POST['description'];
 

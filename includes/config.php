@@ -21,6 +21,10 @@ if (file_exists(dirname(__DIR__) . '/vendor/autoload.php')) {
 }
 
 // Global Constants
+$protocol = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on') ? 'https' : 'http';
+$host = isset($_SERVER['HTTP_HOST']) ? $_SERVER['HTTP_HOST'] : 'iutsiks.iutoic-dhaka.edu';
+define('SITE_URL', $protocol . '://' . $host);
+
 define('SITE_NAME', 'IUT-SIKS');
 define('SITE_TAGLINE', 'Society of Islamic Knowledge Seekers');
 define('IUT_ADDRESS', 'Islamic University of Technology, Board Bazar, Gazipur-1704');

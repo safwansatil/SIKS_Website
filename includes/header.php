@@ -18,17 +18,17 @@
     <meta name="google-site-verification" content="oqP7o6QtvXrvmnK5Jai2A0T_7HM-Wwk2wPowrzv2Sc8" />
     
     <!-- Canonical URL -->
-    <link rel="canonical" href="<?php echo isset($ogUrl) ? $ogUrl : 'https://iutsiks.iutoic-dhaka.edu' . explode('?', $_SERVER['REQUEST_URI'])[0]; ?>">
+    <link rel="canonical" href="<?php echo isset($ogUrl) ? $ogUrl : SITE_URL . explode('?', $_SERVER['REQUEST_URI'])[0]; ?>">
 
     <!-- Open Graph Meta Tags (Facebook, WhatsApp, LinkedIn, etc.) -->
     <meta property="og:type" content="<?php echo isset($ogType) ? $ogType : 'website'; ?>">
     <meta property="og:title" content="<?php echo isset($ogTitle) ? htmlspecialchars($ogTitle) : SITE_NAME . ' | ' . SITE_TAGLINE; ?>">
     <meta property="og:description" content="<?php echo isset($ogDescription) ? htmlspecialchars(trim(preg_replace('/\s+/', ' ', $ogDescription))) : 'Official portal of the Society of Islamic Knowledge Seekers (SIKS) at the Islamic University of Technology.'; ?>">
-    <meta property="og:url" content="<?php echo isset($ogUrl) ? $ogUrl : 'https://iutsiks.iutoic-dhaka.edu' . explode('?', $_SERVER['REQUEST_URI'])[0]; ?>">
-    <meta property="og:image" content="<?php echo isset($ogImage) ? $ogImage : 'https://iutsiks.iutoic-dhaka.edu/assets/images/Logo-green.png'; ?>">
+    <meta property="og:url" content="<?php echo isset($ogUrl) ? $ogUrl : SITE_URL . explode('?', $_SERVER['REQUEST_URI'])[0]; ?>">
+    <meta property="og:image" content="<?php echo isset($ogImage) ? $ogImage : SITE_URL . '/assets/images/Logo-green.png'; ?>">
     <?php
     // Determine og:image MIME type from the image URL
-    $ogImageUrl = isset($ogImage) ? $ogImage : 'https://iutsiks.iutoic-dhaka.edu/assets/images/Logo-green.png';
+    $ogImageUrl = isset($ogImage) ? $ogImage : SITE_URL . '/assets/images/Logo-green.png';
     $ogImageExt = strtolower(pathinfo(parse_url($ogImageUrl, PHP_URL_PATH), PATHINFO_EXTENSION));
     $ogImageMimeMap = ['jpg' => 'image/jpeg', 'jpeg' => 'image/jpeg', 'png' => 'image/png', 'webp' => 'image/webp', 'gif' => 'image/gif'];
     $ogImageMime = $ogImageMimeMap[$ogImageExt] ?? 'image/png';
@@ -48,7 +48,7 @@
     <meta name="twitter:card" content="<?php echo isset($ogImage) ? 'summary_large_image' : 'summary'; ?>">
     <meta name="twitter:title" content="<?php echo isset($ogTitle) ? htmlspecialchars($ogTitle) : SITE_NAME . ' | ' . SITE_TAGLINE; ?>">
     <meta name="twitter:description" content="<?php echo isset($ogDescription) ? htmlspecialchars(trim(preg_replace('/\s+/', ' ', $ogDescription))) : 'Official portal of the Society of Islamic Knowledge Seekers (SIKS) at the Islamic University of Technology.'; ?>">
-    <meta name="twitter:image" content="<?php echo isset($ogImage) ? $ogImage : 'https://iutsiks.iutoic-dhaka.edu/assets/images/Logo-green.png'; ?>">
+    <meta name="twitter:image" content="<?php echo isset($ogImage) ? $ogImage : SITE_URL . '/assets/images/Logo-green.png'; ?>">
     <meta name="twitter:image:alt" content="<?php echo isset($ogTitle) ? htmlspecialchars($ogTitle) : SITE_NAME; ?>">
 
     <!-- Tailwind CSS via CDN -->

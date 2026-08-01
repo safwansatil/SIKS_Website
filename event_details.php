@@ -31,9 +31,9 @@ if (!$isHtmx && strpos($currentUri, $canonicalUrl) === false) {
 $ogTitle = htmlspecialchars($event['name']) . ' | ' . SITE_NAME;
 $ogDescription = trim(preg_replace('/\s+/', ' ', mb_substr(strip_tags($event['short_description'] ?? $event['description'] ?? ''), 0, 200)));
 if (!empty($event['cover_image'])) {
-    $ogImage = 'https://iutsiks.iutoic-dhaka.edu/' . ltrim($event['cover_image'], '/');
+    $ogImage = SITE_URL . '/' . ltrim($event['cover_image'], '/');
 }
-$ogUrl = 'https://iutsiks.iutoic-dhaka.edu/event/' . $event['id'] . '/' . ($event['slug'] ?: generateSlug($event['name']));
+$ogUrl = SITE_URL . '/event/' . $event['id'] . '/' . ($event['slug'] ?: generateSlug($event['name']));
 $ogType = 'article';
 
 if (!$isHtmx) {
