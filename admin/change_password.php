@@ -20,13 +20,20 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $admin = $stmt->fetch();
 
                 if ($admin && password_verify($current_password, $admin['password'])) {
-                    // Generate secure 6-digit OTP
-                    $otp = random_int(100000, 999999);
-                    
-                    // Store details in session
-                    $_SESSION['change_pwd_pending_hash'] = password_hash($new_password, PASSWORD_BCRYPT, ['cost' => 12]);
-                    $_SESSION['change_pwd_otp'] = $otp;
-                    $_SESSION['change_pwd_otp_expiry'] = time() + 600; // 10 minutes
+                    // Enforce 60-second OTP request rate limit
+                    if (isset($_SESSION['change_pwd_last_request']) && (time() - $_SESSION['change_pwd_last_request']) < 60) {
+                        $remaining = 60 - (time() - $_SESSION['change_pwd_last_request']);
+                        $error = "Please wait " . $remaining . " seconds before requesting another verification code.";
+                    } else {
+                        $_SESSION['change_pwd_last_request'] = time();
+
+                        // Generate secure 6-digit OTP
+                        $otp = random_int(100000, 999999);
+                        
+                        // Store details in session
+                        $_SESSION['change_pwd_pending_hash'] = password_hash($new_password, PASSWORD_BCRYPT, ['cost' => 12]);
+                        $_SESSION['change_pwd_otp'] = $otp;
+                        $_SESSION['change_pwd_otp_expiry'] = time() + 600; // 10 minutes
                     
                     // Dispatch verification mail to the designated address
                     $to = 'siks@iut-dhaka.edu';
@@ -48,6 +55,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         header('Location: verify_password_change.php?mail_error=1&dev_otp=' . $otp);
                     }
                     exit;
+                    } // End rate-limit else
                 } else {
                     $error = 'Incorrect current password.';
                 }
