@@ -16,7 +16,7 @@
 > ## Website availability
 > The SIKS Website may currently be unavailable or unreliable while we transition between IUT servers. A replacement server is expected at the beginning of the next semester, in **November 2026**.
 >
-> **Thank you for your patience — stay tuned for the website's return.**
+> **Thank you for your patience. Stay tuned for the website's return.**
 
 ## About SIKS
 
