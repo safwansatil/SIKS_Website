@@ -1,19 +1,50 @@
+<div align="center">
+
 # SIKS Website
 
-The SIKS Website is the official online platform for the Society of Islamic Knowledge Seekers (SIKS) at the Islamic University of Technology (IUT). It is intended to keep the society's community informed and connected by presenting information about SIKS, articles, events, announcements, and other relevant activities.
+### The online home of the Society of Islamic Knowledge Seekers at the Islamic University of Technology
 
-## Hosting Status
+[![Status: Temporarily Offline](https://img.shields.io/badge/status-temporarily%20offline-orange)](#hosting-status) [![Institution: IUT](https://img.shields.io/badge/institution-IUT-1f6feb)](#about-siks)
 
-The website was originally hosted on an IUT server. Unfortunately, that server experienced a failure and has not yet been replaced.
+**The website is currently undergoing a hosting transition. Please check back soon.**
 
-As a temporary measure, the website has been hosted on another IUT server. However, this temporary hosting environment has presented significant accessibility and file-hosting difficulties, so the website may currently be unavailable or unreliable for some visitors.
+</div>
 
-IUT is expected to provide a new server at the beginning of the next semester, in **November 2026**. Once the new server is available, we plan to restore the website properly and work toward providing a more stable and accessible experience.
+---
 
-Thank you for your patience and understanding during this transition. **Stay tuned for updates and the return of the SIKS Website.**
+> [!IMPORTANT]
+> ## Website availability
+> The SIKS Website may currently be unavailable or unreliable while we transition between IUT servers. A replacement server is expected at the beginning of the next semester, in **November 2026**.
+>
+> **Thank you for your patience — stay tuned for the website's return.**
 
-## About This Repository
+## About SIKS
 
-This repository contains the source code for the SIKS Website, including its public-facing pages, society content, event and article management functionality, and supporting administrative features.
+The **Society of Islamic Knowledge Seekers (SIKS)** is a student society at the **Islamic University of Technology (IUT)**. This website is being developed as the society's central online platform for sharing:
 
-Further documentation and deployment information will be added or updated when the new hosting environment is available.
+- Society information and updates
+- Articles and publications
+- Events and activities
+- Announcements and community resources
+
+## Hosting status
+
+The website was originally hosted on an IUT server, but that server experienced a failure and has not yet been replaced. We temporarily moved the website to another IUT server; however, the temporary environment has caused significant difficulties with server access and file hosting.
+
+When the new IUT server becomes available, we plan to restore the website properly and provide a more stable, accessible experience for visitors.
+
+## About this repository
+
+This repository contains the source code for the SIKS Website, including its public pages, society content, article and event functionality, and administrative features.
+
+Deployment and setup documentation will be expanded once the new hosting environment is ready.
+
+---
+
+<div align="center">
+
+**Stay tuned for updates.**
+
+*The SIKS Website will be back online when the new hosting infrastructure is available.*
+
+</div>
